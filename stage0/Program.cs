@@ -6,13 +6,16 @@ namespace Targil0
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Enter your name:");
+            Welcome6659();
+        }
 
-            // Read the user's name from the console
-            string name = Console.ReadLine();
+        private static void Welcome6659()
+        {
+            Console.Write("Enter your name:");
 
-            // Display the welcome message with the user's name
-            Console.WriteLine("{0}, welcome to my first console application!", name);
+            string name = Console.ReadLine()!;
+
+            Console.WriteLine($"{name}, welcome to my first console application!");
         }
     }
 }
