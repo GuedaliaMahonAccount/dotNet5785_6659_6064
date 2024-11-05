@@ -7,6 +7,7 @@ namespace Targil0
         static void Main(string[] args)
         {
             Welcome6659();
+            Console.ReadKey();
         }
 
         private static void Welcome6659()
