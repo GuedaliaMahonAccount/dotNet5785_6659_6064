@@ -7,9 +7,11 @@ namespace Targil0
         static void Main(string[] args)
         {
             Welcome6659();
+            Welcome6064();
             Console.ReadKey();
         }
 
+        static partial void Welcome6064();
         private static void Welcome6659()
         {
             Console.Write("Enter your name:");
