@@ -11,3 +11,4 @@ namespace stage0
     hellooooooo
     }
 }
+Hello World
