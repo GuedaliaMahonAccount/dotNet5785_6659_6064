@@ -11,4 +11,4 @@ namespace stage0
     hellooooooo
     }
 }
-Hello Go
+Hefllo Goe
