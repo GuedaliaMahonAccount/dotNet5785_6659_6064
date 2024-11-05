@@ -1,0 +1,45 @@
+# Fichiers de build Visual Studio
+*.obj
+*.exe
+*.pdb
+*.dll
+*.cache
+*.ilk
+*.lib
+*.ndk
+*.psess
+*.suo
+*.user
+*.unsuccessfulbuild
+*.ipch
+*.aps
+*.nupkg
+*.vsix
+
+# Dossiers de build Visual Studio
+[Bb]in/
+[Oo]bj/
+
+# Fichiers de configuration utilisateur Visual Studio
+.vs/
+*.user
+*.suo
+
+# Fichiers de configuration de build
+*.BuildLog.*
+*.log
+*.tlog
+*.lastbuildstate
+
+# Packages NuGet
+*.nupkg
+**/packages/*
+
+# JetBrains Rider
+.idea/
+
+# Fichiers de configuration et de cache de build
+**/project.lock.json
+**/project.fragment.lock.json
+.vscode/
+.vs/
