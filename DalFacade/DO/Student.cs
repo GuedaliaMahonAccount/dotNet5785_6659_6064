@@ -26,36 +26,3 @@ public record Student
     public Student() : this(0) { }
 }
 
-// Module Course.cs
-namespace DO;
-
-/// <summary>
-/// Course Entity
-/// </summary>
-/// <param name="Id">unique ID (created automatically - provide 0 as an argument)</param>
-/// <param name="CourseNumber">Course official number</param>
-/// <param name="Name">Course official name</param>
-/// <param name="InSemester">Course’s semester</param>
-/// <param name="InYear">Course’s year</param>
-/// <param name="DayInWeek">Which weekday the course is given</param>
-/// <param name="StartTime">Course lesson start time</param>
-/// <param name="EndTime">Course lesson end time</param>
-/// <param name="Credits">Amount of credits given for successful completing the course</param>
-public record Course
-(
-    int Id,
-    string CourseNumber,
-    string CourseName,
-    Year? InYear = null,
-    SemesterNames? InSemester = null,
-    WeekDay? DayInWeek = null,
-    TimeSpan? StartTime = null,
-    TimeSpan? EndTime = null,
-    int? Credits = null
-)
-{
-    /// <summary>
-    /// Default constructor for stage 3
-    /// </summary>
-    public Course() : this(0, "", "") { }
-}
