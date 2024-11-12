@@ -8,31 +8,63 @@ public class AssignmentImplementation : IAssignment
 {
     public void Create(Assignment item)
     {
-        throw new NotImplementedException();
-    }
+        // Check if the assignment with the same ID already exists
+        if (Read(item.Id) != null)
+        {
+            throw new Exception($"Assignment with ID {item.Id} already exists");
+        }
 
-    public void Delete(int id)
-    {
-        throw new NotImplementedException();
-    }
-
-    public void DeleteAll()
-    {
-        throw new NotImplementedException();
+        // Add the assignment if ID is unique
+        DataSource.Assignments.Add(item);
     }
 
     public Assignment? Read(int id)
     {
-        throw new NotImplementedException();
+        // Look for the assignment by ID and return it if found, otherwise return null
+        return DataSource.Assignments.Find(a => a.Id == id);
     }
 
     public List<Assignment> ReadAll()
     {
-        throw new NotImplementedException();
+        // Step 1: Create a copy of each item in the assignment list
+        var assignmentCopy = DataSource.Assignments
+            .Select(a => new Assignment(a.Id, a.CallId, a.VolunteerId, a.StartTime, a.EndTime, a.EndType))
+            .ToList();
+
+        // Step 2: Return the copy
+        return assignmentCopy;
     }
 
     public void Update(Assignment item)
     {
-        throw new NotImplementedException();
+        // Check if the assignment exists
+        var existingAssignment = Read(item.Id);
+        if (existingAssignment == null)
+        {
+            throw new Exception($"Assignment with ID {item.Id} does not exist");
+        }
+
+        // Update by removing the old entry and adding the updated one
+        DataSource.Assignments.Remove(existingAssignment);
+        DataSource.Assignments.Add(item);
+    }
+
+    public void Delete(int id)
+    {
+        // Check if the assignment exists
+        var assignment = Read(id);
+        if (assignment == null)
+        {
+            throw new Exception($"Assignment with ID {id} does not exist");
+        }
+
+        // Remove the assignment from the list
+        DataSource.Assignments.Remove(assignment);
+    }
+
+    public void DeleteAll()
+    {
+        // Clear the list of assignments
+        DataSource.Assignments.Clear();
     }
 }
