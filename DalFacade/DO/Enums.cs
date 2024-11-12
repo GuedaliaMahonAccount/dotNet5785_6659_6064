@@ -1,5 +1,14 @@
 ﻿namespace DO;
-
-internal class Enums
+public enum Role
 {
+    Admin,
+    Volunteer
 }
+
+public enum DistanceType
+{
+    Plane,
+    Foot
+}
+
+
