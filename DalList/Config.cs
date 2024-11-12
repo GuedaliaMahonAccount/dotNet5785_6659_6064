@@ -1,5 +1,8 @@
 ﻿namespace Dal
 {
+    /// <summary>
+    /// Manages unique IDs, clock, and risk range settings, with a reset method to reinitialize values.
+    /// </summary>
     internal static class Config
     {
         const int startCallId = 1;
