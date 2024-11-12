@@ -1,4 +1,6 @@
-﻿namespace DO;
+﻿using static DO.Role;
+using static DO.DistanceType;
+namespace DO;
 
 /// <summary>
 /// Represents a volunteer with personal information, location details, 
@@ -22,19 +24,19 @@ public record Volunteer
     string Name,
     string Phone,
     string Email,
+    Boolean IsActive,
+    Role Role,
+    DistanceType DistanceType,
     string? Password=null,
     string? Address = null,
     double? Latitude = null,
     double? Longitude = null,
-    Role Role = Role.Volunteer,
-    Boolean IsActive = false,
-    double? MaxDistance = null,
-    DistanceType DistanceType= DistanceType.Plane
+    double? MaxDistance = null
 )
 {
     /// <summary>
-    /// Default constructor for stage 3
+    /// Default constructor for vonlonter
     /// </summary>
-    public Volunteer() : this(0, "", "", "", null, null, null, null, Role.Volunteer, true, null, DistanceType.Plane) { }
+    public Volunteer() : this(0, "", "", "",false, Role.Volunteer, DistanceType.Foot, null, null, null, null, null) { }
 
 }

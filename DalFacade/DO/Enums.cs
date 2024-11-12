@@ -11,4 +11,10 @@ public enum DistanceType
     Foot
 }
 
+public enum CallType
+{
+    PrepareFood,
+    DriveFood
+}
+
 
