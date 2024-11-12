@@ -3,6 +3,7 @@
     /// <summary>
     /// Manages unique IDs, clock, and risk range settings, with a reset method to reinitialize values.
     /// </summary>
+
     internal static class Config
     {
 
@@ -22,11 +23,17 @@
         const int startCallId = 1;
         static int nextCallId = startCallId;
         internal static int NextCallId { get => nextCallId++; }
+
         const int startAssignmentId = 100;
         static int nextAssignmentId = startAssignmentId;
         internal static int NextAssignmentId { get => nextAssignmentId++; }
-        internal static DateTime Clock { get; set; } = DateTime.Now;
-        internal static TimeSpan RiskRange { get; set; } = TimeSpan.FromHours(4);
+
+        internal static DateTime Clock;
+        internal static TimeSpan RiskRange;
+
+        /// <summary>
+        ///Reset all system variables to their initial values
+        /// </summary>
         internal static void Reset()
         {
             nextCallId = startCallId;
