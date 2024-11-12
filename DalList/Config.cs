@@ -5,6 +5,20 @@
     /// </summary>
     internal static class Config
     {
+
+
+
+
+
+
+        ///
+        /// need to ad description
+        /// 
+
+
+
+
+
         const int startCallId = 1;
         static int nextCallId = startCallId;
         internal static int NextCallId { get => nextCallId++; }
