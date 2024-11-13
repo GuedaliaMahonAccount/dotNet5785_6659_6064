@@ -164,60 +164,11 @@ public static class Initialization
     "Delivering donated blankets and winter gear for soldiers in cold areas.",
     "Organizing group therapy sessions to support soldier well-being."
 };
-        CallType[] callTypes = new[]
-{
-    CallType.PrepareFood,               // Preparing nutritious meals for soldiers stationed at remote bases.
-    CallType.DeliverSupplies,           // Delivering fresh food and supplies to soldiers on active duty.
-    CallType.CollectLaundry,            // Collecting uniforms and other clothing items from soldiers for cleaning.
-    CallType.WashLaundry,               // Organizing and washing laundry for soldiers in the field.
-    CallType.Transport,                 // Providing transportation for soldiers moving between training sites.
-    CallType.RepairEquipment,           // Repairing essential equipment used by soldiers in field operations.
-    CallType.ProvideClothing,           // Supplying soldiers with needed clothing and protective gear.
-    CallType.SetupCamp,                 // Helping set up temporary shelters for soldiers during training exercises.
-    CallType.CleanFacilities,           // Cleaning facilities used by soldiers to maintain hygiene and morale.
-    CallType.ProvideMedicalAid,         // Assisting with basic medical care and first aid for injured soldiers.
-    CallType.MentalHealthSupport,       // Providing mental health support for soldiers dealing with stress.
-    CallType.OfferTraining,             // Offering training in first aid and basic survival skills to new recruits.
-    CallType.OrganizeRecreationalEvent, // Organizing recreational activities to boost soldier morale.
-    CallType.PrepareHotDrinks,          // Preparing hot drinks and snacks for soldiers on cold night shifts.
-    CallType.CollectDonations,          // Collecting food and clothing donations from the community for soldiers.
-    CallType.PerformVehicleMaintenance, // Performing vehicle maintenance for transport vehicles used by soldiers.
-    CallType.TutorOrMentor,             // Tutoring soldiers in subjects they need help with for future studies.
-    CallType.SupplyHygieneKits,         // Distributing hygiene kits including soap, shampoo, and other essentials.
-    CallType.OrganizeLogistics,         // Helping coordinate logistical support for upcoming training exercises.
-    CallType.ProvideITSupport,          // Setting up basic technology and communication equipment for soldiers.
-    CallType.TranslateDocuments,        // Translating important documents for soldiers in bilingual units.
-    CallType.AssistWithPaperwork,       // Assisting soldiers with completing essential paperwork and filing forms.
-    CallType.EmergencyResponse,         // Responding to urgent calls for transportation of supplies or soldiers.
-    CallType.DistributeCarePackages,    // Delivering personalized care packages from families to the front lines.
-    CallType.PrepareFood,               // Preparing meals specifically tailored to meet dietary needs of soldiers.
-    CallType.Transport,                 // Transporting heavy equipment needed for soldier training operations.
-    CallType.ProvideClothing,           // Collecting and distributing warm clothing for soldiers in colder areas.
-    CallType.OrganizeRecreationalEvent, // Assisting in setting up recreation areas for downtime between exercises.
-    CallType.MentalHealthSupport,       // Offering counseling services for soldiers dealing with homesickness.
-    CallType.OrganizeRecreationalEvent, // Planning group activities to help soldiers relax and build camaraderie.
-    CallType.PrepareHotDrinks,          // Delivering hot drinks to soldiers on long patrols in winter weather.
-    CallType.CollectDonations,          // Organizing community drives to gather essential supplies for soldiers.
-    CallType.PerformVehicleMaintenance, // Assisting with maintenance of field equipment essential for missions.
-    CallType.TutorOrMentor,             // Providing mentorship to young soldiers adjusting to military life.
-    CallType.SupplyHygieneKits,         // Supplying individual hygiene kits to soldiers returning from exercises.
-    CallType.OrganizeLogistics,         // Coordinating supply logistics for a large training mission.
-    CallType.ProvideITSupport,          // Assisting soldiers with technical issues in their communication gear.
-    CallType.TranslateDocuments,        // Translating training materials for soldiers in multilingual units.
-    CallType.AssistWithPaperwork,       // Helping soldiers complete required paperwork after basic training.
-    CallType.EmergencyResponse,         // Responding to emergency calls for urgent medical supplies.
-    CallType.DistributeCarePackages,    // Distributing care packages from local organizations to active soldiers.
-    CallType.PrepareFood,               // Preparing food packages for quick delivery to soldiers on night shifts.
-    CallType.Transport,                 // Transporting medical equipment to field locations where soldiers train.
-    CallType.ProvideClothing,           // Repairing damaged uniforms and gear for soldiers in remote areas.
-    CallType.SetupCamp,                 // Setting up sleeping areas in temporary camps for training exercises.
-    CallType.CleanFacilities,           // Sanitizing and organizing common areas in field bases.
-    CallType.ProvideMedicalAid,         // Providing basic first aid support to soldiers in rugged environments.
-    CallType.SupplyHygieneKits,         // Helping soldiers practice self-care with hygiene products.
-    CallType.PrepareFood,               // Preparing and delivering nutritious meals for soldiers on duty.
-    CallType.DeliverSupplies,           // Delivering donated blankets and winter gear for soldiers in cold areas.
-    CallType.OrganizeRecreationalEvent, // Organizing group therapy sessions to support soldier well-being.
-};
+        CallType[] callTypes = new CallType[50];
+        for (int i = 0; i < callTypes.Length; i++)
+        {
+            callTypes[i] = (CallType)s_rand.Next(Enum.GetValues(typeof(CallType)).Length);
+        }
         string[] addresses = new[] {
     "גרנדר קניון, David Tuviyahu Ave 125, Be'er Sheva",
     "דרך אליהו נאוי 28, Beersheba",
@@ -298,6 +249,99 @@ public static class Initialization
             );
 
             s_dalCall!.Create(call);
+        }
+    }
+
+    private static void CreateAssignments()
+    {
+        List<Volunteer> volunteers = s_dalVolunteer!.ReadAll().ToList();
+        List<Call> calls = s_dalCall!.ReadAll().ToList();
+        int assignmentId = s_dalConfig!.NextAssignmentId;
+
+        // Shuffle volunteers to create diverse assignment distribution
+        List<Volunteer> shuffledVolunteers = volunteers.OrderBy(_ => s_rand.Next()).ToList();
+        int totalVolunteers = shuffledVolunteers.Count;
+
+        // Set up volunteers: 
+        // - a few with no assignments
+        // - some with one assignment
+        // - others with multiple assignments
+        int noAssignmentCount = Math.Max(1, totalVolunteers / 5); // 20% have no assignments
+        int singleAssignmentCount = Math.Max(1, totalVolunteers / 3); // 30% have one assignment
+        int multipleAssignmentCount = totalVolunteers - noAssignmentCount - singleAssignmentCount; // Remaining have multiple assignments
+
+        // Assign calls to volunteers
+        int callIndex = 0; // Tracks available calls
+
+        for (int i = 0; i < totalVolunteers; i++)
+        {
+            Volunteer volunteer = shuffledVolunteers[i];
+            int assignmentsForThisVolunteer;
+
+            if (i < noAssignmentCount)
+            {
+                // Skip assignment for this volunteer
+                continue;
+            }
+            else if (i < noAssignmentCount + singleAssignmentCount)
+            {
+                assignmentsForThisVolunteer = 1; // One assignment
+            }
+            else
+            {
+                assignmentsForThisVolunteer = s_rand.Next(2, 5); // Multiple assignments, between 2 and 4
+            }
+
+            for (int j = 0; j < assignmentsForThisVolunteer && callIndex < calls.Count; j++)
+            {
+                Call call = calls[callIndex++];
+                DateTime startTime = call.StartTime.AddHours(s_rand.Next(1, 24));
+                DateTime? endTime = null;
+                Enum? endType = null;
+
+                // Randomly decide if this assignment will be completed, canceled, or expired
+                double outcomeChance = s_rand.NextDouble();
+
+                if (outcomeChance < 0.3)
+                {
+                    // Completed within call's deadline
+                    endTime = call.DeadLine.HasValue
+                        ? call.StartTime.AddHours(s_rand.Next(1, (int)(call.DeadLine.Value - startTime).TotalHours + 1))
+                        : startTime.AddHours(s_rand.Next(1, 72));
+                    endType = EndType.Completed;
+                }
+                else if (outcomeChance < 0.5)
+                {
+                    // Self-canceled
+                    endTime = startTime.AddHours(s_rand.Next(1, 48));
+                    endType = EndType.SelfCanceled;
+                }
+                else if (outcomeChance < 0.7)
+                {
+                    // Admin-canceled
+                    endTime = startTime.AddHours(s_rand.Next(1, 48));
+                    endType = EndType.AdminCanceled;
+                }
+                else
+                {
+                    // Expired
+                    endType = EndType.Expired;
+                }
+
+                // Create the assignment
+                var assignment = new Assignment
+                (
+                    Id: assignmentId++,
+                    CallId: call.Id,
+                    VolunteerId: volunteer.Id,
+                    StartTime: startTime,
+                    EndTime: endTime,
+                    EndType: endType
+                );
+
+                // Save the assignment
+                s_dalAssignment!.Create(assignment);
+            }
         }
     }
 

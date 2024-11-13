@@ -66,34 +66,22 @@ public enum DistanceType
 
 public enum CallType
 {
-    PrepareFood,               // Prepare meals or food packages
-    DeliverSupplies,           // Transport essential supplies like food or water
-    CollectLaundry,            // Gather laundry items from soldiers
-    WashLaundry,               // Wash collected laundry
-    Transport,                 // Provide transportation to soldiers or for materials
-    RepairEquipment,           // Fix or maintain essential equipment or gear
-    ProvideClothing,           // Supply clothing items, uniforms, or protective gear
-    SetupCamp,                 // Assist in setting up temporary camps or shelters
-    CleanFacilities,           // Clean common areas or facilities used by soldiers
-    ProvideMedicalAid,         // Support with basic medical care or first aid (for volunteers with training)
-    MentalHealthSupport,       // Provide emotional support or counseling (for qualified volunteers)
-    OfferTraining,             // Conduct training sessions for soldiers (e.g., on basic cooking, first aid)
-    OrganizeRecreationalEvent, // Plan leisure activities or events for morale boosting
-    PrepareHotDrinks,          // Prepare hot beverages, particularly in colder seasons
-    CollectDonations,          // Gather donations from the community for needed supplies
-    PerformVehicleMaintenance, // Basic maintenance on vehicles used in operations
-    TutorOrMentor,             // Provide tutoring or mentorship for soldiers needing educational support
-    SupplyHygieneKits,         // Distribute hygiene kits (soap, shampoo, etc.)
-    OrganizeLogistics,         // Coordinate logistics for an operation or mission
-    ProvideITSupport,          // Help with basic technology or communication setup
-    TranslateDocuments,        // Translate materials or documents for multilingual units
-    AssistWithPaperwork,       // Help with documentation or filing, particularly for new recruits
-    EmergencyResponse,         // Respond to emergency needs (e.g., urgent transport or medical)
-    DistributeCarePackages     // Hand out personal care packages from families or donors
+    Open,              // The call is open and not currently assigned to any volunteer. It may have been previously assigned but was canceled by the volunteer or administrator.
+    InTreatment,       // The call is currently being handled by a volunteer.
+    Closed,            // A volunteer has completed the call.
+    Expired,           // The call was not handled or was assigned but not completed within the allowed time.
+    OpenAtRisk,        // The call is open and nearing its required completion time, within a risk time range defined by the administrator.
+    InTreatmentAtRisk  // The call is currently in treatment but nearing its required completion time, within a risk time range defined by the administrator.
 }
 
 
-
+public enum EndType
+{
+    Completed,            // The call was successfully handled and completed before the maximum allowed time.
+    SelfCanceled,         // The volunteer chose to cancel their assignment before the maximum allowed time.
+    AdminCanceled,        // The administrator canceled the volunteer's assignment before the maximum allowed time.
+    Expired               // The call was canceled as it was not handled before the maximum allowed time.
+}
 
 
 
