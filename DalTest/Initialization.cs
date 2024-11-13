@@ -15,13 +15,13 @@ public static class Initialization
 
     private static void CreateVolunteers()
     {
+        // Volunteer details
         string[] volunteerNames = {
         "Dani Levy", "Eli Amar", "Yair Cohen", "Ariela Levin", "Dina Klein",
         "Shira Israelof", "Yael Mizrahi", "Oren Shmuel", "Maya Katz",
         "Tomer Golan", "Lea Sharabi", "Moti Ben-David", "Yaakov Peretz",
         "Ruth Azulay", "Itzik Shalev", "Sara Bar", "Yonatan Ezra"
     };
-
         string[] volunteerEmails = {
         "danilevy123@gmail.com", "eliamar456@gmail.com", "yaircohen789@outlook.com", "arielalevin234@gmail.com",
         "dinaklein567@gmail.com", "shiraisraelof890@gmail.com", "yaelmizrahi123@outlook.com",
@@ -29,72 +29,81 @@ public static class Initialization
         "motibendavid890@outlook.com", "yaakovperetz123@gmail.com", "ruthazulay456@gmail.com",
         "itzikshalev789@outlook.com", "sarabar234@walla.com", "yonatanezra567@gmail.com"
     };
-
-        // Create a strong password
-        string password = "";
-        string upperCase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        string lowerCase = "abcdefghijklmnopqrstuvwxyz";
-        string digits = "0123456789";
-        string allChars = upperCase + lowerCase + digits;
-
+        string[] addresses = {
+        "גרנדר קניון, David Tuviyahu Ave 125, Be'er Sheva",
+        "דרך אליהו נאוי 28, Beersheba",
+        "מתחם תחנת הדלק אלון, 31, Arad",
+        "Mivtsa Nakhshon Street 60, Be'er Sheva",
+        "Yitzhack I. Rager Boulevard 24, Be'er Sheva",
+        "Tsvi Bornstein Street 312, Yeruham",
+        "איזור תעשייה, הפועלים 5, דימונה",
+        "Herzl Street 43, Be'er Sheva",
+        "Derekh Hebron 21, Beersheba",
+        "Derekh Hebron 4, Beersheba",
+        "Kornmehl Farm M.E. Ramat Negev D.N. Halutza",
+        "רסקו סנטר, HaTikva 8, Beersheba",
+        "40, Tlalim",
+        "קניון פרץ סנטר, דימונה",
+        "פרץ סנטר - אזור תעשיה דרומי, Dimona"
+    };
+        double[] latitudes = {
+        31.2506405f, 31.2467805f, 31.2497676f, 31.2605014f, 31.2473633f,
+        30.988506f, 31.062823f, 31.2396368f, 31.2391961f, 31.2377661f,
+        30.972753f, 31.2474244f, 30.9935689f, 31.0599323f, 31.0599323f
+    };
+        double[] longitudes = {
+        34.7716625f, 34.8156994f, 35.1914546f, 34.7873239f, 34.7978134f,
+        34.927951f, 35.0192015f, 34.7877478f, 34.7967932f, 34.7944248f,
+        34.7755085f, 34.79862f, 34.7643578f, 35.0203137f, 35.0203137f
+    };
+        string[] strongPasswords = {
+        "A3b9Kp5vL1", "Z8mQ7xW4rB", "L2dR9yC8zN", "J1fV6kH3tP", "B5gY4nM7jQ",
+        "N6xP8cL2mV", "T3lH7wQ5rZ", "Y9kJ4bM8xL", "R7dF2yW6nP", "X3bZ9mQ5jT",
+        "M1pV8yN6xL", "G7kJ2fT9mB", "H5qZ4pL7nV", "D9yX6kB3rQ", "C1mP7vJ8wZ"
+    };
 
         List<string> phonePrefixes = new List<string> { "050", "053", "058", "052", "054" };
-        Random random = new Random();
 
         for (int i = 0; i < volunteerNames.Length; i++)
         {
-            string name = volunteerNames[i];
-            string email = volunteerEmails[i];
+            // Assign each volunteer a unique strong password from the array
+            string password = strongPasswords[i % strongPasswords.Length];
 
-            // Generate unique ID
+            // Generate unique ID for each volunteer
             int id;
             do
             {
                 id = s_rand.Next(200000000, 400000000);
             } while (s_dalVolunteer!.Read(id) != null);
 
-            // Generate phone number
-            string phone = $"{phonePrefixes[random.Next(phonePrefixes.Count)]}-{random.Next(1000000, 9999999)}";
+            // Generate random phone number and max distance
+            string phone = $"{phonePrefixes[s_rand.Next(phonePrefixes.Count)]}-{s_rand.Next(1000000, 9999999)}";
+            double maxDistance = s_rand.Next(1, 101);
 
+            // Set role and active status
+            Role role = (i == 0) ? Role.Admin : Role.GeneralVolunteer;
+            bool isActive = (i != volunteerNames.Length - 1);
+            DistanceType distanceType = DistanceType.Plane;
 
-            // Generate maximum distance for calls (randomly up to 100 km)
-            int maxDistance = random.Next(1, 101);
+            // Create and add the volunteer to the database
+            var volunteer = new Volunteer
+            (
+                Id: id,
+                Name: volunteerNames[i],
+                Email: volunteerEmails[i],
+                Phone: phone,
+                Role: role,
+                IsActive: isActive,
+                MaxDistance: maxDistance,
+                DistanceType: distanceType,
+                Password: password,
+                Address: addresses.Length > i ? addresses[i] : null,
+                Latitude: latitudes.Length > i ? latitudes[i] : null,
+                Longitude: longitudes.Length > i ? longitudes[i] : null
+            );
 
-            password += upperCase[random.Next(upperCase.Length)];   // Add one uppercase letter
-            password += lowerCase[random.Next(lowerCase.Length)];  // Add one lowercase letter
-            password += digits[random.Next(digits.Length)];       // Add one digit
-
-
-            // Fill the rest of the password to make it at least 8 characters long
-            for (int j = password.Length; j < 8; j++)
-            {
-                password += allChars[random.Next(allChars.Length)];
-            }
-
-            // Shuffle the password to ensure randomness
-            password = new string(password.OrderBy(c => random.Next()).ToArray());
-
-
-            Role role = (i == 0) ? Role.Admin : Role.GeneralVolunteer; // First volunteer is the manager
-            bool isActive = (i != volunteerNames.Length - 1); // All volunteers are active except the last one
-            double? MaxDistance = null; // Set max distance as null
-            DistanceType distanceType = DistanceType.Plane; // Default distance type is Plane
-
-            // Create the volunteer and add to the database
-            s_dalVolunteer!.Create(new Volunteer
-            {
-                Id = id,
-                Name = name,
-                Email = email,
-                Phone = phone,
-                Role = role,
-                IsActive = isActive,
-                MaxDistance = maxDistance,
-                DistanceType = distanceType,
-                Password = password 
-            });
-
-            Console.WriteLine($"Volunteer Created: {name}, {email}, {phone}, Role: {role}, Active: {isActive}, Max Distance: {maxDistance}, Distance Type: {distanceType}, Password: {password}");
+            s_dalVolunteer!.Create(volunteer);
+            Console.WriteLine($"Volunteer Created: {volunteer.Name}, {volunteer.Email}, {volunteer.Phone}, Role: {volunteer.Role}, Active: {volunteer.IsActive}, Max Distance: {volunteer.MaxDistance}, Distance Type: {volunteer.DistanceType}, Password: {volunteer.Password}");
         }
     }
 
@@ -258,10 +267,10 @@ public static class Initialization
     "Derech Metsada 47, Beersheba",
     "מרכז הנגב דרך מצדה 6, Beersheba"
 };
-        float[] latitudes = new float[] {
+        double[] latitudes = new double[] {
 31.2506405f, 31.2467805f, 31.2497676f, 31.2605014f, 31.2473633f, 30.98850599999999f, 31.062823f, 31.2396368f, 31.2391961f, 31.2377661f, 30.972753f, 31.2474244f, 30.9935689f, 31.0599323f, 31.0599323f, 31.22165469999999f, 31.2260083f, 31.2244175f, 31.2333045f, 31.2360614f, 31.2380911f, 31.2385546f, 31.2385105f, 31.2381019f, 31.2388346f, 31.243331f, 31.2447522f, 31.2443165f, 31.2492702f, 31.239762f, 31.2443691f, 31.2447522f, 31.244116f, 31.24109f, 31.2439462f, 31.2476115f, 31.243726f, 31.238365f, 31.238365f, 31.2386544f, 31.2461259f, 31.2474978f, 31.245456f, 31.2457355f, 31.2538143f, 31.2506405f, 31.2506405f, 31.2506405f, 31.2581979f, 31.2591166f
 };
-        float[] longitudes = new float[] {
+        double[] longitudes = new double[] {
 34.7716625f, 34.8156994f, 35.1914546f, 34.7873239f, 34.7978134f, 34.927951f, 35.0192015f, 34.7877478f, 34.7967932f, 34.7944248f, 34.7755085f, 34.79862f, 34.7643578f, 35.0203137f, 35.0203137f, 34.8001505f, 34.8096236f, 34.8014475f, 34.7965166f, 34.7881834f, 34.7912054f, 34.7924147f, 34.7906793f, 34.7875611f, 34.7907967f, 34.812547f, 34.81256610000001f, 34.8127704f, 34.8178768f, 34.7889659f, 34.8114871f, 34.81256610000001f, 34.8060877f, 34.789058f, 34.7965666f, 34.8106433f, 34.7946189f, 34.7726193f, 34.7726193f, 34.7740828f, 34.8120535f, 34.7986387f, 34.7814817f, 34.7814879f, 34.7983284f, 34.7716625f, 34.7716625f, 34.7716625f, 34.792098f, 34.7955966f
 };
 
