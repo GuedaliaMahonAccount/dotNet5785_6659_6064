@@ -88,21 +88,181 @@ public static class Initialization
         }
     }
 
-
-
-
-
     private static void CreateCalls()
     {
-        string[] callTopics = { "Medical Assistance", "Food Delivery", "Emotional Support", "Shopping Help", "Technical Assistance" };
-        foreach (var topic in callTopics)
+        string[] descriptions = new[]
+{
+    "Preparing nutritious meals for soldiers stationed at remote bases.",
+    "Delivering fresh food and supplies to soldiers on active duty.",
+    "Collecting uniforms and other clothing items from soldiers for cleaning.",
+    "Organizing and washing laundry for soldiers in the field.",
+    "Providing transportation for soldiers moving between training sites.",
+    "Repairing essential equipment used by soldiers in field operations.",
+    "Supplying soldiers with needed clothing and protective gear.",
+    "Helping set up temporary shelters for soldiers during training exercises.",
+    "Cleaning facilities used by soldiers to maintain hygiene and morale.",
+    "Assisting with basic medical care and first aid for injured soldiers.",
+    "Providing mental health support for soldiers dealing with stress.",
+    "Offering training in first aid and basic survival skills to new recruits.",
+    "Organizing recreational activities to boost soldier morale.",
+    "Preparing hot drinks and snacks for soldiers on cold night shifts.",
+    "Collecting food and clothing donations from the community for soldiers.",
+    "Performing vehicle maintenance for transport vehicles used by soldiers.",
+    "Tutoring soldiers in subjects they need help with for future studies.",
+    "Distributing hygiene kits including soap, shampoo, and other essentials.",
+    "Helping coordinate logistical support for upcoming training exercises.",
+    "Setting up basic technology and communication equipment for soldiers.",
+    "Translating important documents for soldiers in bilingual units.",
+    "Assisting soldiers with completing essential paperwork and filing forms.",
+    "Responding to urgent calls for transportation of supplies or soldiers.",
+    "Delivering personalized care packages from families to the front lines.",
+    "Preparing meals specifically tailored to meet dietary needs of soldiers.",
+    "Transporting heavy equipment needed for soldier training operations.",
+    "Collecting and distributing warm clothing for soldiers in colder areas.",
+    "Assisting in setting up recreation areas for downtime between exercises.",
+    "Offering counseling services for soldiers dealing with homesickness.",
+    "Planning group activities to help soldiers relax and build camaraderie.",
+    "Delivering hot drinks to soldiers on long patrols in winter weather.",
+    "Organizing community drives to gather essential supplies for soldiers.",
+    "Assisting with maintenance of field equipment essential for missions.",
+    "Providing mentorship to young soldiers adjusting to military life.",
+    "Supplying individual hygiene kits to soldiers returning from exercises.",
+    "Coordinating supply logistics for a large training mission.",
+    "Assisting soldiers with technical issues in their communication gear.",
+    "Translating training materials for soldiers in multilingual units.",
+    "Helping soldiers complete required paperwork after basic training.",
+    "Responding to emergency calls for urgent medical supplies.",
+    "Distributing care packages from local organizations to active soldiers.",
+    "Preparing food packages for quick delivery to soldiers on night shifts.",
+    "Transporting medical equipment to field locations where soldiers train.",
+    "Repairing damaged uniforms and gear for soldiers in remote areas.",
+    "Setting up sleeping areas in temporary camps for training exercises.",
+    "Sanitizing and organizing common areas in field bases.",
+    "Providing basic first aid support to soldiers in rugged environments.",
+    "Helping soldiers practice self-care with hygiene products.",
+    "Preparing and delivering nutritious meals for soldiers on duty.",
+    "Delivering donated blankets and winter gear for soldiers in cold areas.",
+    "Organizing group therapy sessions to support soldier well-being."
+};
+        CallType[] callTypes = new[]
+{
+    CallType.PrepareFood,               // Preparing nutritious meals for soldiers stationed at remote bases.
+    CallType.DeliverSupplies,           // Delivering fresh food and supplies to soldiers on active duty.
+    CallType.CollectLaundry,            // Collecting uniforms and other clothing items from soldiers for cleaning.
+    CallType.WashLaundry,               // Organizing and washing laundry for soldiers in the field.
+    CallType.Transport,                 // Providing transportation for soldiers moving between training sites.
+    CallType.RepairEquipment,           // Repairing essential equipment used by soldiers in field operations.
+    CallType.ProvideClothing,           // Supplying soldiers with needed clothing and protective gear.
+    CallType.SetupCamp,                 // Helping set up temporary shelters for soldiers during training exercises.
+    CallType.CleanFacilities,           // Cleaning facilities used by soldiers to maintain hygiene and morale.
+    CallType.ProvideMedicalAid,         // Assisting with basic medical care and first aid for injured soldiers.
+    CallType.MentalHealthSupport,       // Providing mental health support for soldiers dealing with stress.
+    CallType.OfferTraining,             // Offering training in first aid and basic survival skills to new recruits.
+    CallType.OrganizeRecreationalEvent, // Organizing recreational activities to boost soldier morale.
+    CallType.PrepareHotDrinks,          // Preparing hot drinks and snacks for soldiers on cold night shifts.
+    CallType.CollectDonations,          // Collecting food and clothing donations from the community for soldiers.
+    CallType.PerformVehicleMaintenance, // Performing vehicle maintenance for transport vehicles used by soldiers.
+    CallType.TutorOrMentor,             // Tutoring soldiers in subjects they need help with for future studies.
+    CallType.SupplyHygieneKits,         // Distributing hygiene kits including soap, shampoo, and other essentials.
+    CallType.OrganizeLogistics,         // Helping coordinate logistical support for upcoming training exercises.
+    CallType.ProvideITSupport,          // Setting up basic technology and communication equipment for soldiers.
+    CallType.TranslateDocuments,        // Translating important documents for soldiers in bilingual units.
+    CallType.AssistWithPaperwork,       // Assisting soldiers with completing essential paperwork and filing forms.
+    CallType.EmergencyResponse,         // Responding to urgent calls for transportation of supplies or soldiers.
+    CallType.DistributeCarePackages,    // Delivering personalized care packages from families to the front lines.
+    CallType.PrepareFood,               // Preparing meals specifically tailored to meet dietary needs of soldiers.
+    CallType.Transport,                 // Transporting heavy equipment needed for soldier training operations.
+    CallType.ProvideClothing,           // Collecting and distributing warm clothing for soldiers in colder areas.
+    CallType.OrganizeRecreationalEvent, // Assisting in setting up recreation areas for downtime between exercises.
+    CallType.MentalHealthSupport,       // Offering counseling services for soldiers dealing with homesickness.
+    CallType.OrganizeRecreationalEvent, // Planning group activities to help soldiers relax and build camaraderie.
+    CallType.PrepareHotDrinks,          // Delivering hot drinks to soldiers on long patrols in winter weather.
+    CallType.CollectDonations,          // Organizing community drives to gather essential supplies for soldiers.
+    CallType.PerformVehicleMaintenance, // Assisting with maintenance of field equipment essential for missions.
+    CallType.TutorOrMentor,             // Providing mentorship to young soldiers adjusting to military life.
+    CallType.SupplyHygieneKits,         // Supplying individual hygiene kits to soldiers returning from exercises.
+    CallType.OrganizeLogistics,         // Coordinating supply logistics for a large training mission.
+    CallType.ProvideITSupport,          // Assisting soldiers with technical issues in their communication gear.
+    CallType.TranslateDocuments,        // Translating training materials for soldiers in multilingual units.
+    CallType.AssistWithPaperwork,       // Helping soldiers complete required paperwork after basic training.
+    CallType.EmergencyResponse,         // Responding to emergency calls for urgent medical supplies.
+    CallType.DistributeCarePackages,    // Distributing care packages from local organizations to active soldiers.
+    CallType.PrepareFood,               // Preparing food packages for quick delivery to soldiers on night shifts.
+    CallType.Transport,                 // Transporting medical equipment to field locations where soldiers train.
+    CallType.ProvideClothing,           // Repairing damaged uniforms and gear for soldiers in remote areas.
+    CallType.SetupCamp,                 // Setting up sleeping areas in temporary camps for training exercises.
+    CallType.CleanFacilities,           // Sanitizing and organizing common areas in field bases.
+    CallType.ProvideMedicalAid,         // Providing basic first aid support to soldiers in rugged environments.
+    CallType.SupplyHygieneKits,         // Helping soldiers practice self-care with hygiene products.
+    CallType.PrepareFood,               // Preparing and delivering nutritious meals for soldiers on duty.
+    CallType.DeliverSupplies,           // Delivering donated blankets and winter gear for soldiers in cold areas.
+    CallType.OrganizeRecreationalEvent, // Organizing group therapy sessions to support soldier well-being.
+};
+        string[] addresses = new[]
         {
-            int id;
-            do
-                id = s_rand.Next(1000, 9999);
-            while (s_dalCall!.Read(id) != null);
+    "Ino Shaki 6",
+    "Perets Bernstein 2",
+    "Ben Yehuda 13",
+    "Dizengoff 99",
+    "Herzl 45",
+    "Weizmann 17",
+    "Jabotinsky 35",
+    "King George 20",
+    "Rothschild 16",
+    "Aluf David Elazar 10",
+    "Sokolov 22",
+    "Yafo 32",
+    "Allenby 72",
+    "Hillel Yaffe 3",
+    "Rabbi Akiva 5",
+    "Ben Gurion 50",
+    "Yigal Alon 98",
+    "Keren Hayesod 21",
+    "Hertzel 8",
+    "Shaul Hamelech 22",
+    "Menachem Begin 6",
+    "Nahalat Binyamin 25",
+    "Bialik 15",
+    "Sderot Yerushalayim 10",
+    "Shenkar 12",
+    "David HaMelech 7",
+    "Moshe Dayan 33",
+    "Hankin 40",
+    "Balfour 28",
+    "Levi Eshkol 4",
+    "Herzl 15",
+    "Hagolan 12",
+    "HaPalmach 2",
+    "HaHistadrut 20",
+    "HaYarkon 200",
+    "Ruppin 19",
+    "HaAliyah 11",
+    "Neot Peres 7",
+    "HaMasger 17",
+    "Mish'ol HaNesharim 5",
+    "Rabbi Meir 3",
+    "Herzl 89",
+    "Pinsker 10",
+    "HaShomer 3",
+    "Nili 8",
+    "Sderot Rothschild 9",
+    "Trumpeldor 7",
+    "Bergen Street 4",
+    "Even Gvirol 19",
+    "Giora Yoseftal 2",
+    "Ben Tzvi 5"
+};
 
-            s_dalCall!.Create(new Call { Id = id, Topic = topic });
+
+
+
+
+
+        foreach (var topic in descriptions)
+        {
+
+
+            s_dalCall!.Create(new Call { });
         }
     }
 
