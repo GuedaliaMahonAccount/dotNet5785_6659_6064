@@ -73,6 +73,12 @@ public static class Initialization
             // Shuffle the password to ensure randomness
             password = new string(password.OrderBy(c => random.Next()).ToArray());
 
+
+            Role role = (i == 0) ? Role.Admin : Role.GeneralVolunteer; // First volunteer is the manager
+            bool isActive = (i != volunteerNames.Length - 1); // All volunteers are active except the last one
+            double? MaxDistance = null; // Set max distance as null
+            DistanceType distanceType = DistanceType.Plane; // Default distance type is Plane
+
             // Create the volunteer and add to the database
             s_dalVolunteer!.Create(new Volunteer
             {
@@ -80,11 +86,14 @@ public static class Initialization
                 Name = name,
                 Email = email,
                 Phone = phone,
+                Role = role,
+                IsActive = isActive,
                 MaxDistance = maxDistance,
-                Password = password // Assuming Password is a property of the Volunteer class
+                DistanceType = distanceType,
+                Password = password 
             });
 
-            Console.WriteLine($"Volunteer Created: {name}, {email}, {phone}, Max Distance: {maxDistance} km, Password: {password}");
+            Console.WriteLine($"Volunteer Created: {name}, {email}, {phone}, Role: {role}, Active: {isActive}, Max Distance: {maxDistance}, Distance Type: {distanceType}, Password: {password}");
         }
     }
 
@@ -106,20 +115,7 @@ public static class Initialization
         }
     }
 
-    private static void CreateAssignments()
-    {
-        var volunteerIds = s_dalVolunteer!.GetAllIds();
-        var callIds = s_dalCall!.GetAllIds();
 
-        foreach (var volunteerId in volunteerIds)
-        {
-            var callId = callIds[s_rand.Next(callIds.Count)];
-            if (s_dalAssignment!.Read(volunteerId, callId) == null)
-            {
-                s_dalAssignment.Create(new Assignment { VolunteerId = volunteerId, CallId = callId });
-            }
-        }
-    }
 
     public static void Do(IVolunteer? dalVolunteer, ICall? dalCall, IAssignment? dalAssignment, IConfig? dalConfig)
     {

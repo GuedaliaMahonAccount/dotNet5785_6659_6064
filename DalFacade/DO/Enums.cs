@@ -60,7 +60,7 @@ public enum DistanceType
     Segway,              // Distance accessible by segway paths, typically in urban areas
     Rollerblade,         // Paths accessible for rollerblading or skating
     Skateboard,          // Routes where skateboards can travel, typically urban or park paths
-    UrbanShortcuts       // Distance considering pedestrian shortcuts within urban settings (e.g., alleys)
+    UrbanShortcuts,      // Distance considering pedestrian shortcuts within urban settings (e.g., alleys)
 }
 
 
@@ -91,6 +91,9 @@ public enum CallType
     EmergencyResponse,         // Respond to emergency needs (e.g., urgent transport or medical)
     DistributeCarePackages     // Hand out personal care packages from families or donors
 }
+
+
+
 
 
 

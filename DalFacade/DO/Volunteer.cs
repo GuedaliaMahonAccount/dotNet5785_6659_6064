@@ -37,6 +37,6 @@ public record Volunteer
     /// <summary>
     /// Default constructor for vonlonter
     /// </summary>
-    public Volunteer() : this(0, "", "", "",false, Role.Volunteer, DistanceType.Foot, null, null, null, null, null) { }
+    public Volunteer() : this(0, "", "", "",false, Role.GeneralVolunteer, DistanceType.Foot, null, null, null, null, null) { }
    
 }
