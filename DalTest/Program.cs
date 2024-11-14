@@ -11,42 +11,6 @@ namespace DalTest
         private static IVolunteer? s_daVolunteer = new VolunteerImplementation();
         private static IConfig? s_dalConfig = new ConfigImplementation();
 
-        /// <summary>
-        /// enums
-        /// </summary>
-        public enum MainMenuOption
-        {
-            ExitMainMenu=1,
-            DisplaySubMenuAssignment,
-            DisplaySubMenuCall,
-            DisplaySubMenuVolunteer,
-            InitializeData,
-            DisplayAllData,
-            DisplayConfigurationSubMenu,
-            ResetDatabaseAndConfiguration
-        }
-        public enum ConfigSubMenuOption
-        {
-            ExitSubMenu,
-            AdvanceSystemClockOneMinute,
-            AdvanceSystemClockOneHour,
-            DisplayCurrentSystemClockValue,
-            SetNewConfigValue,
-            DisplayCurrentConfigValue,
-            ResetAllConfigValues
-        }
-        public enum GeneralEntityOption
-        {
-            Exit,                      // Exit the submenu
-            Create,                    // Add a new object of the entity type to the list (Create)
-            Read,                      // Display an object by ID (Read)
-            ReadAll,                   // Display all objects of the entity type (ReadAll)
-            Update,                    // Update an existing object's data (Update)
-            Delete,                    // Delete an existing object from the list (Delete)
-            DeleteAll                  // Delete all objects from the list (DeleteAll)
-        }
-
-
 
 
 
@@ -277,10 +241,6 @@ namespace DalTest
                 Console.WriteLine($"An error occurred in ResetDatabaseAndConfig: {ex.Message}");
             }
         }
-
-
-
-
 
 
 
@@ -595,8 +555,6 @@ namespace DalTest
                 Console.WriteLine($"An error occurred while deleting all {entityName}: {ex.Message}");
             }
         }
-
-
 
 
 

@@ -1,4 +1,7 @@
 ﻿namespace DO;
+
+
+
 public enum Role
 {
     Admin,                // System administrator with full platform access
@@ -35,8 +38,6 @@ public enum Role
     FoodSupplier,         // Sources and supplies ingredients or ready-made food
     RecreationCoordinator // Organizes recreational activities for relaxation
 }
-
-
 public enum DistanceType
 {
     Plane,               // Straight-line (as-the-crow-flies) distance, often used in aviation
@@ -62,8 +63,6 @@ public enum DistanceType
     Skateboard,          // Routes where skateboards can travel, typically urban or park paths
     UrbanShortcuts,      // Distance considering pedestrian shortcuts within urban settings (e.g., alleys)
 }
-
-
 public enum CallType
 {
     Open,              // The call is open and not currently assigned to any volunteer. It may have been previously assigned but was canceled by the volunteer or administrator.
@@ -73,14 +72,43 @@ public enum CallType
     OpenAtRisk,        // The call is open and nearing its required completion time, within a risk time range defined by the administrator.
     InTreatmentAtRisk  // The call is currently in treatment but nearing its required completion time, within a risk time range defined by the administrator.
 }
-
-
 public enum EndType
 {
     Completed,            // The call was successfully handled and completed before the maximum allowed time.
     SelfCanceled,         // The volunteer chose to cancel their assignment before the maximum allowed time.
     AdminCanceled,        // The administrator canceled the volunteer's assignment before the maximum allowed time.
     Expired               // The call was canceled as it was not handled before the maximum allowed time.
+}
+public enum MainMenuOption
+{
+    ExitMainMenu = 1,
+    DisplaySubMenuAssignment,
+    DisplaySubMenuCall,
+    DisplaySubMenuVolunteer,
+    InitializeData,
+    DisplayAllData,
+    DisplayConfigurationSubMenu,
+    ResetDatabaseAndConfiguration
+}
+public enum ConfigSubMenuOption
+{
+    ExitSubMenu,
+    AdvanceSystemClockOneMinute,
+    AdvanceSystemClockOneHour,
+    DisplayCurrentSystemClockValue,
+    SetNewConfigValue,
+    DisplayCurrentConfigValue,
+    ResetAllConfigValues
+}
+public enum GeneralEntityOption
+{
+    Exit,                      // Exit the submenu
+    Create,                    // Add a new object of the entity type to the list (Create)
+    Read,                      // Display an object by ID (Read)
+    ReadAll,                   // Display all objects of the entity type (ReadAll)
+    Update,                    // Update an existing object's data (Update)
+    Delete,                    // Delete an existing object from the list (Delete)
+    DeleteAll                  // Delete all objects from the list (DeleteAll)
 }
 
 
