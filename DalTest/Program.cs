@@ -6,6 +6,7 @@ namespace DalTest
 {
     internal class Program
     {
+        // Main menu entity
         private static IAssignment? s_dAssignment = new AssignmentImplementation();
         private static ICall? s_dalCall = new CallImplementation();
         private static IVolunteer? s_daVolunteer = new VolunteerImplementation();
