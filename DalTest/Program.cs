@@ -25,7 +25,16 @@ namespace DalTest
             DisplayConfigurationSubMenu,
             ResetDatabaseAndConfiguration
         }
-
+        public enum ConfigSubMenuOption
+        {
+            ExitSubMenu,
+            AdvanceSystemClockOneMinute,
+            AdvanceSystemClockOneHour,
+            DisplayCurrentSystemClockValue,
+            SetNewConfigValue,
+            DisplayCurrentConfigValue,
+            ResetAllConfigValues
+        }
 
 
 
@@ -265,7 +274,7 @@ namespace DalTest
                 }
             }
         }
-        //config submenu
+        // ShowConfigSubMenu method with the options
         public static void ShowConfigSubMenu()
         {
             bool continueRunning = true;
@@ -276,23 +285,32 @@ namespace DalTest
                 Console.Write("Please choose an option: ");
 
                 if (int.TryParse(Console.ReadLine(), out int option) &&
-                    Enum.IsDefined(typeof(MainMenuOption), option - 1))
+                    Enum.IsDefined(typeof(ConfigSubMenuOption), option))
                 {
-                    MainMenuOption selectedOption = (MainMenuOption)(option - 1);
+                    ConfigSubMenuOption selectedOption = (ConfigSubMenuOption)option;
 
                     switch (selectedOption)
                     {
-                        case MainMenuOption.ExitMainMenu:
-                            continueRunning = false; // Exit
+                        case ConfigSubMenuOption.ExitSubMenu:
+                            continueRunning = false;
                             break;
-                        case MainMenuOption.DisplayConfigurationSubMenu:
-                            ShowConfigSubMenu(); // Show Submenu for Configuration
+                        case ConfigSubMenuOption.AdvanceSystemClockOneMinute:
+                            AdvanceSystemClockOneMinute();
                             break;
-                        case MainMenuOption.AdvanceSystemClock:
-                            AdvanceSystemClock(); // Advance system clock
+                        case ConfigSubMenuOption.AdvanceSystemClockOneHour:
+                            AdvanceSystemClockOneHour();
                             break;
-                        case MainMenuOption.ResetConfigValues:
-                            ResetConfigValues(); // Reset config values
+                        case ConfigSubMenuOption.DisplayCurrentSystemClockValue:
+                            Console.WriteLine($"Current system clock value: {s_dalConfig?.Clock}");
+                            break;
+                        case ConfigSubMenuOption.SetNewConfigValue:
+                            SetNewConfigValue();
+                            break;
+                        case ConfigSubMenuOption.DisplayCurrentConfigValue:
+                            DisplayCurrentConfigValue();
+                            break;
+                        case ConfigSubMenuOption.ResetAllConfigValues:
+                            ResetAllConfigValues();
                             break;
                         default:
                             Console.WriteLine("Invalid option. Please choose again.");
@@ -303,6 +321,9 @@ namespace DalTest
                 {
                     Console.WriteLine("Invalid option. Please choose again.");
                 }
+
+                if (continueRunning) Console.WriteLine("Press any key to continue...");
+                Console.ReadKey();
             }
         }
         //display all data
@@ -357,6 +378,93 @@ namespace DalTest
         /// <summary>
         /// assigment submenu
         /// </summary>
+
+
+        /// <summary>
+        /// call submenu
+        /// </summary>
+
+
+        /// <summary>
+        /// volonteer submenu
+        /// </summary>
+
+
+        /// <summary>
+        /// configurw submenu
+        /// </summary>
+        // Private method to advance the system clock by one minute
+        private static void AdvanceSystemClockOneMinute()
+        {
+            try
+            {
+                s_dalConfig?.Clock.AddMinutes(1);
+                Console.WriteLine("System clock advanced by one minute.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred in AdvanceSystemClockOneMinute: {ex.Message}");
+            }
+        }
+        // Private method to advance the system clock by one hour
+        private static void AdvanceSystemClockOneHour()
+        {
+            try
+            {
+                s_dalConfig?.Clock.AddHours(1);
+                Console.WriteLine("System clock advanced by one hour.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred in AdvanceSystemClockOneHour: {ex.Message}");
+            }
+        }
+        // Private method to set a new configuration value
+        private static void SetNewConfigValue()
+        {
+            try
+            {
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred in SetNewConfigValue: {ex.Message}");
+            }
+        }
+        // Private method to display the current configuration value
+        private static void DisplayCurrentConfigValue()
+        {
+            try
+            {
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred in DisplayCurrentConfigValue: {ex.Message}");
+            }
+        }
+        // Private method to reset all configuration values
+        private static void ResetAllConfigValues()
+        {
+            try
+            {
+                s_dalConfig?.Reset();
+                Console.WriteLine("All configuration values reset.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred in ResetAllConfigValues: {ex.Message}");
+            }
+        }
+
+
+
+
+
+
+
+
+
 
 
 
