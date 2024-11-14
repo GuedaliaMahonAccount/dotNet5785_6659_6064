@@ -19,7 +19,9 @@ public static class Initialization
         "Dani Levy", "Eli Amar", "Yair Cohen", "Ariela Levin", "Dina Klein",
         "Shira Israelof", "Yael Mizrahi", "Oren Shmuel", "Maya Katz",
         "Tomer Golan", "Lea Sharabi", "Moti Ben-David", "Yaakov Peretz",
-        "Ruth Azulay", "Itzik Shalev", "Sara Bar", "Yonatan Ezra"
+        "Ruth Azulay", "Itzik Shalev", "Sara Bar", "Yonatan Ezra",
+        "Noam Mizrahi","Yossi Tal", "Dana Asor","Rina Bar","Gal Yaakov",
+        "Nave Shaked","Amit Cohen","Michal Dahary","Itamar Ben-Ami","Adi Raz"
     };
 
         string[] volunteerEmails = {
@@ -27,7 +29,9 @@ public static class Initialization
         "dinaklein567@gmail.com", "shiraisraelof890@gmail.com", "yaelmizrahi123@outlook.com",
         "orenshmuel456@gmail.com", "mayakatz789@gmail.com", "tomergolan234@gmail.com", "leasharabi567@gmail.com",
         "motibendavid890@outlook.com", "yaakovperetz123@gmail.com", "ruthazulay456@gmail.com",
-        "itzikshalev789@outlook.com", "sarabar234@walla.com", "yonatanezra567@gmail.com"
+        "itzikshalev789@outlook.com", "sarabar234@walla.com", "yonatanezra567@gmail.com","NoamM@gmail.com",
+        "Yossi12@gmail.com","DanaAsor1@gmail.com","RinaB12@gmail.com","GalYaakov22@gmail.com",
+        "NaveS11@walla.com","AmitCohen1@outlook.com","MichalDA@gmail.com","ItamarBenAMI@outlook.com","AdiRaz1@gmail.com"
     };
         // Create a strong password
         string password = "";
@@ -92,7 +96,6 @@ public static class Initialization
                 DistanceType = distanceType,
                 Password = password 
             });
-
             Console.WriteLine($"Volunteer Created: {name}, {email}, {phone}, Role: {role}, Active: {isActive}, Max Distance: {maxDistance}, Distance Type: {distanceType}, Password: {password}");
         }
     }
