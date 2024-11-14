@@ -16,10 +16,10 @@ namespace DalTest
         /// </summary>
         public enum MainMenuOption
         {
-            ExitMainMenu,
-            DisplaySubMenuVolunteer,
-            DisplaySubMenuCall,
+            ExitMainMenu=1,
             DisplaySubMenuAssignment,
+            DisplaySubMenuCall,
+            DisplaySubMenuVolunteer,
             InitializeData,
             DisplayAllData,
             DisplayConfigurationSubMenu,
@@ -34,6 +34,17 @@ namespace DalTest
             SetNewConfigValue,
             DisplayCurrentConfigValue,
             ResetAllConfigValues
+        }
+         
+        public enum selectedsubOption
+        {
+            Exit,                      // Exit the submenu
+            Create,                    // Add a new object of the entity type to the list (Create)
+            Read,                      // Display an object by ID (Read)
+            ReadAll,                   // Display all objects of the entity type (ReadAll)
+            Update,                    // Update an existing object's data (Update)
+            Delete,                    // Delete an existing object from the list (Delete)
+            DeleteAll                  // Delete all objects from the list (DeleteAll)
         }
 
 
@@ -131,9 +142,9 @@ namespace DalTest
                 if (int.TryParse(Console.ReadLine(), out int option) &&
                     Enum.IsDefined(typeof(MainMenuOption), option - 1))
                 {
-                    MainMenuOption selectedOption = (MainMenuOption)(option - 1);
+                    MainMenuOption selectedsubOption = (MainMenuOption)(option - 1);
 
-                    switch (selectedOption)
+                    switch (selectedsubOption)
                     {
                         case MainMenuOption.ExitMainMenu:
                             continueRunning = false; // Exit
@@ -193,7 +204,7 @@ namespace DalTest
                         case MainMenuOption.DisplaySubMenuCall:
                             ShowCallSubMenu(); // Show Submenu for Call
                             break;
-                        case MainMenuOption.Create:
+                        case MainMenuOption.Create():
                             CreateEntity("Call"); // Create
                             break;
                         case MainMenuOption.Read:
