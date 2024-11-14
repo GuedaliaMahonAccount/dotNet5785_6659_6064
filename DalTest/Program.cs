@@ -277,11 +277,18 @@ namespace DalTest
         // ShowConfigSubMenu method with the options
         public static void ShowConfigSubMenu()
         {
+
             bool continueRunning = true;
             while (continueRunning)
             {
                 Console.Clear();
-                ShowConfigMenu();
+                Console.WriteLine("Config Menu:");
+                Console.WriteLine("1. Advance system clock by minute");
+                Console.WriteLine("2. Advance system clock by hour");
+                Console.WriteLine("3. Show current system clock value");
+                Console.WriteLine("4. Set a new config value");
+                Console.WriteLine("5. Reset config values");
+                Console.WriteLine("6. Exit");
                 Console.Write("Please choose an option: ");
 
                 if (int.TryParse(Console.ReadLine(), out int option) &&
@@ -337,17 +344,6 @@ namespace DalTest
             {
                 Console.WriteLine($"An error occurred in DisplayAllData: {ex.Message}");
             }
-        }
-        // Private method for Config-specific actions (e.g., time adjustments)
-        private static void ShowConfigMenu()
-        {
-            Console.WriteLine("Config Menu:");
-            Console.WriteLine("1. Advance system clock by minute");
-            Console.WriteLine("2. Advance system clock by hour");
-            Console.WriteLine("3. Show current system clock value");
-            Console.WriteLine("4. Set a new config value");
-            Console.WriteLine("5. Reset config values");
-            Console.WriteLine("6. Exit");
         }
         //reset database and configuration
         public static void ResetDatabaseAndConfig()
