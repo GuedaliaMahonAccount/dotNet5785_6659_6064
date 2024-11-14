@@ -383,18 +383,9 @@ namespace DalTest
 
 
         /// <summary>
-        /// assigment submenu
+        /// general submenu
         /// </summary>
 
-
-        /// <summary>
-        /// call submenu
-        /// </summary>
-
-
-        /// <summary>
-        /// volonteer submenu
-        /// </summary>
 
 
         /// <summary>
