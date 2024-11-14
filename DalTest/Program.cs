@@ -89,13 +89,13 @@ namespace DalTest
                             continueRunning = false; // Exit
                             break;
                         case MainMenuOption.DisplaySubMenuAssignment:
-                            ShowAssignmentSubMenu(); // Show Submenu for Assignment
+                            ShowSubMenu("Assignment");// Show Submenu for Assignment
                             break;
                         case MainMenuOption.DisplaySubMenuCall:
-                            ShowCallSubMenu(); // Show Submenu for Call
+                            ShowSubMenu("Call"); // Show Submenu for Call
                             break; 
                         case MainMenuOption.DisplaySubMenuVolunteer:
-                            ShowVolunteerSubMenu(); // Show Submenu for Volunteer
+                            ShowSubMenu("Volunteer"); // Show Submenu for Volunteer
                             break;
                         case MainMenuOption.InitializeData:
                             Initialization.Do();// Initialize Data
@@ -129,66 +129,14 @@ namespace DalTest
         /// <summary>
         /// main menu option 
         /// </summary>
-        //assignment submenu
-        public static void ShowAssignmentSubMenu()
+        //show general submenu for call, assignements, and volonteers
+        public static void ShowSubMenu(string entityName)
         {
             bool continueRunning = true;
             while (continueRunning)
             {
                 Console.Clear();
-                ShowEntityMenu("Assignment");
-                Console.Write("Please choose an option: ");
-
-                if (int.TryParse(Console.ReadLine(), out int option) &&
-                    Enum.IsDefined(typeof(MainMenuOption), option - 1))
-                {
-                    MainMenuOption selectedsubOption = (MainMenuOption)(option - 1);
-
-                    switch (selectedsubOption)
-                    {
-                        case MainMenuOption.ExitMainMenu:
-                            continueRunning = false; // Exit
-                            break;
-                        case MainMenuOption.DisplaySubMenuAssignment:
-                            ShowAssignmentSubMenu(); // Show Submenu for Assignment
-                            break;
-                        case MainMenuOption.Create:
-                            CreateEntity("Assignment"); // Create
-                            break;
-                        case MainMenuOption.Read:
-                            ReadEntity("Assignment"); // Read
-                            break;
-                        case MainMenuOption.ReadAll:
-                            DisplayAllData(); // ReadAll
-                            break;
-                        case MainMenuOption.Update:
-                            UpdateEntity("Assignment"); // Update
-                            break;
-                        case MainMenuOption.Delete:
-                            DeleteEntity("Assignment"); // Delete
-                            break;
-                        case MainMenuOption.DeleteAll:
-                            DeleteAllEntities("Assignment"); // DeleteAll
-                            break;
-                        default:
-                            Console.WriteLine("Invalid option. Please choose again.");
-                            break;
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("Invalid option. Please choose again.");
-                }
-            }
-        }
-        //call submenu
-        public static void ShowCallSubMenu()
-        {
-            bool continueRunning = true;
-            while (continueRunning)
-            {
-                Console.Clear();
-                ShowEntityMenu("Call");
+                ShowEntityMenu(entityName);
                 Console.Write("Please choose an option: ");
 
                 if (int.TryParse(Console.ReadLine(), out int option) &&
@@ -201,78 +149,23 @@ namespace DalTest
                         case MainMenuOption.ExitMainMenu:
                             continueRunning = false; // Exit
                             break;
-                        case MainMenuOption.DisplaySubMenuCall:
-                            ShowCallSubMenu(); // Show Submenu for Call
-                            break;
-                        case MainMenuOption.Create():
-                            CreateEntity("Call"); // Create
-                            break;
-                        case MainMenuOption.Read:
-                            ReadEntity("Call"); // Read
-                            break;
-                        case MainMenuOption.ReadAll:
-                            DisplayAllData(); // ReadAll
-                            break;
-                        case MainMenuOption.Update:
-                            UpdateEntity("Call"); // Update
-                            break;
-                        case MainMenuOption.Delete:
-                            DeleteEntity("Call"); // Delete
-                            break;
-                        case MainMenuOption.DeleteAll:
-                            DeleteAllEntities("Call"); // DeleteAll
-                            break;
-                        default:
-                            Console.WriteLine("Invalid option. Please choose again.");
-                            break;
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("Invalid option. Please choose again.");
-                }
-            }
-        }
-        //volunteer submenu
-        public static void ShowVolunteerSubMenu()
-        {
-            bool continueRunning = true;
-            while (continueRunning)
-            {
-                Console.Clear();
-                ShowEntityMenu("Volunteer");
-                Console.Write("Please choose an option: ");
-
-                if (int.TryParse(Console.ReadLine(), out int option) &&
-                    Enum.IsDefined(typeof(MainMenuOption), option - 1))
-                {
-                    MainMenuOption selectedOption = (MainMenuOption)(option - 1);
-
-                    switch (selectedOption)
-                    {
-                        case MainMenuOption.ExitMainMenu:
-                            continueRunning = false; // Exit
-                            break;
-                        case MainMenuOption.DisplaySubMenuVolunteer:
-                            ShowVolunteerSubMenu(); // Show Submenu for Volunteer
-                            break;
                         case MainMenuOption.Create:
-                            CreateEntity("Volunteer"); // Create
+                            CreateEntity(entityName); // Create
                             break;
                         case MainMenuOption.Read:
-                            ReadEntity("Volunteer"); // Read
+                            ReadEntity(entityName); // Read
                             break;
                         case MainMenuOption.ReadAll:
                             DisplayAllData(); // ReadAll
                             break;
                         case MainMenuOption.Update:
-                            UpdateEntity("Volunteer"); // Update
+                            UpdateEntity(entityName); // Update
                             break;
                         case MainMenuOption.Delete:
-                            DeleteEntity("Volunteer"); // Delete
+                            DeleteEntity(entityName); // Delete
                             break;
                         case MainMenuOption.DeleteAll:
-                            DeleteAllEntities("Volunteer"); // DeleteAll
+                            DeleteAllEntities(entityName); // DeleteAll
                             break;
                         default:
                             Console.WriteLine("Invalid option. Please choose again.");
@@ -384,18 +277,9 @@ namespace DalTest
 
 
         /// <summary>
-        /// assigment submenu
+        /// general submenu
         /// </summary>
 
-
-        /// <summary>
-        /// call submenu
-        /// </summary>
-
-
-        /// <summary>
-        /// volonteer submenu
-        /// </summary>
 
 
         /// <summary>
