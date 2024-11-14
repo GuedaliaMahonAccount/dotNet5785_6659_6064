@@ -35,7 +35,7 @@ namespace DalTest
             DisplayCurrentConfigValue,
             ResetAllConfigValues
         }
-        public enum selectedsubOption
+        public enum GeneralEntityOption
         {
             Exit,                      // Exit the submenu
             Create,                    // Add a new object of the entity type to the list (Create)
@@ -129,9 +129,12 @@ namespace DalTest
         /// main menu option 
         /// </summary>
         //show general submenu for call, assignements, and volonteers
+        // Show general submenu for call, assignments, and volunteers
         public static void ShowSubMenu(string entityName)
         {
             bool continueRunning = true;
+            Type enumType = typeof(GeneralEntityOption); // Assume GeneralEntityOption enum exists
+
             while (continueRunning)
             {
                 Console.Clear();
@@ -139,31 +142,31 @@ namespace DalTest
                 Console.Write("Please choose an option: ");
 
                 if (int.TryParse(Console.ReadLine(), out int option) &&
-                    Enum.IsDefined(typeof(MainMenuOption), option - 1))
+                    Enum.IsDefined(enumType, option - 1))
                 {
-                    MainMenuOption selectedOption = (MainMenuOption)(option - 1);
+                    var selectedOption = (GeneralEntityOption)Enum.ToObject(enumType, option - 1);
 
                     switch (selectedOption)
                     {
-                        case MainMenuOption.ExitMainMenu:
+                        case GeneralEntityOption.Exit:
                             continueRunning = false; // Exit
                             break;
-                        case MainMenuOption.Create:
+                        case GeneralEntityOption.Create:
                             CreateEntity(entityName); // Create
                             break;
-                        case MainMenuOption.Read:
+                        case GeneralEntityOption.Read:
                             ReadEntity(entityName); // Read
                             break;
-                        case MainMenuOption.ReadAll:
+                        case GeneralEntityOption.ReadAll:
                             DisplayAllData(entityName); // ReadAll
                             break;
-                        case MainMenuOption.Update:
+                        case GeneralEntityOption.Update:
                             UpdateEntity(entityName); // Update
                             break;
-                        case MainMenuOption.Delete:
+                        case GeneralEntityOption.Delete:
                             DeleteEntity(entityName); // Delete
                             break;
-                        case MainMenuOption.DeleteAll:
+                        case GeneralEntityOption.DeleteAll:
                             DeleteAllEntities(entityName); // DeleteAll
                             break;
                         default:
@@ -173,7 +176,13 @@ namespace DalTest
                 }
                 else
                 {
-                    Console.WriteLine("Invalid option. Please choose again.");
+                    Console.WriteLine("Invalid option. Please enter a number corresponding to the menu.");
+                }
+
+                if (continueRunning)
+                {
+                    Console.WriteLine("Press any key to continue...");
+                    Console.ReadKey();
                 }
             }
         }
@@ -280,8 +289,21 @@ namespace DalTest
 
 
         /// <summary>
-        /// general submenu
+        /// general entity submenu
         /// </summary>
+        //general entity submenu
+        public static void ShowEntityMenu(string entityName)
+        {
+            Console.WriteLine($"{entityName} Menu:");
+            Console.WriteLine("1. Exit");
+            Console.WriteLine("2. Create");
+            Console.WriteLine("3. Read");
+            Console.WriteLine("4. Read All");
+            Console.WriteLine("5. Update");
+            Console.WriteLine("6. Delete");
+            Console.WriteLine("7. Delete All");
+        }
+        // create general entity
         public static void CreateEntity(string entityName)
         {
             try
@@ -314,6 +336,263 @@ namespace DalTest
             catch (Exception ex)
             {
                 Console.WriteLine($"An error occurred while creating {entityName}: {ex.Message}");
+            }
+        }
+        // read general entity
+        public static void ReadEntity(string entityName)
+        {
+            try
+            {
+                Console.Write($"Enter the ID of the {entityName} to read: ");
+                if (int.TryParse(Console.ReadLine(), out int id))
+                {
+                    switch (entityName)
+                    {
+                        case "Assignment":
+                            var assignment = s_dAssignment?.Get(id);
+                            if (assignment != null)
+                            {
+                                Console.WriteLine(assignment);
+                            }
+                            else
+                            {
+                                Console.WriteLine($"No {entityName} found with ID {id}.");
+                            }
+                            break;
+
+                        case "Call":
+                            var call = s_dalCall?.Get(id);
+                            if (call != null)
+                            {
+                                Console.WriteLine(call);
+                            }
+                            else
+                            {
+                                Console.WriteLine($"No {entityName} found with ID {id}.");
+                            }
+                            break;
+
+                        case "Volunteer":
+                            var volunteer = s_daVolunteer?.Get(id);
+                            if (volunteer != null)
+                            {
+                                Console.WriteLine(volunteer);
+                            }
+                            else
+                            {
+                                Console.WriteLine($"No {entityName} found with ID {id}.");
+                            }
+                            break;
+
+                        default:
+                            break;
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Invalid ID. Please enter a valid number.");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred while reading {entityName}: {ex.Message}");
+            }
+        }
+        // read all general entity
+        public static void DisplayAllData(string entityName)
+        {
+            try
+            {
+                switch (entityName)
+                {
+                    case "Assignment":
+                        var assignments = s_dAssignment?.GetAll();
+                        if (assignments != null)
+                        {
+                            foreach (var assignment in assignments)
+                            {
+                                Console.WriteLine(assignment);
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine($"No {entityName} found.");
+                        }
+                        break;
+
+                    case "Call":
+                        var calls = s_dalCall?.GetAll();
+                        if (calls != null)
+                        {
+                            foreach (var call in calls)
+                            {
+                                Console.WriteLine(call);
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine($"No {entityName} found.");
+                        }
+                        break;
+
+                    case "Volunteer":
+                        var volunteers = s_daVolunteer?.GetAll();
+                        if (volunteers != null)
+                        {
+                            foreach (var volunteer in volunteers)
+                            {
+                                Console.WriteLine(volunteer);
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine($"No {entityName} found.");
+                        }
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred while displaying all {entityName}: {ex.Message}");
+            }
+        }
+        // update general entity
+        public static void UpdateEntity(string entityName)
+        {
+            try
+            {
+                Console.Write($"Enter the ID of the {entityName} to update: ");
+                if (int.TryParse(Console.ReadLine(), out int id))
+                {
+                    switch (entityName)
+                    {
+                        case "Assignment":
+                            var assignment = s_dAssignment?.Get(id);
+                            if (assignment != null)
+                            {
+                                assignment.SetDetailsFromUserInput();
+                                s_dAssignment?.Update(assignment);
+                                Console.WriteLine($"{entityName} updated successfully.");
+                            }
+                            else
+                            {
+                                Console.WriteLine($"No {entityName} found with ID {id}.");
+                            }
+                            break;
+
+                        case "Call":
+                            var call = s_dalCall?.Get(id);
+                            if (call != null)
+                            {
+                                call.SetDetailsFromUserInput();
+                                s_dalCall?.Update(call);
+                                Console.WriteLine($"{entityName} updated successfully.");
+                            }
+                            else
+                            {
+                                Console.WriteLine($"No {entityName} found with ID {id}.");
+                            }
+                            break;
+
+                        case "Volunteer":
+                            var volunteer = s_daVolunteer?.Get(id);
+                            if (volunteer != null)
+                            {
+                                volunteer.SetDetailsFromUserInput();
+                                s_daVolunteer?.Update(volunteer);
+                                Console.WriteLine($"{entityName} updated successfully.");
+                            }
+                            else
+                            {
+                                Console.WriteLine($"No {entityName} found with ID {id}.");
+                            }
+                            break;
+
+                        default:
+                            break;
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Invalid ID. Please enter a valid number.");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred while updating {entityName}: {ex.Message}");
+            }
+        }
+        // delete general entity
+        public static void DeleteEntity(string entityName)
+        {
+            try
+            {
+                Console.Write($"Enter the ID of the {entityName} to delete: ");
+                if (int.TryParse(Console.ReadLine(), out int id))
+                {
+                    switch (entityName)
+                    {
+                        case "Assignment":
+                            s_dAssignment?.Delete(id);
+                            Console.WriteLine($"{entityName} deleted successfully.");
+                            break;
+
+                        case "Call":
+                            s_dalCall?.Delete(id);
+                            Console.WriteLine($"{entityName} deleted successfully.");
+                            break;
+
+                        case "Volunteer":
+                            s_daVolunteer?.Delete(id);
+                            Console.WriteLine($"{entityName} deleted successfully.");
+                            break;
+
+                        default:
+                            break;
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Invalid ID. Please enter a valid number.");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred while deleting {entityName}: {ex.Message}");
+            }
+        }
+        // delete all general entity
+        public static void DeleteAllEntities(string entityName)
+        {
+            try
+            {
+                switch (entityName)
+                {
+                    case "Assignment":
+                        s_dAssignment?.DeleteAll();
+                        Console.WriteLine($"All {entityName} deleted successfully.");
+                        break;
+
+                    case "Call":
+                        s_dalCall?.DeleteAll();
+                        Console.WriteLine($"All {entityName} deleted successfully.");
+                        break;
+
+                    case "Volunteer":
+                        s_daVolunteer?.DeleteAll();
+                        Console.WriteLine($"All {entityName} deleted successfully.");
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred while deleting all {entityName}: {ex.Message}");
             }
         }
 
