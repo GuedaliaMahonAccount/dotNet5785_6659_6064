@@ -418,13 +418,64 @@ namespace DalTest
         // Private method to set a new configuration value
         private static void SetNewConfigValue()
         {
-            try
+            bool continueConfiguring = true;
+            while (continueConfiguring)
             {
+                try
+                {
+                    Console.WriteLine("Please choose a configuration setting to update:");
+                    Console.WriteLine("1. Update System Clock");
+                    Console.WriteLine("2. Update Risk Range");
+                    Console.WriteLine("3. Exit Configuration");
 
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"An error occurred in SetNewConfigValue: {ex.Message}");
+                    if (int.TryParse(Console.ReadLine(), out int choice))
+                    {
+                        switch (choice)
+                        {
+                            case 1:
+                                Console.Write("Enter the new date and time for the Clock (format: yyyy-MM-dd HH:mm): ");
+                                if (DateTime.TryParse(Console.ReadLine(), out DateTime newClock))
+                                {
+                                    s_dalConfig.Clock = newClock;
+                                    Console.WriteLine("System clock updated successfully.");
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Invalid date and time format. Clock update failed.");
+                                }
+                                break;
+
+                            case 2:
+                                Console.Write("Enter the new Risk Range (in minutes): ");
+                                if (int.TryParse(Console.ReadLine(), out int riskMinutes))
+                                {
+                                    s_dalConfig.RiskRange = TimeSpan.FromMinutes(riskMinutes);
+                                    Console.WriteLine("Risk range updated successfully.");
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Invalid input. Risk range update failed.");
+                                }
+                                break;
+
+                            case 3:
+                                continueConfiguring = false; // Exit the configuration menu
+                                break;
+
+                            default:
+                                Console.WriteLine("Invalid choice. Please choose again.");
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("Invalid choice. Please enter a valid number.");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"An error occurred in SetNewConfigValue: {ex.Message}");
+                }
             }
         }
         // Private method to display the current configuration value
@@ -432,7 +483,11 @@ namespace DalTest
         {
             try
             {
-
+                Console.WriteLine("Current Configuration Values:");
+                Console.WriteLine($"1. System Clock: {s_dalConfig.Clock}");
+                Console.WriteLine($"2. Risk Range: {s_dalConfig.RiskRange.TotalMinutes} minutes");
+                Console.WriteLine($"3. Next Call ID: {s_dalConfig.NextCallId}");
+                Console.WriteLine($"4. Next Assignment ID: {s_dalConfig.NextAssignmentId}");
             }
             catch (Exception ex)
             {
