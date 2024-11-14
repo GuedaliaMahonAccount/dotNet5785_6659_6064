@@ -35,7 +35,6 @@ namespace DalTest
             DisplayCurrentConfigValue,
             ResetAllConfigValues
         }
-         
         public enum selectedsubOption
         {
             Exit,                      // Exit the submenu
@@ -156,7 +155,7 @@ namespace DalTest
                             ReadEntity(entityName); // Read
                             break;
                         case MainMenuOption.ReadAll:
-                            DisplayAllData(); // ReadAll
+                            DisplayAllData(entityName); // ReadAll
                             break;
                         case MainMenuOption.Update:
                             UpdateEntity(entityName); // Update
@@ -242,13 +241,17 @@ namespace DalTest
         {
             try
             {
-
+                DisplayAllData("Assignment");
+                DisplayAllData("Call");
+                DisplayAllData("Volunteer");
+                DisplayCurrentConfigValue();
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"An error occurred in DisplayAllData: {ex.Message}");
             }
         }
+
         //reset database and configuration
         public static void ResetDatabaseAndConfig()
         {
