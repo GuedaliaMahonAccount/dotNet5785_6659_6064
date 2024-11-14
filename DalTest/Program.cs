@@ -11,45 +11,36 @@ namespace DalTest
         private static IVolunteer? s_daVolunteer = new VolunteerImplementation();
         private static IConfig? s_dalConfig = new ConfigImplementation();
 
+        /// <summary>
+        /// enums
+        /// </summary>
+        public enum MainMenuOption
+        {
+            ExitMainMenu,
+            DisplaySubMenuVolunteer,
+            DisplaySubMenuCall,
+            DisplaySubMenuAssignment,
+            InitializeData,
+            DisplayAllData,
+            DisplayConfigurationSubMenu,
+            ResetDatabaseAndConfiguration
+        }
+
+
+
+
+
+
+
+        /// <summary>
+        /// main
+        /// </summary>
+        /// <param name="args"></param>
         static void Main(string[] args)
         {
-            try
-            {
-                RunApplication();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"An error occurred: {ex.Message}");
-            }
+            ShowMainMenu();
         }
-
-        private static void RunApplication()
-        {
-            try
-            {
-                s_dAssignment?.Create(new Assignment());
-                s_dalCall?.Create(new Call());
-                s_daVolunteer?.Create(new Volunteer());
-                s_dalConfig?.create(new Config());
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"An error occurred in RunApplication: {ex.Message}");
-            }
-        }
-
-        private static void CreateVolunteer()
-        {
-            try
-            {
-                s_daVolunteer?.Create(new Volunteer());
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"An error occurred in CreateVolunteer: {ex.Message}");
-            }
-        }
-
+        //main menu
         private static void ShowMainMenu()
         {
             bool continueRunning = true;
@@ -67,32 +58,35 @@ namespace DalTest
                 Console.WriteLine("8. Reset Database and Configuration Data");
                 Console.Write("Please choose an option: ");
 
-                if (int.TryParse(Console.ReadLine(), out int option))
+                if (int.TryParse(Console.ReadLine(), out int option) &&
+                    Enum.IsDefined(typeof(MainMenuOption), option - 1))
                 {
-                    switch (option)
+                    MainMenuOption selectedOption = (MainMenuOption)(option - 1);
+
+                    switch (selectedOption)
                     {
-                        case 1:
+                        case MainMenuOption.ExitMainMenu:
                             continueRunning = false; // Exit
                             break;
-                        case 2:
+                        case MainMenuOption.DisplaySubMenuAssignment:
                             ShowAssignmentSubMenu(); // Show Submenu for Assignment
                             break;
-                        case 3:
+                        case MainMenuOption.DisplaySubMenuCall:
                             ShowCallSubMenu(); // Show Submenu for Call
-                            break;
-                        case 4:
+                            break; 
+                        case MainMenuOption.DisplaySubMenuVolunteer:
                             ShowVolunteerSubMenu(); // Show Submenu for Volunteer
                             break;
-                        case 5:
-                            Initialization.Do(); // Initialize Data
+                        case MainMenuOption.InitializeData:
+                            Initialization.Do();// Initialize Data
                             break;
-                        case 6:
+                        case MainMenuOption.DisplayAllData:
                             DisplayAllData(); // Display All Data in the Database
                             break;
-                        case 7:
+                        case MainMenuOption.DisplayConfigurationSubMenu:
                             ShowConfigSubMenu(); // Show Submenu for Configuration
                             break;
-                        case 8:
+                        case MainMenuOption.ResetDatabaseAndConfiguration:
                             ResetDatabaseAndConfig(); // Reset Database and Configuration Data
                             break;
                         default:
@@ -108,6 +102,280 @@ namespace DalTest
         }
 
 
+
+
+
+
+        /// <summary>
+        /// main menu option 
+        /// </summary>
+        //assignment submenu
+        public static void ShowAssignmentSubMenu()
+        {
+            bool continueRunning = true;
+            while (continueRunning)
+            {
+                Console.Clear();
+                ShowEntityMenu("Assignment");
+                Console.Write("Please choose an option: ");
+
+                if (int.TryParse(Console.ReadLine(), out int option) &&
+                    Enum.IsDefined(typeof(MainMenuOption), option - 1))
+                {
+                    MainMenuOption selectedOption = (MainMenuOption)(option - 1);
+
+                    switch (selectedOption)
+                    {
+                        case MainMenuOption.ExitMainMenu:
+                            continueRunning = false; // Exit
+                            break;
+                        case MainMenuOption.DisplaySubMenuAssignment:
+                            ShowAssignmentSubMenu(); // Show Submenu for Assignment
+                            break;
+                        case MainMenuOption.Create:
+                            CreateEntity("Assignment"); // Create
+                            break;
+                        case MainMenuOption.Read:
+                            ReadEntity("Assignment"); // Read
+                            break;
+                        case MainMenuOption.ReadAll:
+                            DisplayAllData(); // ReadAll
+                            break;
+                        case MainMenuOption.Update:
+                            UpdateEntity("Assignment"); // Update
+                            break;
+                        case MainMenuOption.Delete:
+                            DeleteEntity("Assignment"); // Delete
+                            break;
+                        case MainMenuOption.DeleteAll:
+                            DeleteAllEntities("Assignment"); // DeleteAll
+                            break;
+                        default:
+                            Console.WriteLine("Invalid option. Please choose again.");
+                            break;
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Invalid option. Please choose again.");
+                }
+            }
+        }
+        //call submenu
+        public static void ShowCallSubMenu()
+        {
+            bool continueRunning = true;
+            while (continueRunning)
+            {
+                Console.Clear();
+                ShowEntityMenu("Call");
+                Console.Write("Please choose an option: ");
+
+                if (int.TryParse(Console.ReadLine(), out int option) &&
+                    Enum.IsDefined(typeof(MainMenuOption), option - 1))
+                {
+                    MainMenuOption selectedOption = (MainMenuOption)(option - 1);
+
+                    switch (selectedOption)
+                    {
+                        case MainMenuOption.ExitMainMenu:
+                            continueRunning = false; // Exit
+                            break;
+                        case MainMenuOption.DisplaySubMenuCall:
+                            ShowCallSubMenu(); // Show Submenu for Call
+                            break;
+                        case MainMenuOption.Create:
+                            CreateEntity("Call"); // Create
+                            break;
+                        case MainMenuOption.Read:
+                            ReadEntity("Call"); // Read
+                            break;
+                        case MainMenuOption.ReadAll:
+                            DisplayAllData(); // ReadAll
+                            break;
+                        case MainMenuOption.Update:
+                            UpdateEntity("Call"); // Update
+                            break;
+                        case MainMenuOption.Delete:
+                            DeleteEntity("Call"); // Delete
+                            break;
+                        case MainMenuOption.DeleteAll:
+                            DeleteAllEntities("Call"); // DeleteAll
+                            break;
+                        default:
+                            Console.WriteLine("Invalid option. Please choose again.");
+                            break;
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Invalid option. Please choose again.");
+                }
+            }
+        }
+        //volunteer submenu
+        public static void ShowVolunteerSubMenu()
+        {
+            bool continueRunning = true;
+            while (continueRunning)
+            {
+                Console.Clear();
+                ShowEntityMenu("Volunteer");
+                Console.Write("Please choose an option: ");
+
+                if (int.TryParse(Console.ReadLine(), out int option) &&
+                    Enum.IsDefined(typeof(MainMenuOption), option - 1))
+                {
+                    MainMenuOption selectedOption = (MainMenuOption)(option - 1);
+
+                    switch (selectedOption)
+                    {
+                        case MainMenuOption.ExitMainMenu:
+                            continueRunning = false; // Exit
+                            break;
+                        case MainMenuOption.DisplaySubMenuVolunteer:
+                            ShowVolunteerSubMenu(); // Show Submenu for Volunteer
+                            break;
+                        case MainMenuOption.Create:
+                            CreateEntity("Volunteer"); // Create
+                            break;
+                        case MainMenuOption.Read:
+                            ReadEntity("Volunteer"); // Read
+                            break;
+                        case MainMenuOption.ReadAll:
+                            DisplayAllData(); // ReadAll
+                            break;
+                        case MainMenuOption.Update:
+                            UpdateEntity("Volunteer"); // Update
+                            break;
+                        case MainMenuOption.Delete:
+                            DeleteEntity("Volunteer"); // Delete
+                            break;
+                        case MainMenuOption.DeleteAll:
+                            DeleteAllEntities("Volunteer"); // DeleteAll
+                            break;
+                        default:
+                            Console.WriteLine("Invalid option. Please choose again.");
+                            break;
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Invalid option. Please choose again.");
+                }
+            }
+        }
+        //config submenu
+        public static void ShowConfigSubMenu()
+        {
+            bool continueRunning = true;
+            while (continueRunning)
+            {
+                Console.Clear();
+                ShowConfigMenu();
+                Console.Write("Please choose an option: ");
+
+                if (int.TryParse(Console.ReadLine(), out int option) &&
+                    Enum.IsDefined(typeof(MainMenuOption), option - 1))
+                {
+                    MainMenuOption selectedOption = (MainMenuOption)(option - 1);
+
+                    switch (selectedOption)
+                    {
+                        case MainMenuOption.ExitMainMenu:
+                            continueRunning = false; // Exit
+                            break;
+                        case MainMenuOption.DisplayConfigurationSubMenu:
+                            ShowConfigSubMenu(); // Show Submenu for Configuration
+                            break;
+                        case MainMenuOption.AdvanceSystemClock:
+                            AdvanceSystemClock(); // Advance system clock
+                            break;
+                        case MainMenuOption.ResetConfigValues:
+                            ResetConfigValues(); // Reset config values
+                            break;
+                        default:
+                            Console.WriteLine("Invalid option. Please choose again.");
+                            break;
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Invalid option. Please choose again.");
+                }
+            }
+        }
+        //display all data
+        public static void DisplayAllData()
+        {
+            try
+            {
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred in DisplayAllData: {ex.Message}");
+            }
+        }
+        // Private method for Config-specific actions (e.g., time adjustments)
+        private static void ShowConfigMenu()
+        {
+            Console.WriteLine("Config Menu:");
+            Console.WriteLine("1. Advance system clock by minute");
+            Console.WriteLine("2. Advance system clock by hour");
+            Console.WriteLine("3. Show current system clock value");
+            Console.WriteLine("4. Set a new config value");
+            Console.WriteLine("5. Reset config values");
+            Console.WriteLine("6. Exit");
+        }
+        //reset database and configuration
+        public static void ResetDatabaseAndConfig()
+        {
+            try
+            {
+                s_dAssignment?.DeleteAll();
+                s_dalCall?.DeleteAll();
+                s_daVolunteer?.DeleteAll();
+                s_dalConfig?.Reset();
+                Console.WriteLine("Database and configuration data reset.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred in ResetDatabaseAndConfig: {ex.Message}");
+            }
+        }
+
+
+
+
+
+
+
+
+
+
+        /// <summary>
+        /// assigment submenu
+        /// </summary>
+
+
+
+
+
+
+
+        // Private method to display all data in the database
+        private static void CreateVolunteer()
+        {
+            try
+            {
+                s_daVolunteer?.Create(new Volunteer());
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred in CreateVolunteer: {ex.Message}");
+            }
+        }
 
         // Private method to display a submenu for a given entity
         private static void ShowEntityMenu(string entityName)
@@ -219,18 +487,6 @@ namespace DalTest
             {
                 Console.WriteLine($"Error deleting all {entityName}s: {ex.Message}");
             }
-        }
-
-        // Private method for Config-specific actions (e.g., time adjustments)
-        private static void ShowConfigMenu()
-        {
-            Console.WriteLine("Config Menu:");
-            Console.WriteLine("1. Advance system clock by minute");
-            Console.WriteLine("2. Advance system clock by hour");
-            Console.WriteLine("3. Show current system clock value");
-            Console.WriteLine("4. Set a new config value");
-            Console.WriteLine("5. Reset config values");
-            Console.WriteLine("6. Exit");
         }
 
         // Private method for advancing the system clock

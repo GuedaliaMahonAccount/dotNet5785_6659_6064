@@ -351,7 +351,7 @@ public static class Initialization
 
 
 
-    public static void Do(IVolunteer? dalVolunteer, ICall? dalCall, IAssignment? dalAssignment, IConfig? dalConfig)
+    public static void Do(IVolunteer? dalVolunteer=null, ICall? dalCall = null, IAssignment? dalAssignment = null, IConfig? dalConfig = null)
     {
         s_dalVolunteer = dalVolunteer ?? throw new NullReferenceException("DAL object can not be null!");
         s_dalCall = dalCall ?? throw new NullReferenceException("DAL object can not be null!");
