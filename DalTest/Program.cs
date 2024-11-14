@@ -269,7 +269,7 @@ namespace DalTest
 
 
 
-        
+
 
 
 
@@ -279,6 +279,42 @@ namespace DalTest
         /// <summary>
         /// general submenu
         /// </summary>
+        public static void CreateEntity(string entityName)
+        {
+            try
+            {
+                switch (entityName)
+                {
+                    case "Assignment":
+                        var assignment = new Assignment();
+                        assignment.SetDetailsFromUserInput();
+                        s_dAssignment?.Add(assignment);
+                        break;
+
+                    case "Call":
+                        var call = new Call();
+                        call.SetDetailsFromUserInput();
+                        s_dalCall?.Add(call);
+                        break;
+
+                    case "Volunteer":
+                        var volunteer = new Volunteer();
+                        volunteer.SetDetailsFromUserInput();
+                        s_daVolunteer?.Add(volunteer);
+                        break;
+
+                    default:
+                        break;
+                }
+                Console.WriteLine($"{entityName} created and added successfully.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred while creating {entityName}: {ex.Message}");
+            }
+        }
+
+
 
 
 
