@@ -247,8 +247,6 @@ namespace DalTest
 
 
 
-
-
         /// <summary>
         /// general entity submenu
         /// </summary>
@@ -364,7 +362,7 @@ namespace DalTest
                 switch (entityName)
                 {
                     case "Assignment":
-                        var assignments = s_dAssignment?.GetAll();
+                        var assignments = s_dAssignment?.ReadAll();
                         if (assignments != null)
                         {
                             foreach (var assignment in assignments)
@@ -379,7 +377,7 @@ namespace DalTest
                         break;
 
                     case "Call":
-                        var calls = s_dalCall?.GetAll();
+                        var calls = s_dalCall?.ReadAll();
                         if (calls != null)
                         {
                             foreach (var call in calls)
@@ -394,7 +392,7 @@ namespace DalTest
                         break;
 
                     case "Volunteer":
-                        var volunteers = s_daVolunteer?.GetAll();
+                        var volunteers = s_daVolunteer?.ReadAll();
                         if (volunteers != null)
                         {
                             foreach (var volunteer in volunteers)
@@ -827,7 +825,6 @@ namespace DalTest
                 return null;
             }
         }
-
         //create new call
         public static Call CreatenewCall()
         {
