@@ -775,7 +775,7 @@ namespace DalTest
                 return null;
             }
         }
-        //create new assignment
+        // Create new assignment
         public static Assignment CreatenewAssignment()
         {
             try
@@ -792,45 +792,42 @@ namespace DalTest
                 if (!int.TryParse(Console.ReadLine(), out int volunteerId) || volunteerId < 200000000 || volunteerId > 400000000)
                     throw new ArgumentException("Invalid Volunteer ID. Volunteer ID must be a number between 200000000 and 400000000.\n");
 
-                Console.WriteLine("Enter Assignment Status (0: Open, 1: In Progress, 2: Closed):");
-                string status = Console.ReadLine();
-                if (int.TryParse(status, out int statusValue))
+                Console.WriteLine("Enter Start Time (format: yyyy-MM-dd HH:mm):");
+                if (!DateTime.TryParse(Console.ReadLine(), out DateTime startTime))
+                    throw new ArgumentException("Invalid start time format. Please enter a valid date and time.\n");
+
+                Console.WriteLine("Do you want to enter an End Time? (Yes/No):");
+                DateTime? endTime = null;
+                string endTimeInput = Console.ReadLine()?.ToLower();
+                if (endTimeInput == "yes")
                 {
-                    if (statusValue < 0 || statusValue > 2)
-                        throw new ArgumentException("Invalid status. Please enter a number between 0 and 2.\n");
+                    Console.WriteLine("Enter End Time (format: yyyy-MM-dd HH:mm):");
+                    if (!DateTime.TryParse(Console.ReadLine(), out DateTime end))
+                        throw new ArgumentException("Invalid end time format. Please enter a valid date and time.\n");
+                    endTime = end;
                 }
-                else
+
+                Console.WriteLine("Enter End Type (0: Completed, 1: SelfCanceled, 2: AdminCanceled, 3: Expired) or press Enter to skip:");
+                EndType? endType = null;
+                string endTypeInput = Console.ReadLine();
+                if (!string.IsNullOrWhiteSpace(endTypeInput))
                 {
-                    throw new ArgumentException("Invalid input. Please enter a valid number between 0 and 2.\n");
+                    if (!int.TryParse(endTypeInput, out int endTypeValue) || !Enum.IsDefined(typeof(EndType), endTypeValue))
+                        throw new ArgumentException("Invalid end type. Please enter a valid number between 0 and 3 corresponding to the options.\n");
+
+                    // Cast the integer to the specific EndType enum
+                    endType = (EndType)endTypeValue;
                 }
 
-                Console.WriteLine("Enter Assignment Date and Time (format: yyyy-MM-dd HH:mm):");
-                if (!DateTime.TryParse(Console.ReadLine(), out DateTime assignmentDateTime))
-                    throw new ArgumentException("Invalid date and time format. Please enter a valid date and time.\n");
-
-                Console.WriteLine("Enter Assignment Duration (in minutes):");
-                if (!int.TryParse(Console.ReadLine(), out int duration) || duration <= 0)
-                    throw new ArgumentException("Invalid duration. Please enter a positive integer.\n");
-
-                Console.WriteLine("Enter Assignment Distance (in kilometers):");
-                if (!double.TryParse(Console.ReadLine(), out double distance) || distance <= 0)
-                    throw new ArgumentException("Invalid distance. Please enter a positive number.\n");
-
-                return new Assignment
-                {
-                    Id = id,
-                    CallId = callId,
-                    VolunteerId = volunteerId,
-                    Status = (AssignmentStatus)status
-                };
+                return new Assignment(id, callId, volunteerId, startTime, endTime, endType);
             }
             catch (ArgumentException ex)
             {
                 Console.WriteLine($"Error: {ex.Message}");
                 return null;
             }
-
         }
+
         //create new call
         public static Call CreatenewCall()
         {
@@ -840,38 +837,49 @@ namespace DalTest
                 if (!int.TryParse(Console.ReadLine(), out int id) || id < 100000000 || id > 200000000)
                     throw new ArgumentException("Invalid ID. ID must be a number between 100000000 and 200000000.\n");
 
-                Console.WriteLine("Enter Call Date and Time (format: yyyy-MM-dd HH:mm):");
-                if (!DateTime.TryParse(Console.ReadLine(), out DateTime callDateTime))
-                    throw new ArgumentException("Invalid date and time format. Please enter a valid date and time.\n");
+                Console.WriteLine("Enter Call Type (0: Open, 1: Urgent, 2: Recurring):");
+                string callTypeInput = Console.ReadLine();
+                if (!int.TryParse(callTypeInput, out int callTypeValue) || !Enum.IsDefined(typeof(CallType), callTypeValue))
+                    throw new ArgumentException("Invalid Call Type. Please enter a valid number corresponding to the options.\n");
 
-                Console.WriteLine("Enter Call Duration (in minutes):");
-                if (!int.TryParse(Console.ReadLine(), out int duration) || duration <= 0)
-                    throw new ArgumentException("Invalid duration. Please enter a positive integer.\n");
+                Console.WriteLine("Enter Address:");
+                string address = Console.ReadLine();
+                if (string.IsNullOrWhiteSpace(address))
+                    throw new ArgumentException("Invalid Address. Address cannot be empty.\n");
 
-                Console.WriteLine("Enter Call Distance (in kilometers):");
-                if (!double.TryParse(Console.ReadLine(), out double distance) || distance <= 0)
-                    throw new ArgumentException("Invalid distance. Please enter a positive number.\n");
+                Console.WriteLine("Enter Latitude:");
+                if (!double.TryParse(Console.ReadLine(), out double latitude))
+                    throw new ArgumentException("Invalid Latitude. Please enter a valid number.\n");
 
-                Console.WriteLine("Enter Call Risk Level (0: Low, 1: Medium, 2: High):");
-                string riskLevel = Console.ReadLine();
-                if (int.TryParse(riskLevel, out int riskLevelValue))
+                Console.WriteLine("Enter Longitude:");
+                if (!double.TryParse(Console.ReadLine(), out double longitude))
+                    throw new ArgumentException("Invalid Longitude. Please enter a valid number.\n");
+
+                Console.WriteLine("Enter Start Time (format: yyyy-MM-dd HH:mm):");
+                if (!DateTime.TryParse(Console.ReadLine(), out DateTime startTime))
+                    throw new ArgumentException("Invalid Start Time format. Please enter a valid date and time.\n");
+
+                Console.WriteLine("Do you want to add a Description? (Yes/No):");
+                string? description = null;
+                string descriptionInput = Console.ReadLine()?.ToLower();
+                if (descriptionInput == "yes")
                 {
-                    if (riskLevelValue < 0 || riskLevelValue > 2)
-                        throw new ArgumentException("Invalid risk level. Please enter a number between 0 and 2.\n");
+                    Console.WriteLine("Enter Description:");
+                    description = Console.ReadLine();
                 }
-                else
+
+                Console.WriteLine("Do you want to add a Deadline? (Yes/No):");
+                DateTime? deadline = null;
+                string deadlineInput = Console.ReadLine()?.ToLower();
+                if (deadlineInput == "yes")
                 {
-                    throw new ArgumentException("Invalid input. Please enter a valid number between 0 and 2.\n");
+                    Console.WriteLine("Enter Deadline (format: yyyy-MM-dd HH:mm):");
+                    if (!DateTime.TryParse(Console.ReadLine(), out DateTime parsedDeadline))
+                        throw new ArgumentException("Invalid Deadline format. Please enter a valid date and time.\n");
+                    deadline = parsedDeadline;
                 }
 
-                return new Call
-                {
-                    Id = id,
-                    DateTime = callDateTime,
-                    Duration = duration,
-                    Distance = distance,
-                    RiskLevel = (RiskLevel)riskLevelValue
-                };
+                return new Call(id, (CallType)callTypeValue, address, latitude, longitude, startTime, description, deadline);
             }
             catch (ArgumentException ex)
             {
@@ -879,5 +887,6 @@ namespace DalTest
                 return null;
             }
         }
+
     }
 }
