@@ -444,7 +444,7 @@ namespace DalTest
                             if (assignment != null)
                             {
                                 var updatedAssignment = SetAssignmentEntity(assignment);
-                                s_dAssignment?.Update(assignment);
+                                s_dAssignment?.Update(updatedAssignment);
                                 Console.WriteLine($"{entityName} updated successfully.");
                             }
                             else
@@ -458,7 +458,7 @@ namespace DalTest
                             if (call != null)
                             {
                                 var updatedCall = SetCallEntity(call);
-                                s_dalCall?.Update(call);
+                                s_dalCall?.Update(updatedCall);
                                 Console.WriteLine($"{entityName} updated successfully.");
                             }
                             else
@@ -472,7 +472,7 @@ namespace DalTest
                             if (volunteer != null)
                             {
                                 var updatedVolunteer = SetVolunteerEntity(volunteer);
-                                s_daVolunteer?.Update(volunteer);
+                                s_daVolunteer?.Update(updatedVolunteer);
                                 Console.WriteLine($"{entityName} updated successfully.");
                             }
                             else
