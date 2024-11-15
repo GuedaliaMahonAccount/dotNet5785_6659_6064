@@ -6,7 +6,7 @@ namespace DalTest
 {
     internal class Program
     {
-        // Main menu entity
+        // create list of entity
         private static IAssignment? s_dAssignment = new AssignmentImplementation();
         private static ICall? s_dalCall = new CallImplementation();
         private static IVolunteer? s_daVolunteer = new VolunteerImplementation();
@@ -307,7 +307,7 @@ namespace DalTest
                     switch (entityName)
                     {
                         case "Assignment":
-                            var assignment = s_dAssignment?.Get(id);
+                            var assignment = s_dAssignment?.Read(id);
                             if (assignment != null)
                             {
                                 Console.WriteLine(assignment);
@@ -319,7 +319,7 @@ namespace DalTest
                             break;
 
                         case "Call":
-                            var call = s_dalCall?.Get(id);
+                            var call = s_dalCall?.Read(id);
                             if (call != null)
                             {
                                 Console.WriteLine(call);
@@ -331,7 +331,7 @@ namespace DalTest
                             break;
 
                         case "Volunteer":
-                            var volunteer = s_daVolunteer?.Get(id);
+                            var volunteer = s_daVolunteer?.Read(id);
                             if (volunteer != null)
                             {
                                 Console.WriteLine(volunteer);
