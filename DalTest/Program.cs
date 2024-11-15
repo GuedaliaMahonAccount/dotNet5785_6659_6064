@@ -426,10 +426,10 @@ namespace DalTest
                     switch (entityName)
                     {
                         case "Assignment":
-                            var assignment = s_dAssignment?.Get(id);
+                            var assignment = s_dAssignment?.Read(id);
                             if (assignment != null)
                             {
-                                assignment.SetDetailsFromUserInput();
+                                var updatedAssignment = SetAssignmentEntity(assignment);
                                 s_dAssignment?.Update(assignment);
                                 Console.WriteLine($"{entityName} updated successfully.");
                             }
@@ -440,10 +440,10 @@ namespace DalTest
                             break;
 
                         case "Call":
-                            var call = s_dalCall?.Get(id);
+                            var call = s_dalCall?.Read(id);
                             if (call != null)
                             {
-                                call.SetDetailsFromUserInput();
+                                var updatedCall = SetCallEntity(call);
                                 s_dalCall?.Update(call);
                                 Console.WriteLine($"{entityName} updated successfully.");
                             }
@@ -454,10 +454,10 @@ namespace DalTest
                             break;
 
                         case "Volunteer":
-                            var volunteer = s_daVolunteer?.Get(id);
+                            var volunteer = s_daVolunteer?.Read(id);
                             if (volunteer != null)
                             {
-                                volunteer.SetDetailsFromUserInput();
+                                var updatedVolunteer = SetVolunteerEntity(volunteer);
                                 s_daVolunteer?.Update(volunteer);
                                 Console.WriteLine($"{entityName} updated successfully.");
                             }
@@ -884,6 +884,173 @@ namespace DalTest
                 return null;
             }
         }
+
+
+        /// <summary>
+        /// update entity
+        /// <summary?
+        //upfate assignmatn
+        public static Assignment SetAssignmentEntity( Assignment assignment)
+        {
+            try
+            {
+                Console.WriteLine("Enter Call ID:");
+                if (int.TryParse(Console.ReadLine(), out int callId) && callId >= 100000000 && callId <= 200000000)
+                    assignment = assignment with { CallId = callId };
+
+                Console.WriteLine("Enter Volunteer ID:");
+                if (int.TryParse(Console.ReadLine(), out int volunteerId) && volunteerId >= 200000000 && volunteerId <= 400000000)
+                    assignment = assignment with { VolunteerId = volunteerId };
+
+                Console.WriteLine("Enter Start Time (format: yyyy-MM-dd HH:mm):");
+                if (DateTime.TryParse(Console.ReadLine(), out DateTime startTime))
+                    assignment = assignment with { StartTime = startTime };
+
+                Console.WriteLine("Do you want to update the End Time? (Yes/No):");
+                string endTimeInput = Console.ReadLine()?.ToLower();
+                if (endTimeInput == "yes")
+                {
+                    Console.WriteLine("Enter End Time (format: yyyy-MM-dd HH:mm):");
+                    if (DateTime.TryParse(Console.ReadLine(), out DateTime endTime))
+                        assignment = assignment with { EndTime = endTime };
+                }
+
+                Console.WriteLine("Do you want to update the End Type? (Yes/No):");
+                string endTypeInput = Console.ReadLine()?.ToLower();
+                if (endTypeInput == "yes")
+                {
+                    Console.WriteLine("Enter End Type (0: Completed, 1: SelfCanceled, 2: AdminCanceled, 3: Expired):");
+                    if (int.TryParse(Console.ReadLine(), out int endTypeValue) && Enum.IsDefined(typeof(EndType), endTypeValue))
+                        assignment = assignment with { EndType = (EndType)endTypeValue };
+                }
+
+
+                return assignment;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+                return null;
+            }
+        }
+        //update call
+        public static Call SetCallEntity(Call call)
+        {
+            try
+            {
+                Console.WriteLine("Enter Call Type (0: Open, 1: Urgent, 2: Recurring):");
+                if (int.TryParse(Console.ReadLine(), out int callTypeValue) && Enum.IsDefined(typeof(CallType), callTypeValue))
+                    call = call with { CallType = (CallType)callTypeValue };
+
+                Console.WriteLine("Enter Address:");
+                string address = Console.ReadLine();
+                if (!string.IsNullOrWhiteSpace(address))
+                    call = call with { Address = address };
+
+                Console.WriteLine("Enter Latitude:");
+                if (double.TryParse(Console.ReadLine(), out double latitude))
+                    call = call with { Latitude = latitude };
+
+                Console.WriteLine("Enter Longitude:");
+                if (double.TryParse(Console.ReadLine(), out double longitude))
+                    call = call with { Longitude = longitude };
+
+                Console.WriteLine("Enter Start Time (format: yyyy-MM-dd HH:mm):");
+                if (DateTime.TryParse(Console.ReadLine(), out DateTime startTime))
+                    call = call with { StartTime = startTime };
+
+                Console.WriteLine("Do you want to update the Description? (Yes/No):");
+                string descriptionInput = Console.ReadLine()?.ToLower();
+                if (descriptionInput == "yes")
+                {
+                    Console.WriteLine("Enter Description:");
+                    string description = Console.ReadLine();
+                    call = call with { Description = description };
+                }
+
+                Console.WriteLine("Do you want to update the Deadline? (Yes/No):");
+                string deadlineInput = Console.ReadLine()?.ToLower();
+                if (deadlineInput == "yes")
+                {
+                    Console.WriteLine("Enter Deadline (format: yyyy-MM-dd HH:mm):");
+                    if (DateTime.TryParse(Console.ReadLine(), out DateTime deadline))
+                        call = call with { DeadLine = deadline };
+                }
+
+                return call;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+                return null;
+            }
+        }
+        //update volunteer
+        public static Volunteer SetVolunteerEntity(Volunteer volunteer)
+        {
+            try
+            {
+                Console.WriteLine("Enter Full Name (First and Last):");
+                string fullName = Console.ReadLine();
+                if (!string.IsNullOrWhiteSpace(fullName) && fullName.Contains(" "))
+                    volunteer = volunteer with { Name = fullName };
+
+                Console.WriteLine("Enter Phone Number:");
+                string phone = Console.ReadLine();
+                if (System.Text.RegularExpressions.Regex.IsMatch(phone, @"^05\d{8}$"))
+                    volunteer = volunteer with { Phone = phone };
+
+                Console.WriteLine("Enter Email:");
+                string email = Console.ReadLine();
+                if (System.Text.RegularExpressions.Regex.IsMatch(email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
+                    volunteer = volunteer with { Email = email };
+
+                Console.WriteLine("Enter Password:");
+                string password = Console.ReadLine();
+                if (password.Length >= 8 && password.Any(char.IsDigit) && password.Any(char.IsLetter))
+                    volunteer = volunteer with { Password = password };
+
+                Console.WriteLine("Enter Full Address:");
+                string address = Console.ReadLine();
+                if (!string.IsNullOrWhiteSpace(address))
+                    volunteer = volunteer with { Address = address };
+
+                Console.WriteLine("Enter Latitude:");
+                if (double.TryParse(Console.ReadLine(), out double latitude))
+                    volunteer = volunteer with { Latitude = latitude };
+
+                Console.WriteLine("Enter Longitude:");
+                if (double.TryParse(Console.ReadLine(), out double longitude))
+                    volunteer = volunteer with { Longitude = longitude };
+
+                Console.WriteLine("Enter 0 for Manager and 1 for Volunteer:");
+                string roleInput = Console.ReadLine();
+                if (int.TryParse(roleInput, out int role) && Enum.IsDefined(typeof(Role), role))
+                    volunteer = volunteer with { Role = (Role)role };
+
+                Console.WriteLine("Is Active? (Yes/No):");
+                string isActiveInput = Console.ReadLine()?.ToLower();
+                if (isActiveInput == "yes" || isActiveInput == "no")
+                    volunteer = volunteer with { IsActive = isActiveInput == "yes" };
+
+                Console.WriteLine("Enter Maximum Distance to Accept a Call:");
+                if (double.TryParse(Console.ReadLine(), out double maxDistance) && maxDistance > 0)
+                    volunteer = volunteer with { MaxDistance = maxDistance };
+
+                Console.WriteLine("Enter Distance Type (0: Plane, 1: Foot, 2: Car, 3: Bike, 4: Public Transport):");
+                string distanceTypeInput = Console.ReadLine();
+                if (int.TryParse(distanceTypeInput, out int distanceTypeValue) && Enum.IsDefined(typeof(DistanceType), distanceTypeValue))
+                    volunteer = volunteer with { DistanceType = (DistanceType)distanceTypeValue };
+
+                return volunteer;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+                return null;
+            }
+        }
+
 
     }
 }
