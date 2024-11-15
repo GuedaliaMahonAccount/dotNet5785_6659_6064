@@ -43,10 +43,9 @@ namespace DalTest
                 Console.Write("Please choose an option: ");
 
                 if (int.TryParse(Console.ReadLine(), out int option) &&
-                    Enum.IsDefined(typeof(MainMenuOption), option - 1))
+                    Enum.IsDefined(typeof(MainMenuOption), option))
                 {
-                    MainMenuOption selectedOption = (MainMenuOption)(option - 1);
-
+                    MainMenuOption selectedOption = (MainMenuOption)(option);
                     switch (selectedOption)
                     {
                         case MainMenuOption.ExitMainMenu:
