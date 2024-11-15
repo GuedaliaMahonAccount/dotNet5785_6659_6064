@@ -57,7 +57,7 @@ namespace DalTest
                             break;
                         case MainMenuOption.DisplaySubMenuCall:
                             ShowSubMenu("Call"); // Show Submenu for Call
-                            break; 
+                            break;
                         case MainMenuOption.DisplaySubMenuVolunteer:
                             ShowSubMenu("Volunteer"); // Show Submenu for Volunteer
                             break;
@@ -272,21 +272,18 @@ namespace DalTest
                 switch (entityName)
                 {
                     case "Assignment":
-                        var assignment = new Assignment();
-                        assignment.SetDetailsFromUserInput();
-                        s_dAssignment?.Add(assignment);
+                        var assignment = CreatenewAssignment();
+                        s_dAssignment?.Create(assignment);
                         break;
 
                     case "Call":
-                        var call = new Call();
-                        call.SetDetailsFromUserInput();
-                        s_dalCall?.Add(call);
+                        var call = CreatenewCall();
+                        s_dalCall?.Create(call);
                         break;
 
                     case "Volunteer":
                         var volunteer = CreatenewVolunteer();
-                        volunteer.SetDetailsFromUserInput();
-                        s_daVolunteer?.Add(volunteer);
+                        s_daVolunteer?.Create(volunteer);
                         break;
 
                     default:
@@ -683,6 +680,10 @@ namespace DalTest
 
 
 
+        /// <summary>
+        /// creat entyti
+        /// </summary>
+        // create new volunteer
         public static Volunteer CreatenewVolunteer()
         {
             try
@@ -774,6 +775,109 @@ namespace DalTest
                 return null;
             }
         }
+        //create new assignment
+        public static Assignment CreatenewAssignment()
+        {
+            try
+            {
+                Console.WriteLine("Enter ID:");
+                if (!int.TryParse(Console.ReadLine(), out int id) || id < 100000000 || id > 200000000)
+                    throw new ArgumentException("Invalid ID. ID must be a number between 100000000 and 200000000.\n");
 
+                Console.WriteLine("Enter Call ID:");
+                if (!int.TryParse(Console.ReadLine(), out int callId) || callId < 100000000 || callId > 200000000)
+                    throw new ArgumentException("Invalid Call ID. Call ID must be a number between 100000000 and 200000000.\n");
+
+                Console.WriteLine("Enter Volunteer ID:");
+                if (!int.TryParse(Console.ReadLine(), out int volunteerId) || volunteerId < 200000000 || volunteerId > 400000000)
+                    throw new ArgumentException("Invalid Volunteer ID. Volunteer ID must be a number between 200000000 and 400000000.\n");
+
+                Console.WriteLine("Enter Assignment Status (0: Open, 1: In Progress, 2: Closed):");
+                string status = Console.ReadLine();
+                if (int.TryParse(status, out int statusValue))
+                {
+                    if (statusValue < 0 || statusValue > 2)
+                        throw new ArgumentException("Invalid status. Please enter a number between 0 and 2.\n");
+                }
+                else
+                {
+                    throw new ArgumentException("Invalid input. Please enter a valid number between 0 and 2.\n");
+                }
+
+                Console.WriteLine("Enter Assignment Date and Time (format: yyyy-MM-dd HH:mm):");
+                if (!DateTime.TryParse(Console.ReadLine(), out DateTime assignmentDateTime))
+                    throw new ArgumentException("Invalid date and time format. Please enter a valid date and time.\n");
+
+                Console.WriteLine("Enter Assignment Duration (in minutes):");
+                if (!int.TryParse(Console.ReadLine(), out int duration) || duration <= 0)
+                    throw new ArgumentException("Invalid duration. Please enter a positive integer.\n");
+
+                Console.WriteLine("Enter Assignment Distance (in kilometers):");
+                if (!double.TryParse(Console.ReadLine(), out double distance) || distance <= 0)
+                    throw new ArgumentException("Invalid distance. Please enter a positive number.\n");
+
+                return new Assignment
+                {
+                    Id = id,
+                    CallId = callId,
+                    VolunteerId = volunteerId,
+                    Status = (AssignmentStatus)status
+                };
+            }
+            catch (ArgumentException ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+                return null;
+            }
+
+        }
+        //create new call
+        public static Call CreatenewCall()
+        {
+            try
+            {
+                Console.WriteLine("Enter ID:");
+                if (!int.TryParse(Console.ReadLine(), out int id) || id < 100000000 || id > 200000000)
+                    throw new ArgumentException("Invalid ID. ID must be a number between 100000000 and 200000000.\n");
+
+                Console.WriteLine("Enter Call Date and Time (format: yyyy-MM-dd HH:mm):");
+                if (!DateTime.TryParse(Console.ReadLine(), out DateTime callDateTime))
+                    throw new ArgumentException("Invalid date and time format. Please enter a valid date and time.\n");
+
+                Console.WriteLine("Enter Call Duration (in minutes):");
+                if (!int.TryParse(Console.ReadLine(), out int duration) || duration <= 0)
+                    throw new ArgumentException("Invalid duration. Please enter a positive integer.\n");
+
+                Console.WriteLine("Enter Call Distance (in kilometers):");
+                if (!double.TryParse(Console.ReadLine(), out double distance) || distance <= 0)
+                    throw new ArgumentException("Invalid distance. Please enter a positive number.\n");
+
+                Console.WriteLine("Enter Call Risk Level (0: Low, 1: Medium, 2: High):");
+                string riskLevel = Console.ReadLine();
+                if (int.TryParse(riskLevel, out int riskLevelValue))
+                {
+                    if (riskLevelValue < 0 || riskLevelValue > 2)
+                        throw new ArgumentException("Invalid risk level. Please enter a number between 0 and 2.\n");
+                }
+                else
+                {
+                    throw new ArgumentException("Invalid input. Please enter a valid number between 0 and 2.\n");
+                }
+
+                return new Call
+                {
+                    Id = id,
+                    DateTime = callDateTime,
+                    Duration = duration,
+                    Distance = distance,
+                    RiskLevel = (RiskLevel)riskLevelValue
+                };
+            }
+            catch (ArgumentException ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+                return null;
+            }
+        }
     }
 }
