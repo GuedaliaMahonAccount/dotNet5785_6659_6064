@@ -284,7 +284,7 @@ namespace DalTest
                         break;
 
                     case "Volunteer":
-                        var volunteer = new Volunteer();
+                        var volunteer = CreatenewVolunteer();
                         volunteer.SetDetailsFromUserInput();
                         s_daVolunteer?.Add(volunteer);
                         break;
@@ -681,6 +681,99 @@ namespace DalTest
             }
         }
 
+
+
+        public static Volunteer CreatenewVolunteer()
+        {
+            try
+            {
+                Console.WriteLine("Enter ID:");
+                if (!int.TryParse(Console.ReadLine(), out int id) || id < 200000000 || id > 400000000)
+                    throw new ArgumentException("Invalid ID. ID must be a number between 200000000 and 400000000.\n");
+
+                Console.WriteLine("Enter Full Name (First and Last):");
+                string fullName = Console.ReadLine();
+                if (string.IsNullOrWhiteSpace(fullName) || !fullName.Contains(" "))
+                    throw new ArgumentException("Invalid name. Full name must include first and last names.\n");
+
+                Console.WriteLine("Enter Phone Number:");
+                string phone = Console.ReadLine();
+                if (!System.Text.RegularExpressions.Regex.IsMatch(phone, @"^05\d{8}$"))
+                    throw new ArgumentException("Invalid phone number. Phone number must start with '05' and be 10 digits long.\n");
+
+                Console.WriteLine("Enter Email:");
+                string email = Console.ReadLine();
+                if (!System.Text.RegularExpressions.Regex.IsMatch(email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
+                    throw new ArgumentException("Invalid email format. Please enter a valid email.\n");
+
+                Console.WriteLine("Enter Password:");
+                string password = Console.ReadLine();
+                if (password.Length < 8 || !password.Any(char.IsDigit) || !password.Any(char.IsLetter))
+                    throw new ArgumentException("Invalid password. Password must be at least 8 characters long, containing at least one letter and one digit.\n");
+
+                Console.WriteLine("Enter Full Address:");
+                string address = Console.ReadLine();
+                if (string.IsNullOrWhiteSpace(address))
+                    throw new ArgumentException("Invalid address. Please enter a full address.\n");
+
+                Console.WriteLine("Enter Latitude:");
+                if (!double.TryParse(Console.ReadLine(), out double latitude))
+                    throw new ArgumentException("Invalid latitude. Please enter a numeric latitude.\n");
+
+                Console.WriteLine("Enter Longitude:");
+                if (!double.TryParse(Console.ReadLine(), out double longitude))
+                    throw new ArgumentException("Invalid longitude. Please enter a numeric longitude.\n");
+
+                Console.WriteLine("Enter 0 for Manager and 1 for Volunteer:");
+                // Read input from user
+                string input = Console.ReadLine();
+
+                // Try to parse the input to the Role enum
+                if (!int.TryParse(input, out int roleInput) || roleInput < 0 || roleInput > 1)
+                {
+                    throw new ArgumentException("Invalid role. Role must be either '0' for Volunteer or '1' for Manager.\n");
+                }
+
+                Console.WriteLine("Is Active? (Yes/No):");
+                bool isActive = Console.ReadLine().ToLower() == "Yes";
+
+                Console.WriteLine("Enter Maximum Distance to Accept a Call:");
+                if (!int.TryParse(Console.ReadLine(), out int maxDistance) || maxDistance <= 0)
+                    throw new ArgumentException("Invalid maximum distance. Please enter a positive integer.\n");
+
+                Console.WriteLine("Enter Distance Type (0: plane, 1: foot, 2: Car, 3: Bike, 4: Public Transport):");
+                string distanceType = Console.ReadLine();
+                if (int.TryParse(distanceType, out int distanceTypeValue))
+                {
+                    if (distanceTypeValue < 0 || distanceTypeValue > 4)
+                        throw new ArgumentException("Invalid distance type. Please enter a number between 0 and 4.\n");
+                }
+                else
+                {
+                    throw new ArgumentException("Invalid input. Please enter a valid number between 0 and 4.\n");
+                }
+                return new Volunteer
+                {
+                    Id = id,
+                    Name = fullName,
+                    Phone = phone,
+                    Email = email,
+                    Password = password,
+                    Address = address,
+                    Latitude = latitude,
+                    Longitude = longitude,
+                    Role = (Role)roleInput,
+                    IsActive = isActive,
+                    MaxDistance = maxDistance,
+                    DistanceType = (DistanceType)distanceTypeValue
+                };
+            }
+            catch (ArgumentException ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+                return null;
+            }
+        }
 
     }
 }
