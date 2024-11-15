@@ -30,60 +30,74 @@ namespace DalTest
             bool continueRunning = true;
             while (continueRunning)
             {
-                Console.Clear();
-                Console.WriteLine("Main Menu:");
-                Console.WriteLine("1. Exit");
-                Console.WriteLine("2. Show Submenu for Assignment");
-                Console.WriteLine("3. Show Submenu for Call");
-                Console.WriteLine("4. Show Submenu for Volunteer");
-                Console.WriteLine("5. Initialize Data");
-                Console.WriteLine("6. Display All Data in the Database");
-                Console.WriteLine("7. Show Submenu for Configuration");
-                Console.WriteLine("8. Reset Database and Configuration Data");
-                Console.Write("Please choose an option: ");
-
-                if (int.TryParse(Console.ReadLine(), out int option) &&
-                    Enum.IsDefined(typeof(MainMenuOption), option))
+                try
                 {
-                    MainMenuOption selectedOption = (MainMenuOption)(option);
-                    switch (selectedOption)
+                    Console.Clear();
+                    Console.WriteLine("Main Menu:");
+                    Console.WriteLine("1. Exit");
+                    Console.WriteLine("2. Show Submenu for Assignment");
+                    Console.WriteLine("3. Show Submenu for Call");
+                    Console.WriteLine("4. Show Submenu for Volunteer");
+                    Console.WriteLine("5. Initialize Data");
+                    Console.WriteLine("6. Display All Data in the Database");
+                    Console.WriteLine("7. Show Submenu for Configuration");
+                    Console.WriteLine("8. Reset Database and Configuration Data");
+                    Console.Write("Please choose an option: ");
+
+                    if (int.TryParse(Console.ReadLine(), out int option) &&
+                        Enum.IsDefined(typeof(MainMenuOption), option))
                     {
-                        case MainMenuOption.ExitMainMenu:
-                            continueRunning = false; // Exit
-                            break;
-                        case MainMenuOption.DisplaySubMenuAssignment:
-                            ShowSubMenu("Assignment");// Show Submenu for Assignment
-                            break;
-                        case MainMenuOption.DisplaySubMenuCall:
-                            ShowSubMenu("Call"); // Show Submenu for Call
-                            break;
-                        case MainMenuOption.DisplaySubMenuVolunteer:
-                            ShowSubMenu("Volunteer"); // Show Submenu for Volunteer
-                            break;
-                        case MainMenuOption.InitializeData:
-                            Initialization.Do();// Initialize Data
-                            break;
-                        case MainMenuOption.DisplayAllData:
-                            DisplayAllData(); // Display All Data in the Database
-                            break;
-                        case MainMenuOption.DisplayConfigurationSubMenu:
-                            ShowConfigSubMenu(); // Show Submenu for Configuration
-                            break;
-                        case MainMenuOption.ResetDatabaseAndConfiguration:
-                            ResetDatabaseAndConfig(); // Reset Database and Configuration Data
-                            break;
-                        default:
-                            Console.WriteLine("Invalid option. Please choose again.");
-                            break;
+                        MainMenuOption selectedOption = (MainMenuOption)(option);
+                        switch (selectedOption)
+                        {
+                            case MainMenuOption.ExitMainMenu:
+                                continueRunning = false; // Exit
+                                break;
+                            case MainMenuOption.DisplaySubMenuAssignment:
+                                ShowSubMenu("Assignment"); // Show Submenu for Assignment
+                                break;
+                            case MainMenuOption.DisplaySubMenuCall:
+                                ShowSubMenu("Call"); // Show Submenu for Call
+                                break;
+                            case MainMenuOption.DisplaySubMenuVolunteer:
+                                ShowSubMenu("Volunteer"); // Show Submenu for Volunteer
+                                break;
+                            case MainMenuOption.InitializeData:
+                                Initialization.Do(s_daVolunteer, s_dalCall, s_dAssignment, s_dalConfig ); // Initialize Data
+                                break;
+                            case MainMenuOption.DisplayAllData:
+                                DisplayAllData(); // Display All Data in the Database
+                                break;
+                            case MainMenuOption.DisplayConfigurationSubMenu:
+                                ShowConfigSubMenu(); // Show Submenu for Configuration
+                                break;
+                            case MainMenuOption.ResetDatabaseAndConfiguration:
+                                ResetDatabaseAndConfig(); // Reset Database and Configuration Data
+                                break;
+                            default:
+                                Console.WriteLine("Invalid option. Please choose again.");
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("Invalid option. Please choose again.");
                     }
                 }
-                else
+                catch (Exception ex)
                 {
-                    Console.WriteLine("Invalid option. Please choose again.");
+                    // Handle any unexpected exceptions and display the error message
+                    Console.WriteLine($"An error occurred: {ex.Message}");
+                    Console.WriteLine("Please try again or choose a different option.");
+                }
+                finally
+                {
+                    // Pause the program to allow the user to read any error messages
+                    Console.WriteLine("Press any key to continue...");
+                    Console.ReadKey();
                 }
             }
         }
-
 
 
 
