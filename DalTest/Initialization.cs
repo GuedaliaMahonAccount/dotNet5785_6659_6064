@@ -239,10 +239,12 @@ public static class Initialization
                 ? (DateTime?)startTime.AddHours(s_rand.Next(1, 72)) // Random deadline within 1-72 hours after startTime
                 : null;
 
+            int callId = s_dalConfig.NextCallId;
+
             //create the call  
             var call = new Call
             (
-                Id: i + 1,
+                Id: callId,
                 CallType: callTypes[i],
                 Address: addresses[i],
                 Latitude: latitudes[i],
@@ -332,10 +334,12 @@ public static class Initialization
                     endType = EndType.Expired;
                 }
 
+                int assignmentsId = s_dalConfig.NextAssignmentId;
+
                 // Create the assignment
                 var assignment = new Assignment
                 (
-                    Id: assignmentId++,
+                    Id: assignmentsId,
                     CallId: call.Id,
                     VolunteerId: volunteer.Id,
                     StartTime: startTime,

@@ -11,10 +11,24 @@ public class AssignmentImplementation : IAssignment
         // Check if the assignment with the same ID already exists
         if (Read(item.Id) != null)
         {
-            throw new Exception($"Assignment with ID {item.Id} already exists");
+            throw new Exception($"Assignment with ID {item.Id} already exists.");
         }
 
-        // Add the assignment if ID is unique
+        // Check if the CallId exists
+        var callExists = DataSource.Calls.FirstOrDefault(call => call.Id == item.CallId);
+        if (callExists == null)
+        {
+            throw new Exception($"Call with ID {item.CallId} does not exist.");
+        }
+
+        // Check if the VolunteerId exists
+        var volunteerExists = DataSource.Volunteers.FirstOrDefault(volunteer => volunteer.Id == item.VolunteerId);
+        if (volunteerExists == null)
+        {
+            throw new Exception($"Volunteer with ID {item.VolunteerId} does not exist.");
+        }
+
+        // Add the assignment if all checks pass
         DataSource.Assignments.Add(item);
     }
 
