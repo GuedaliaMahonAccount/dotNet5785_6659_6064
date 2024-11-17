@@ -12,7 +12,7 @@ internal class CallImplementation : ICall
         // Check if the call with the same ID already exists
         if (Read(item.Id) != null)
         {
-            throw new Exception($"Call with ID {item.Id} already exists.");
+            throw new DalAlreadyExistsException($"Call with ID {item.Id} already exists.");
         }
 
         // Add the call if ID is unique
@@ -48,7 +48,7 @@ internal class CallImplementation : ICall
         var existingCall = Read(item.Id);
         if (existingCall == null)
         {
-            throw new Exception($"Call with ID {item.Id} does not exist.");
+            throw new DalDoesNotExistException($"Call with ID {item.Id} does not exist.");
         }
 
         // Update by removing the old entry and adding the updated one
@@ -62,7 +62,7 @@ internal class CallImplementation : ICall
         var call = Read(id);
         if (call == null)
         {
-            throw new Exception($"Call with ID {id} does not exist.");
+            throw new DalDoesNotExistException($"Call with ID {id} does not exist.");
         }
 
         // Remove the call from the list
