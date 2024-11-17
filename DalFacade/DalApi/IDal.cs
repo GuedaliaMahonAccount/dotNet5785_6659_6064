@@ -1,7 +1,7 @@
 ﻿
 namespace DalApi
 {
-    internal interface IDal
+    public interface IDal
     {
         IAssignment Assignment { get; }
         ICall Call { get; }
