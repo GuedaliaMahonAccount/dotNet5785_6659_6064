@@ -3,6 +3,7 @@
 using DalApi;
 using DO;
 using System.Collections.Generic;
+using System.Linq;
 
 internal class CallImplementation : ICall
 {
@@ -11,7 +12,7 @@ internal class CallImplementation : ICall
         // Check if the call with the same ID already exists
         if (Read(item.Id) != null)
         {
-            throw new Exception($"Call with ID {item.Id} already exists");
+            throw new Exception($"Call with ID {item.Id} already exists.");
         }
 
         // Add the call if ID is unique
@@ -21,18 +22,24 @@ internal class CallImplementation : ICall
     public Call? Read(int id)
     {
         // Look for the call by ID and return it if found, otherwise return null
-        return DataSource.Calls.Find(c => c.Id == id);
+        return DataSource.Calls.FirstOrDefault(item => item.Id == id);
     }
 
-    public List<Call> ReadAll()
+    public Call? Read(Func<Call, bool> filter)
     {
-        // Step 1: Create a copy of each item in the call list
+        // Return the first call that matches the filter, or null if none match
+        return DataSource.Calls.FirstOrDefault(filter);
+    }
+
+    public IEnumerable<Call> ReadAll(Func<Call, bool>? filter = null)
+    {
+        // Create a copy of each item in the call list
         var callCopy = DataSource.Calls
             .Select(c => new Call(c.Id, c.CallType, c.Address, c.Latitude, c.Longitude, c.StartTime, c.Description, c.DeadLine))
             .ToList();
 
-        // Step 2: Return the copy
-        return callCopy;
+        // Apply the filter if provided, otherwise return all calls
+        return filter != null ? callCopy.Where(filter) : callCopy;
     }
 
     public void Update(Call item)
@@ -41,7 +48,7 @@ internal class CallImplementation : ICall
         var existingCall = Read(item.Id);
         if (existingCall == null)
         {
-            throw new Exception($"Call with ID {item.Id} does not exist");
+            throw new Exception($"Call with ID {item.Id} does not exist.");
         }
 
         // Update by removing the old entry and adding the updated one
@@ -55,7 +62,7 @@ internal class CallImplementation : ICall
         var call = Read(id);
         if (call == null)
         {
-            throw new Exception($"Call with ID {id} does not exist");
+            throw new Exception($"Call with ID {id} does not exist.");
         }
 
         // Remove the call from the list

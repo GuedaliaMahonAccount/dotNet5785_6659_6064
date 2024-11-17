@@ -3,6 +3,7 @@
 using DalApi;
 using DO;
 using System.Collections.Generic;
+using System.Linq;
 
 internal class AssignmentImplementation : IAssignment
 {
@@ -15,15 +16,13 @@ internal class AssignmentImplementation : IAssignment
         }
 
         // Check if the CallId exists
-        var callExists = DataSource.Calls.FirstOrDefault(call => call.Id == item.CallId);
-        if (callExists == null)
+        if (!DataSource.Calls.Any(call => call.Id == item.CallId))
         {
             throw new Exception($"Call with ID {item.CallId} does not exist.");
         }
 
         // Check if the VolunteerId exists
-        var volunteerExists = DataSource.Volunteers.FirstOrDefault(volunteer => volunteer.Id == item.VolunteerId);
-        if (volunteerExists == null)
+        if (!DataSource.Volunteers.Any(volunteer => volunteer.Id == item.VolunteerId))
         {
             throw new Exception($"Volunteer with ID {item.VolunteerId} does not exist.");
         }
@@ -35,18 +34,24 @@ internal class AssignmentImplementation : IAssignment
     public Assignment? Read(int id)
     {
         // Look for the assignment by ID and return it if found, otherwise return null
-        return DataSource.Assignments.Find(a => a.Id == id);
+        return DataSource.Assignments.FirstOrDefault(item => item.Id == id);
     }
 
-    public List<Assignment> ReadAll()
+    public Assignment? Read(Func<Assignment, bool> filter)
     {
-        // Step 1: Create a copy of each item in the assignment list
+        // Return the first assignment that matches the filter, or null if none match
+        return DataSource.Assignments.FirstOrDefault(filter);
+    }
+
+    public IEnumerable<Assignment> ReadAll(Func<Assignment, bool>? filter = null)
+    {
+        // Create a copy of the assignment list
         var assignmentCopy = DataSource.Assignments
             .Select(a => new Assignment(a.Id, a.CallId, a.VolunteerId, a.StartTime, a.EndTime, a.EndType))
             .ToList();
 
-        // Step 2: Return the copy
-        return assignmentCopy;
+        // Apply the filter if provided, otherwise return all assignments
+        return filter != null ? assignmentCopy.Where(filter) : assignmentCopy;
     }
 
     public void Update(Assignment item)
@@ -55,7 +60,7 @@ internal class AssignmentImplementation : IAssignment
         var existingAssignment = Read(item.Id);
         if (existingAssignment == null)
         {
-            throw new Exception($"Assignment with ID {item.Id} does not exist");
+            throw new Exception($"Assignment with ID {item.Id} does not exist.");
         }
 
         // Update by removing the old entry and adding the updated one
@@ -69,7 +74,7 @@ internal class AssignmentImplementation : IAssignment
         var assignment = Read(id);
         if (assignment == null)
         {
-            throw new Exception($"Assignment with ID {id} does not exist");
+            throw new Exception($"Assignment with ID {id} does not exist.");
         }
 
         // Remove the assignment from the list

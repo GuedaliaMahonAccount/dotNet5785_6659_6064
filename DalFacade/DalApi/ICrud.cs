@@ -1,6 +1,4 @@
-﻿
-
-using DO;
+﻿using DO;
 
 namespace DalApi
 {
@@ -8,10 +6,16 @@ namespace DalApi
     {
         void Create(T item); //Creates new entity object in DAL
         T Read(int id); //Reads entity object from DAL
-        List<T> ReadAll(); //stage 1 only, Reads all entity objects
+        T? Read(Func<T, bool> filter);
+        IEnumerable<T> ReadAll(Func<T, bool>? filter = null); // stage 2, Reads all entity objects with optional filtering
+
         void Update(T item); //Updates entity object in DAL
         void Delete(int id); //Deletes entity object from DAL
         void DeleteAll(); //Delete all entity objects from DAL
 
     }
 }
+
+
+
+
