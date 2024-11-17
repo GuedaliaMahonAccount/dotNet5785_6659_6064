@@ -5,7 +5,7 @@
     /// <summary>
     /// Implementation of IConfig interface, delegating properties and methods to the Config class.
     /// </summary>
-    public class ConfigImplementation : IConfig
+    internal class ConfigImplementation : IConfig
     {
 
         // Gets the next unique call ID.
