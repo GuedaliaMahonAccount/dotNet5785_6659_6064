@@ -12,6 +12,8 @@ namespace DalTest
         private static IVolunteer? s_daVolunteer = new VolunteerImplementation();
         private static IConfig? s_dalConfig = new ConfigImplementation();
 
+        static readonly IDal s_dal = new DalList();
+
 
 
 
@@ -62,7 +64,7 @@ namespace DalTest
                                 ShowSubMenu("Volunteer"); // Show Submenu for Volunteer
                                 break;
                             case MainMenuOption.InitializeData:
-                                Initialization.Do(s_daVolunteer, s_dalCall, s_dAssignment, s_dalConfig ); // Initialize Data
+                                Initialization.Do(s_dal); // Initialize Data
                                 break;
                             case MainMenuOption.DisplayAllData:
                                 DisplayAllData(); // Display All Data in the Database
@@ -97,6 +99,7 @@ namespace DalTest
                 }
             }
         }
+
 
 
 
@@ -283,17 +286,17 @@ namespace DalTest
                 {
                     case "Assignment":
                         var assignment = CreatenewAssignment();
-                        s_dAssignment?.Create(assignment);
+                        s_dal!.Assignment.Create(assignment);
                         break;
 
                     case "Call":
                         var call = CreatenewCall();
-                        s_dalCall?.Create(call);
+                        s_dal!.Call.Create(call);
                         break;
 
                     case "Volunteer":
                         var volunteer = CreatenewVolunteer();
-                        s_daVolunteer?.Create(volunteer);
+                        s_dal!.Volunteer.Create(volunteer);
                         break;
 
                     default:
