@@ -10,7 +10,6 @@ namespace DalTest
         static readonly IDal s_dal = new DalList();
 
 
-
         /// <summary>
         /// main
         /// </summary>
