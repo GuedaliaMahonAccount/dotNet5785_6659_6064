@@ -11,18 +11,18 @@ namespace DalTest
         private static ICall? s_dalCall = new CallImplementation();
         private static IVolunteer? s_daVolunteer = new VolunteerImplementation();
         private static IConfig? s_dalConfig = new ConfigImplementation();
-
         static readonly IDal s_dal = new DalList();
 
 
-
-
-        /// <summary>
-        /// main
-        /// </summary>
-        /// <param name="args"></param>
-        static void Main(string[] args)
+       
+                /// <summary>
+                /// main
+                /// </summary>
+                /// <param name="args"></param>
+                static void Main(string[] args)
         {
+
+
             ShowMainMenu();
         }
         //main menu
