@@ -12,7 +12,7 @@ internal class VolunteerImplementation : IVolunteer
         // Check if the volunteer with the same ID already exists
         if (Read(item.Id) != null)
         {
-            throw new Exception($"Volunteer with ID {item.Id} already exists.");
+            throw new DalAlreadyExistsException($"Volunteer with ID {item.Id} already exists.");
         }
 
         // Add the volunteer if ID is unique
@@ -51,7 +51,7 @@ internal class VolunteerImplementation : IVolunteer
         var existingVolunteer = Read(item.Id);
         if (existingVolunteer == null)
         {
-            throw new Exception($"Volunteer with ID {item.Id} does not exist.");
+            throw new DalDoesNotExistException($"Volunteer with ID {item.Id} does not exist.");
         }
 
         // Update by removing the old entry and adding the updated one
@@ -65,7 +65,7 @@ internal class VolunteerImplementation : IVolunteer
         var volunteer = Read(id);
         if (volunteer == null)
         {
-            throw new Exception($"Volunteer with ID {id} does not exist.");
+            throw new DalDoesNotExistException($"Volunteer with ID {id} does not exist.");
         }
 
         // Remove the volunteer from the list
