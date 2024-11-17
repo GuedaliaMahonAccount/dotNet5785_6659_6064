@@ -6,6 +6,10 @@ using System;
 
 public static class Initialization
 {
+    private static IDal? s_dal;
+
+
+
     private static IVolunteer? s_dalVolunteer;
     private static ICall? s_dalCall;
     private static IAssignment? s_dalAssignment;
@@ -354,27 +358,12 @@ public static class Initialization
     }
 
 
-
-    public static void Do(IVolunteer? dalVolunteer=null, ICall? dalCall = null, IAssignment? dalAssignment = null, IConfig? dalConfig = null)
+    public static void Do(IDal dal)
     {
-        s_dalVolunteer = dalVolunteer ?? throw new NullReferenceException("DAL object can not be null!");
-        s_dalCall = dalCall ?? throw new NullReferenceException("DAL object can not be null!");
-        s_dalAssignment = dalAssignment ?? throw new NullReferenceException("DAL object can not be null!");
-        s_dalConfig = dalConfig ?? throw new NullReferenceException("Config object can not be null!");
+        s_dal = dal ?? throw new NullReferenceException("DAL object can not be null!");
 
-        Console.WriteLine("Resetting Configuration values and List values...");
-        s_dalConfig.Reset();
-        s_dalVolunteer.DeleteAll();
-        s_dalCall.DeleteAll();
-        s_dalAssignment.DeleteAll();
-
-        Console.WriteLine("Initializing Volunteers list ...");
-        CreateVolunteers();
-
-        Console.WriteLine("Initializing Calls list ...");
-        CreateCalls();
-
-        Console.WriteLine("Initializing Assignments list ...");
-        CreateAssignments();
+        Console.WriteLine("Reset Configuration values and List values...");
+        s_dal.ResetDB();
     }
+
 }

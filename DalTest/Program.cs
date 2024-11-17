@@ -15,6 +15,8 @@ namespace DalTest
 
 
 
+
+
         /// <summary>
         /// main
         /// </summary>
@@ -283,17 +285,17 @@ namespace DalTest
                 {
                     case "Assignment":
                         var assignment = CreatenewAssignment();
-                        s_dAssignment?.Create(assignment);
+                        s_dal!.Assignment.Create(assignment);
                         break;
 
                     case "Call":
                         var call = CreatenewCall();
-                        s_dalCall?.Create(call);
+                        s_dal!.Call.Create(call);
                         break;
 
                     case "Volunteer":
                         var volunteer = CreatenewVolunteer();
-                        s_daVolunteer?.Create(volunteer);
+                        s_dal!.Volunteer.Create(volunteer);
                         break;
 
                     default:
