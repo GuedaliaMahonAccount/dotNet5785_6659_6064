@@ -6,23 +6,17 @@ namespace DalTest
 {
     internal class Program
     {
-        // create list of entity
-        private static IAssignment? s_dAssignment = new AssignmentImplementation();
-        private static ICall? s_dalCall = new CallImplementation();
-        private static IVolunteer? s_daVolunteer = new VolunteerImplementation();
-        private static IConfig? s_dalConfig = new ConfigImplementation();
+
         static readonly IDal s_dal = new DalList();
 
 
-       
-                /// <summary>
-                /// main
-                /// </summary>
-                /// <param name="args"></param>
-                static void Main(string[] args)
+
+        /// <summary>
+        /// main
+        /// </summary>
+        /// <param name="args"></param>
+        static void Main(string[] args)
         {
-
-
             ShowMainMenu();
         }
         //main menu
@@ -200,7 +194,7 @@ namespace DalTest
                             AdvanceSystemClockOneHour();
                             break;
                         case ConfigSubMenuOption.DisplayCurrentSystemClockValue:
-                            Console.WriteLine($"Current system clock value: {s_dalConfig?.Clock}");
+                            Console.WriteLine($"Current system clock value: {s_dal!.Config?.Clock}");
                             break;
                         case ConfigSubMenuOption.SetNewConfigValue:
                             SetNewConfigValue();
@@ -246,10 +240,10 @@ namespace DalTest
         {
             try
             {
-                s_dAssignment?.DeleteAll();
-                s_dalCall?.DeleteAll();
-                s_daVolunteer?.DeleteAll();
-                s_dalConfig?.Reset();
+                s_dal!.Assignment?.DeleteAll();
+                s_dal!.Call?.DeleteAll();
+                s_dal!.Volunteer?.DeleteAll();
+                s_dal!.Config?.Reset();
                 Console.WriteLine("Database and configuration data reset.");
             }
             catch (Exception ex)
@@ -321,7 +315,7 @@ namespace DalTest
                     switch (entityName)
                     {
                         case "Assignment":
-                            var assignment = s_dAssignment?.Read(id);
+                            var assignment = s_dal!.Assignment?.Read(id);
                             if (assignment != null)
                             {
                                 Console.WriteLine(assignment);
@@ -333,7 +327,7 @@ namespace DalTest
                             break;
 
                         case "Call":
-                            var call = s_dalCall?.Read(id);
+                            var call = s_dal!.Call?.Read(id);
                             if (call != null)
                             {
                                 Console.WriteLine(call);
@@ -345,7 +339,7 @@ namespace DalTest
                             break;
 
                         case "Volunteer":
-                            var volunteer = s_daVolunteer?.Read(id);
+                            var volunteer = s_dal!.Volunteer?.Read(id);
                             if (volunteer != null)
                             {
                                 Console.WriteLine(volunteer);
@@ -378,7 +372,7 @@ namespace DalTest
                 switch (entityName)
                 {
                     case "Assignment":
-                        var assignments = s_dAssignment?.ReadAll();
+                        var assignments = s_dal!.Assignment?.ReadAll();
                         if (assignments != null)
                         {
                             foreach (var assignment in assignments)
@@ -393,7 +387,7 @@ namespace DalTest
                         break;
 
                     case "Call":
-                        var calls = s_dalCall?.ReadAll();
+                        var calls = s_dal!.Call?.ReadAll();
                         if (calls != null)
                         {
                             foreach (var call in calls)
@@ -408,7 +402,7 @@ namespace DalTest
                         break;
 
                     case "Volunteer":
-                        var volunteers = s_daVolunteer?.ReadAll();
+                        var volunteers = s_dal!.Volunteer?.ReadAll();
                         if (volunteers != null)
                         {
                             foreach (var volunteer in volunteers)
@@ -442,11 +436,11 @@ namespace DalTest
                     switch (entityName)
                     {
                         case "Assignment":
-                            var assignment = s_dAssignment?.Read(id);
+                            var assignment = s_dal!.Assignment?.Read(id);
                             if (assignment != null)
                             {
                                 var updatedAssignment = SetAssignmentEntity(assignment);
-                                s_dAssignment?.Update(updatedAssignment);
+                                s_dal!.Assignment?.Update(updatedAssignment);
                                 Console.WriteLine($"{entityName} updated successfully.");
                             }
                             else
@@ -456,11 +450,11 @@ namespace DalTest
                             break;
 
                         case "Call":
-                            var call = s_dalCall?.Read(id);
+                            var call = s_dal!.Call?.Read(id);
                             if (call != null)
                             {
                                 var updatedCall = SetCallEntity(call);
-                                s_dalCall?.Update(updatedCall);
+                                s_dal!.Call?.Update(updatedCall);
                                 Console.WriteLine($"{entityName} updated successfully.");
                             }
                             else
@@ -470,11 +464,11 @@ namespace DalTest
                             break;
 
                         case "Volunteer":
-                            var volunteer = s_daVolunteer?.Read(id);
+                            var volunteer = s_dal!.Volunteer?.Read(id);
                             if (volunteer != null)
                             {
                                 var updatedVolunteer = SetVolunteerEntity(volunteer);
-                                s_daVolunteer?.Update(updatedVolunteer);
+                                s_dal!.Volunteer?.Update(updatedVolunteer);
                                 Console.WriteLine($"{entityName} updated successfully.");
                             }
                             else
@@ -508,17 +502,17 @@ namespace DalTest
                     switch (entityName)
                     {
                         case "Assignment":
-                            s_dAssignment?.Delete(id);
+                            s_dal!.Assignment?.Delete(id);
                             Console.WriteLine($"{entityName} deleted successfully.");
                             break;
 
                         case "Call":
-                            s_dalCall?.Delete(id);
+                            s_dal!.Call?.Delete(id);
                             Console.WriteLine($"{entityName} deleted successfully.");
                             break;
 
                         case "Volunteer":
-                            s_daVolunteer?.Delete(id);
+                            s_dal!.Volunteer?.Delete(id);
                             Console.WriteLine($"{entityName} deleted successfully.");
                             break;
 
@@ -544,17 +538,17 @@ namespace DalTest
                 switch (entityName)
                 {
                     case "Assignment":
-                        s_dAssignment?.DeleteAll();
+                        s_dal!.Assignment?.DeleteAll();
                         Console.WriteLine($"All {entityName} deleted successfully.");
                         break;
 
                     case "Call":
-                        s_dalCall?.DeleteAll();
+                        s_dal!.Call?.DeleteAll();
                         Console.WriteLine($"All {entityName} deleted successfully.");
                         break;
 
                     case "Volunteer":
-                        s_daVolunteer?.DeleteAll();
+                        s_dal!.Volunteer?.DeleteAll();
                         Console.WriteLine($"All {entityName} deleted successfully.");
                         break;
 
@@ -578,7 +572,7 @@ namespace DalTest
         {
             try
             {
-                s_dalConfig?.Clock.AddMinutes(1);
+                s_dal!.Config?.Clock.AddMinutes(1);
                 Console.WriteLine("System clock advanced by one minute.");
             }
             catch (Exception ex)
@@ -591,7 +585,7 @@ namespace DalTest
         {
             try
             {
-                s_dalConfig?.Clock.AddHours(1);
+                s_dal!.Config?.Clock.AddHours(1);
                 Console.WriteLine("System clock advanced by one hour.");
             }
             catch (Exception ex)
@@ -620,7 +614,7 @@ namespace DalTest
                                 Console.Write("Enter the new date and time for the Clock (format: yyyy-MM-dd HH:mm): ");
                                 if (DateTime.TryParse(Console.ReadLine(), out DateTime newClock))
                                 {
-                                    s_dalConfig.Clock = newClock;
+                                    s_dal!.Config.Clock = newClock;
                                     Console.WriteLine("System clock updated successfully.");
                                 }
                                 else
@@ -633,7 +627,7 @@ namespace DalTest
                                 Console.Write("Enter the new Risk Range (in minutes): ");
                                 if (int.TryParse(Console.ReadLine(), out int riskMinutes))
                                 {
-                                    s_dalConfig.RiskRange = TimeSpan.FromMinutes(riskMinutes);
+                                    s_dal!.Config.RiskRange = TimeSpan.FromMinutes(riskMinutes);
                                     Console.WriteLine("Risk range updated successfully.");
                                 }
                                 else
@@ -668,10 +662,10 @@ namespace DalTest
             try
             {
                 Console.WriteLine("Current Configuration Values:");
-                Console.WriteLine($"1. System Clock: {s_dalConfig.Clock}");
-                Console.WriteLine($"2. Risk Range: {s_dalConfig.RiskRange.TotalMinutes} minutes");
-                Console.WriteLine($"3. Next Call ID: {s_dalConfig.NextCallId}");
-                Console.WriteLine($"4. Next Assignment ID: {s_dalConfig.NextAssignmentId}");
+                Console.WriteLine($"1. System Clock: {s_dal!.Config.Clock}");
+                Console.WriteLine($"2. Risk Range: {s_dal!.Config.RiskRange.TotalMinutes} minutes");
+                Console.WriteLine($"3. Next Call ID: {s_dal!.Config.NextCallId}");
+                Console.WriteLine($"4. Next Assignment ID: {s_dal!.Config.NextAssignmentId}");
             }
             catch (Exception ex)
             {
@@ -683,7 +677,7 @@ namespace DalTest
         {
             try
             {
-                s_dalConfig?.Reset();
+                s_dal!.Config?.Reset();
                 Console.WriteLine("All configuration values reset.");
             }
             catch (Exception ex)
@@ -798,7 +792,7 @@ namespace DalTest
             }
 
             //create nex id
-            int assignmentsId = s_dalConfig.NextAssignmentId;
+            int assignmentsId = s_dal!.Config.NextAssignmentId;
 
             // ID is not handled here; it's assumed to be generated by the configuration system
             return new Assignment(assignmentsId, callId, volunteerId, startTime, endTime, null);
@@ -846,7 +840,7 @@ namespace DalTest
             }
 
             //create next id
-            int callId = s_dalConfig.NextCallId;
+            int callId = s_dal!.Config.NextCallId;
 
             return new Call(callId, (CallType)callTypeValue, address, latitude, longitude, startTime, description, deadline);
         }
