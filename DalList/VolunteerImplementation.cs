@@ -3,16 +3,16 @@
 using DalApi;
 using DO;
 using System.Collections.Generic;
+using System.Linq;
 
 internal class VolunteerImplementation : IVolunteer
 {
-
     public void Create(Volunteer item)
     {
         // Check if the volunteer with the same ID already exists
         if (Read(item.Id) != null)
         {
-            throw new Exception($"Volunteer with ID {item.Id} already exists");
+            throw new DalAlreadyExistsException($"Volunteer with ID {item.Id} already exists.");
         }
 
         // Add the volunteer if ID is unique
@@ -22,27 +22,36 @@ internal class VolunteerImplementation : IVolunteer
     public Volunteer? Read(int id)
     {
         // Look for the volunteer by ID and return it if found, otherwise return null
-        return DataSource.Volunteers.Find(v => v.Id == id);
+        return DataSource.Volunteers.FirstOrDefault(item => item.Id == id);
     }
 
-    public List<Volunteer> ReadAll()
+    public Volunteer? Read(Func<Volunteer, bool> filter)
     {
-        //Create a copy of each item in the volunteer list
+        // Return the first volunteer that matches the filter, or null if none match
+        return DataSource.Volunteers.FirstOrDefault(filter);
+    }
+
+    public IEnumerable<Volunteer> ReadAll(Func<Volunteer, bool>? filter = null)
+    {
+        // Create a copy of each item in the volunteer list
         var volunteerCopy = DataSource.Volunteers
-            .Select(v => new Volunteer(v.Id, v.Name, v.Phone, v.Email, v.IsActive, v.Role, v.DistanceType, v.Password, v.Address, v.Latitude, v.Longitude, v.MaxDistance))
+            .Select(v => new Volunteer(
+                v.Id, v.Name, v.Phone, v.Email, v.IsActive, v.Role,
+                v.DistanceType, v.Password, v.Address, v.Latitude,
+                v.Longitude, v.MaxDistance))
             .ToList();
 
-        //Return the copy
-        return volunteerCopy;
+        // Apply the filter if provided, otherwise return all volunteers
+        return filter != null ? volunteerCopy.Where(filter) : volunteerCopy;
     }
 
     public void Update(Volunteer item)
     {
-        //cheque if the volunteer exists
+        // Check if the volunteer exists
         var existingVolunteer = Read(item.Id);
         if (existingVolunteer == null)
         {
-            throw new Exception($"Volunteer with ID {item.Id} does not exist");
+            throw new DalDoesNotExistException($"Volunteer with ID {item.Id} does not exist.");
         }
 
         // Update by removing the old entry and adding the updated one
@@ -56,7 +65,7 @@ internal class VolunteerImplementation : IVolunteer
         var volunteer = Read(id);
         if (volunteer == null)
         {
-            throw new Exception($"Volunteer with ID {id} does not exist");
+            throw new DalDoesNotExistException($"Volunteer with ID {id} does not exist.");
         }
 
         // Remove the volunteer from the list
@@ -68,5 +77,4 @@ internal class VolunteerImplementation : IVolunteer
         // Clear the list of volunteers
         DataSource.Volunteers.Clear();
     }
-
 }

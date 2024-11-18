@@ -245,36 +245,50 @@
 
         private static void CreateAssignments()
         {
-            List<Volunteer> volunteers = s_dal!.Volunteer.ReadAll();
-            List<Call> calls = s_dal.Call.ReadAll();
+            // Use IEnumerable instead of List
+            IEnumerable<Volunteer> volunteers = s_dal!.Volunteer.ReadAll();
+            IEnumerable<Call> calls = s_dal.Call.ReadAll();
+
             int assignmentId = s_dal.Config.NextAssignmentId;
 
-            List<Volunteer> shuffledVolunteers = volunteers.OrderBy(_ => s_rand.Next()).ToList();
-            int totalVolunteers = shuffledVolunteers.Count;
+            // Shuffle volunteers using a temporary array
+            Volunteer[] shuffledVolunteers = volunteers.OrderBy(_ => s_rand.Next()).ToArray();
+            int totalVolunteers = shuffledVolunteers.Length;
+
+            // Divide volunteers into categories
             int noAssignmentCount = Math.Max(1, totalVolunteers / 5);
             int singleAssignmentCount = Math.Max(1, totalVolunteers / 3);
             int multipleAssignmentCount = totalVolunteers - noAssignmentCount - singleAssignmentCount;
 
-            int callIndex = 0;
+            // Use an enumerator to iterate through calls
+            using var callEnumerator = calls.GetEnumerator();
+            bool hasMoreCalls = callEnumerator.MoveNext();
 
             for (int i = 0; i < totalVolunteers; i++)
             {
                 Volunteer volunteer = shuffledVolunteers[i];
                 int assignmentsForThisVolunteer;
 
+                // Assign no tasks to some volunteers
                 if (i < noAssignmentCount) continue;
+                // Assign one task to some volunteers
                 else if (i < noAssignmentCount + singleAssignmentCount) assignmentsForThisVolunteer = 1;
+                // Assign multiple tasks to the remaining volunteers
                 else assignmentsForThisVolunteer = s_rand.Next(2, 5);
 
-                for (int j = 0; j < assignmentsForThisVolunteer && callIndex < calls.Count; j++)
+                for (int j = 0; j < assignmentsForThisVolunteer && hasMoreCalls; j++)
                 {
-                    Call call = calls[callIndex++];
+                    // Get the current call
+                    Call call = callEnumerator.Current;
+                    hasMoreCalls = callEnumerator.MoveNext();
+
                     DateTime startTime = call.StartTime.AddHours(s_rand.Next(1, 24));
                     DateTime? endTime = null;
                     EndType? endType = null;
 
                     double outcomeChance = s_rand.NextDouble();
 
+                    // Determine the outcome of the assignment
                     if (outcomeChance < 0.3)
                     {
                         endTime = call.DeadLine.HasValue
@@ -297,6 +311,7 @@
                         endType = EndType.Expired;
                     }
 
+                    // Create the assignment
                     var assignment = new Assignment
                     (
                         Id: assignmentId++,
@@ -307,6 +322,7 @@
                         EndType: endType
                     );
 
+                    // Save the assignment in the database
                     s_dal.Assignment.Create(assignment);
                 }
             }
@@ -314,7 +330,7 @@
 
         public static void Do(IDal dal)
         {
-            s_dal = dal ?? throw new NullReferenceException("DAL object cannot be null!");
+            s_dal = dal;
             Console.WriteLine("Reset Configuration values and List values...");
             s_dal.ResetDB();
             CreateVolunteers();

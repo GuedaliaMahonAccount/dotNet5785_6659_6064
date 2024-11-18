@@ -10,7 +10,6 @@ namespace DalTest
         static readonly IDal s_dal = new DalList();
 
 
-
         /// <summary>
         /// main
         /// </summary>
@@ -294,7 +293,7 @@ namespace DalTest
                         break;
 
                     default:
-                        throw new ArgumentException("Unknown entity type.");
+                        throw new UnknownType("Unknown entity type.");
                 }
 
                 Console.WriteLine($"{entityName} created and added successfully.");
@@ -697,57 +696,57 @@ namespace DalTest
         {
             Console.WriteLine("Enter ID:");
             if (!int.TryParse(Console.ReadLine(), out int id) || id < 200000000 || id > 400000000)
-                throw new ArgumentException("Invalid ID. ID must be a number between 200000000 and 400000000.");
+                throw new InvalidIdException("ID must be a number between 200000000 and 400000000.");
 
             Console.WriteLine("Enter Full Name (First and Last):");
             string fullName = Console.ReadLine();
             if (string.IsNullOrWhiteSpace(fullName) || !fullName.Contains(" "))
-                throw new ArgumentException("Invalid name. Full name must include first and last names.");
+                throw new InvalidNameException("Full name must include first and last names.");
 
             Console.WriteLine("Enter Phone Number:");
             string phone = Console.ReadLine();
             if (!System.Text.RegularExpressions.Regex.IsMatch(phone, @"^05\d{8}$"))
-                throw new ArgumentException("Invalid phone number. Phone number must start with '05' and be 10 digits long.");
+                throw new InvalidPhoneNumberException("Phone number must start with '05' and be 10 digits long.");
 
             Console.WriteLine("Enter Email:");
             string email = Console.ReadLine();
             if (!System.Text.RegularExpressions.Regex.IsMatch(email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
-                throw new ArgumentException("Invalid email format. Please enter a valid email.");
+                throw new InvalidEmailException("Invalid email format. Please enter a valid email.");
 
             Console.WriteLine("Enter Password:");
             string password = Console.ReadLine();
             if (password.Length < 8 || !password.Any(char.IsDigit) || !password.Any(char.IsLetter))
-                throw new ArgumentException("Invalid password. Password must be at least 8 characters long, containing at least one letter and one digit.");
+                throw new InvalidPasswordException("Password must be at least 8 characters long, containing at least one letter and one digit.");
 
             Console.WriteLine("Enter Full Address:");
             string address = Console.ReadLine();
             if (string.IsNullOrWhiteSpace(address))
-                throw new ArgumentException("Invalid address. Please enter a full address.");
+                throw new InvalidAddressException("Address cannot be empty.");
 
             Console.WriteLine("Enter Latitude:");
             if (!double.TryParse(Console.ReadLine(), out double latitude))
-                throw new ArgumentException("Invalid latitude. Please enter a numeric latitude.");
+                throw new InvalidCoordinateException("Invalid latitude. Please enter a numeric latitude.");
 
             Console.WriteLine("Enter Longitude:");
             if (!double.TryParse(Console.ReadLine(), out double longitude))
-                throw new ArgumentException("Invalid longitude. Please enter a numeric longitude.");
+                throw new InvalidCoordinateException("Invalid longitude. Please enter a numeric longitude.");
 
             Console.WriteLine("Enter 0 for Manager and 1 for Volunteer:");
             string input = Console.ReadLine();
             if (!int.TryParse(input, out int roleInput) || roleInput < 0 || roleInput > 1)
-                throw new ArgumentException("Invalid role. Role must be either '0' for Volunteer or '1' for Manager.");
+                throw new InvalidRoleException("Role must be either '0' for Volunteer or '1' for Manager.");
 
             Console.WriteLine("Is Active? (Yes/No):");
             bool isActive = Console.ReadLine().ToLower() == "yes";
 
             Console.WriteLine("Enter Maximum Distance to Accept a Call:");
             if (!int.TryParse(Console.ReadLine(), out int maxDistance) || maxDistance <= 0)
-                throw new ArgumentException("Invalid maximum distance. Please enter a positive integer.");
+                throw new InvalidDistanceException("Maximum distance must be a positive integer.");
 
             Console.WriteLine("Enter Distance Type (0: plane, 1: foot, 2: Car, 3: Bike, 4: Public Transport):");
             string distanceType = Console.ReadLine();
             if (!int.TryParse(distanceType, out int distanceTypeValue) || distanceTypeValue < 0 || distanceTypeValue > 4)
-                throw new ArgumentException("Invalid distance type. Please enter a number between 0 and 4.");
+                throw new InvalidDistanceException("Distance type must be a number between 0 and 4.");
 
             return new Volunteer
             {
@@ -765,20 +764,21 @@ namespace DalTest
                 DistanceType = (DistanceType)distanceTypeValue
             };
         }
+
         // Create new assignment
         public static Assignment CreatenewAssignment()
         {
             Console.WriteLine("Enter Call ID:");
-            if (!int.TryParse(Console.ReadLine(), out int callId) )
-                throw new ArgumentException("Invalid Call ID");
+            if (!int.TryParse(Console.ReadLine(), out int callId))
+                throw new InvalidIdException("Invalid Call ID. Please provide a valid integer.");
 
             Console.WriteLine("Enter Volunteer ID:");
             if (!int.TryParse(Console.ReadLine(), out int volunteerId) || volunteerId < 200000000 || volunteerId > 400000000)
-                throw new ArgumentException("Invalid Volunteer ID. Volunteer ID must be a number between 200000000 and 400000000.");
+                throw new InvalidIdException("Invalid Volunteer ID. Volunteer ID must be a number between 200000000 and 400000000.");
 
             Console.WriteLine("Enter Start Time (format: yyyy-MM-dd HH:mm):");
             if (!DateTime.TryParse(Console.ReadLine(), out DateTime startTime))
-                throw new ArgumentException("Invalid start time format. Please enter a valid date and time.");
+                throw new InvalidDateException("Invalid start time format. Please enter a valid date and time in the format yyyy-MM-dd HH:mm.");
 
             Console.WriteLine("Do you want to enter an End Time? (Yes/No):");
             DateTime? endTime = null;
@@ -787,14 +787,13 @@ namespace DalTest
             {
                 Console.WriteLine("Enter End Time (format: yyyy-MM-dd HH:mm):");
                 if (!DateTime.TryParse(Console.ReadLine(), out DateTime end))
-                    throw new ArgumentException("Invalid end time format. Please enter a valid date and time.");
+                    throw new InvalidDateException("Invalid end time format. Please enter a valid date and time in the format yyyy-MM-dd HH:mm.");
                 endTime = end;
             }
 
-            //create nex id
+            // Generate the next assignment ID using the system configuration
             int assignmentsId = s_dal!.Config.NextAssignmentId;
 
-            // ID is not handled here; it's assumed to be generated by the configuration system
             return new Assignment(assignmentsId, callId, volunteerId, startTime, endTime, null);
         }
         //create new call
@@ -802,24 +801,24 @@ namespace DalTest
         {
             Console.WriteLine("Enter Call Type (0: Open, 1: Urgent, 2: Recurring):");
             if (!int.TryParse(Console.ReadLine(), out int callTypeValue) || !Enum.IsDefined(typeof(CallType), callTypeValue))
-                throw new ArgumentException("Invalid Call Type. Please enter a valid number corresponding to the options.");
+                throw new UnknownTypeException("Invalid Call Type. Please enter a valid number corresponding to the options (0: Open, 1: Urgent, 2: Recurring).");
 
             Console.WriteLine("Enter Address:");
             string address = Console.ReadLine();
             if (string.IsNullOrWhiteSpace(address))
-                throw new ArgumentException("Invalid Address. Address cannot be empty.");
+                throw new InvalidAddressException("Invalid Address. Address cannot be empty.");
 
             Console.WriteLine("Enter Latitude:");
             if (!double.TryParse(Console.ReadLine(), out double latitude))
-                throw new ArgumentException("Invalid Latitude. Please enter a valid number.");
+                throw new InvalidCoordinateException("Invalid Latitude. Please enter a valid numeric latitude.");
 
             Console.WriteLine("Enter Longitude:");
             if (!double.TryParse(Console.ReadLine(), out double longitude))
-                throw new ArgumentException("Invalid Longitude. Please enter a valid number.");
+                throw new InvalidCoordinateException("Invalid Longitude. Please enter a valid numeric longitude.");
 
             Console.WriteLine("Enter Start Time (format: yyyy-MM-dd HH:mm):");
             if (!DateTime.TryParse(Console.ReadLine(), out DateTime startTime))
-                throw new ArgumentException("Invalid Start Time format. Please enter a valid date and time.");
+                throw new InvalidDateException("Invalid Start Time format. Please enter a valid date and time in the format yyyy-MM-dd HH:mm.");
 
             Console.WriteLine("Do you want to add a Description? (Yes/No):");
             string description = null;
@@ -835,11 +834,11 @@ namespace DalTest
             {
                 Console.WriteLine("Enter Deadline (format: yyyy-MM-dd HH:mm):");
                 if (!DateTime.TryParse(Console.ReadLine(), out DateTime parsedDeadline))
-                    throw new ArgumentException("Invalid Deadline format. Please enter a valid date and time.");
+                    throw new InvalidDateException("Invalid Deadline format. Please enter a valid date and time in the format yyyy-MM-dd HH:mm.");
                 deadline = parsedDeadline;
             }
 
-            //create next id
+            // Generate the next call ID using the system configuration
             int callId = s_dal!.Config.NextCallId;
 
             return new Call(callId, (CallType)callTypeValue, address, latitude, longitude, startTime, description, deadline);
