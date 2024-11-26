@@ -13,14 +13,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DalList", "DalList\DalList.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DalXml", "DalXml\DalXml.csproj", "{7B9E7429-D940-487A-8C92-8CE275A4B0E8}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "xml", "xml", "{8C9ABDAC-852A-4417-8E2B-0E76E1A7BE9C}"
-	ProjectSection(SolutionItems) = preProject
-		..\dotNet5785_6659_6064\xml\assignments.xml.txt = ..\dotNet5785_6659_6064\xml\assignments.xml.txt
-		..\dotNet5785_6659_6064\xml\calls.xml.txt = ..\dotNet5785_6659_6064\xml\calls.xml.txt
-		..\dotNet5785_6659_6064\xml\data-config.xml.txt = ..\dotNet5785_6659_6064\xml\data-config.xml.txt
-		..\dotNet5785_6659_6064\xml\volunteers.xml.txt = ..\dotNet5785_6659_6064\xml\volunteers.xml.txt
-	EndProjectSection
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
