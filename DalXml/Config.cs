@@ -33,6 +33,12 @@ internal static class Config
         get => XMLTools.GetConfigTimeSpanVal(s_data_config_xml, "RiskRange");
         set => XMLTools.SetConfigTimeSpanVal(s_data_config_xml, "RiskRange", value);
     }
-
+    internal static void Reset()
+    {
+        XMLTools.SetConfigIntVal(s_data_config_xml, "NextCallId", 1);
+        XMLTools.SetConfigIntVal(s_data_config_xml, "NextAssignmentId", 1);
+        XMLTools.SetConfigDateVal(s_data_config_xml, "Clock", DateTime.Now);
+        XMLTools.SetConfigTimeSpanVal(s_data_config_xml, "RiskRange", new TimeSpan(0, 0, 0));
+    }
 }
 
