@@ -110,3 +110,11 @@ public class UnknownTypeException : Exception
 {
     public UnknownTypeException(string? message) : base(message) { }
 }
+
+/// <summary>
+/// DalXMLFileLoadCreateException
+/// </summary>
+public class DalXMLFileLoadCreateException : Exception
+{
+    public DalXMLFileLoadCreateException(string? message) : base(message) { }
+}
