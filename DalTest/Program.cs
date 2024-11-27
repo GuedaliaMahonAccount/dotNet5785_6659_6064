@@ -849,7 +849,7 @@ namespace DalTest
         /// update entity
         /// <summary?
         //upfate assignmatn
-        public static Assignment SetAssignmentEntity( Assignment assignment)
+        public static Assignment SetAssignmentEntity(Assignment assignment)
         {
             try
             {
