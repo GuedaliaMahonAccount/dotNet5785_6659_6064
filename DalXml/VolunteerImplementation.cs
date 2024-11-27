@@ -69,19 +69,24 @@ internal class VolunteerImplementation : IVolunteer
 
     public void DeleteAll()
     {
-        XElement volunteersRootElem = new XElement("Volunteers"); // Create an empty root element
-        XMLTools.SaveListToXMLElement(volunteersRootElem, Config.s_volunteer_xml); // Save empty XML
+        // Create an empty root element with the correct name
+        XElement volunteersRootElem = new XElement("ArrayOfVolunteer");
+
+        // Save the empty XML file
+        XMLTools.SaveListToXMLElement(volunteersRootElem, Config.s_volunteer_xml);
     }
 
     public Volunteer Read(int id)
     {
-        XElement? volunteerElem = XMLTools.LoadListFromXMLElement(Config.s_volunteer_xml)
-            .Elements()
+        XElement volunteersRootElem = XMLTools.LoadListFromXMLElement(Config.s_volunteer_xml);
+
+        XElement? volunteerElem = volunteersRootElem.Elements()
             .FirstOrDefault(v => (int?)v.Element("Id") == id);
 
-        return volunteerElem is null
-            ? throw new DalDoesNotExistException($"Volunteer with ID={id} does not exist")
-            : getVolunteer(volunteerElem);
+        if (volunteerElem == null)
+            return null;
+
+        return getVolunteer(volunteerElem);
     }
 
     public Volunteer? Read(Func<Volunteer, bool> filter)

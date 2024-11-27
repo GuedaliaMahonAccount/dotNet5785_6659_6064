@@ -11,7 +11,7 @@ sealed public class DalXml : IDal
 
     public IConfig Config { get; } = new ConfigImplementation();
 
-public void ResetDB()
+    public void ResetDB()
     {
         Assignment.DeleteAll();
         Call.DeleteAll();
