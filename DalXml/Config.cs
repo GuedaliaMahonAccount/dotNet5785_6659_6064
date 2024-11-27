@@ -4,9 +4,9 @@ namespace Dal;
 internal static class Config
 {
     internal const string s_data_config_xml = "data-configs.xml";
-    internal const string s_volunteer = "volunteers.xml";
-    internal const string s_call = "calls.xml";
-    internal const string s_assignment = "assignments.xml";
+    internal const string s_volunteer_xml = "volunteers.xml";
+    internal const string s_call_xml = "calls.xml";
+    internal const string s_assignment_xml = "assignments.xml";
 
 
 
