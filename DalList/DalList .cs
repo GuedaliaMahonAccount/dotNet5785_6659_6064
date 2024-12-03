@@ -2,8 +2,11 @@
 {
     using DalApi;
 
-    public sealed class DalList : IDal
+    sealed internal class DalList : IDal
     {// Properties initialized with appropriate implementations
+
+        public static IDal Instance { get; } = new DalList();
+        private DalList() { }
         public IAssignment Assignment { get; } = new AssignmentImplementation();
         public ICall Call { get; } = new CallImplementation();
         public IVolunteer Volunteer { get; } = new VolunteerImplementation();

@@ -7,7 +7,7 @@ namespace DalTest
     internal class Program
     {
 
-        static readonly IDal s_dal = new DalList();
+        static readonly IDal s_dal = new DalXml();
 
 
         /// <summary>
@@ -849,7 +849,7 @@ namespace DalTest
         /// update entity
         /// <summary?
         //upfate assignmatn
-        public static Assignment SetAssignmentEntity( Assignment assignment)
+        public static Assignment SetAssignmentEntity(Assignment assignment)
         {
             try
             {

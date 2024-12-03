@@ -13,14 +13,13 @@
 
         private static void CreateVolunteers()
         {
-            // Volunteer details
-            // Volunteer details
             string[] volunteerNames = {
         "Dani Levy", "Eli Amar", "Yair Cohen", "Ariela Levin", "Dina Klein",
         "Shira Israelof", "Yael Mizrahi", "Oren Shmuel", "Maya Katz",
         "Tomer Golan", "Lea Sharabi", "Moti Ben-David", "Yaakov Peretz",
         "Ruth Azulay", "Itzik Shalev", "Sara Bar", "Yonatan Ezra"
     };
+
             string[] volunteerEmails = {
         "danilevy123@gmail.com", "eliamar456@gmail.com", "yaircohen789@outlook.com", "arielalevin234@gmail.com",
         "dinaklein567@gmail.com", "shiraisraelof890@gmail.com", "yaelmizrahi123@outlook.com",
@@ -28,6 +27,7 @@
         "motibendavid890@outlook.com", "yaakovperetz123@gmail.com", "ruthazulay456@gmail.com",
         "itzikshalev789@outlook.com", "sarabar234@walla.com", "yonatanezra567@gmail.com"
     };
+
             string[] addresses = {
         "גרנדר קניון, David Tuviyahu Ave 125, Be'er Sheva",
         "דרך אליהו נאוי 28, Beersheba",
@@ -45,24 +45,27 @@
         "קניון פרץ סנטר, דימונה",
         "פרץ סנטר - אזור תעשיה דרומי, Dimona"
     };
+
             double[] latitudes = {
         31.2506405f, 31.2467805f, 31.2497676f, 31.2605014f, 31.2473633f,
         30.988506f, 31.062823f, 31.2396368f, 31.2391961f, 31.2377661f,
         30.972753f, 31.2474244f, 30.9935689f, 31.0599323f, 31.0599323f
     };
+
             double[] longitudes = {
         34.7716625f, 34.8156994f, 35.1914546f, 34.7873239f, 34.7978134f,
         34.927951f, 35.0192015f, 34.7877478f, 34.7967932f, 34.7944248f,
         34.7755085f, 34.79862f, 34.7643578f, 35.0203137f, 35.0203137f
     };
+
+            List<string> phonePrefixes = new List<string> { "050", "053", "058", "052", "054" };
             string[] strongPasswords = {
         "A3b9Kp5vL1", "Z8mQ7xW4rB", "L2dR9yC8zN", "J1fV6kH3tP", "B5gY4nM7jQ",
         "N6xP8cL2mV", "T3lH7wQ5rZ", "Y9kJ4bM8xL", "R7dF2yW6nP", "X3bZ9mQ5jT",
         "M1pV8yN6xL", "G7kJ2fT9mB", "H5qZ4pL7nV", "D9yX6kB3rQ", "C1mP7vJ8wZ"
     };
-            List<string> phonePrefixes = new List<string> { "050", "053", "058", "052", "054" };
 
-            for (int i = 0; i < volunteerNames.Length; i++)
+            for (int i = 0; i < 15; i++)
             {
                 string password = strongPasswords[i % strongPasswords.Length];
                 int id;
@@ -88,13 +91,12 @@
                     MaxDistance: maxDistance,
                     DistanceType: distanceType,
                     Password: password,
-                    Address: addresses.Length > i ? addresses[i] : null,
-                    Latitude: latitudes.Length > i ? latitudes[i] : null,
-                    Longitude: longitudes.Length > i ? longitudes[i] : null
+                    Address: i < addresses.Length ? addresses[i] : null,
+                    Latitude: i < latitudes.Length ? latitudes[i] : null,
+                    Longitude: i < longitudes.Length ? longitudes[i] : null
                 );
 
                 s_dal.Volunteer.Create(volunteer);
-                Console.WriteLine($"Volunteer Created: {volunteer.Name}");
             }
         }
 
@@ -218,7 +220,9 @@
 
             DateTime start = new DateTime(s_dal!.Config.Clock.Year - 2, 1, 1);
 
-            for (int i = 0; i < descriptions.Length; i++)
+            //in case that it s not exactly 50 data
+            int minLength = new[] { descriptions.Length, addresses.Length, latitudes.Length, longitudes.Length }.Min();
+            for (int i = 0; i < minLength; i++)
             {
                 var startTime = start.AddDays(-s_rand.Next(1, 30));
                 DateTime? deadline = s_rand.NextDouble() < 0.5
@@ -245,22 +249,18 @@
 
         private static void CreateAssignments()
         {
-            // Use IEnumerable instead of List
             IEnumerable<Volunteer> volunteers = s_dal!.Volunteer.ReadAll();
             IEnumerable<Call> calls = s_dal.Call.ReadAll();
 
             int assignmentId = s_dal.Config.NextAssignmentId;
 
-            // Shuffle volunteers using a temporary array
             Volunteer[] shuffledVolunteers = volunteers.OrderBy(_ => s_rand.Next()).ToArray();
             int totalVolunteers = shuffledVolunteers.Length;
 
-            // Divide volunteers into categories
             int noAssignmentCount = Math.Max(1, totalVolunteers / 5);
             int singleAssignmentCount = Math.Max(1, totalVolunteers / 3);
             int multipleAssignmentCount = totalVolunteers - noAssignmentCount - singleAssignmentCount;
 
-            // Use an enumerator to iterate through calls
             using var callEnumerator = calls.GetEnumerator();
             bool hasMoreCalls = callEnumerator.MoveNext();
 
@@ -269,41 +269,52 @@
                 Volunteer volunteer = shuffledVolunteers[i];
                 int assignmentsForThisVolunteer;
 
-                // Assign no tasks to some volunteers
                 if (i < noAssignmentCount) continue;
-                // Assign one task to some volunteers
                 else if (i < noAssignmentCount + singleAssignmentCount) assignmentsForThisVolunteer = 1;
-                // Assign multiple tasks to the remaining volunteers
-                else assignmentsForThisVolunteer = s_rand.Next(2, 5);
+                else assignmentsForThisVolunteer = s_rand.Next(2, Math.Max(2, 5)); // Ensure valid range
 
                 for (int j = 0; j < assignmentsForThisVolunteer && hasMoreCalls; j++)
                 {
-                    // Get the current call
                     Call call = callEnumerator.Current;
                     hasMoreCalls = callEnumerator.MoveNext();
 
-                    DateTime startTime = call.StartTime.AddHours(s_rand.Next(1, 24));
+                    DateTime startTime = call.StartTime.AddHours(s_rand.Next(1, Math.Max(1, 24))); // Ensure valid range
                     DateTime? endTime = null;
                     EndType? endType = null;
 
                     double outcomeChance = s_rand.NextDouble();
 
-                    // Determine the outcome of the assignment
                     if (outcomeChance < 0.3)
                     {
-                        endTime = call.DeadLine.HasValue
-                            ? call.StartTime.AddHours(s_rand.Next(1, (int)(call.DeadLine.Value - startTime).TotalHours + 1))
-                            : startTime.AddHours(s_rand.Next(1, 72));
+                        // Fix for calculating endTime when DeadLine is defined
+                        if (call.DeadLine.HasValue && call.DeadLine.Value > startTime)
+                        {
+                            int maxHours = (int)(call.DeadLine.Value - startTime).TotalHours;
+
+                            if (maxHours >= 1)
+                            {
+                                endTime = call.StartTime.AddHours(s_rand.Next(1, maxHours + 1));
+                            }
+                            else
+                            {
+                                Console.WriteLine($"Invalid maxHours={maxHours}, setting endTime to default range");
+                                endTime = startTime.AddHours(s_rand.Next(1, 72));
+                            }
+                        }
+                        else
+                        {
+                            endTime = startTime.AddHours(s_rand.Next(1, 72));
+                        }
                         endType = EndType.Completed;
                     }
                     else if (outcomeChance < 0.5)
                     {
-                        endTime = startTime.AddHours(s_rand.Next(1, 48));
+                        endTime = startTime.AddHours(s_rand.Next(1, 48)); // Ensure valid range
                         endType = EndType.SelfCanceled;
                     }
                     else if (outcomeChance < 0.7)
                     {
-                        endTime = startTime.AddHours(s_rand.Next(1, 48));
+                        endTime = startTime.AddHours(s_rand.Next(1, 48)); // Ensure valid range
                         endType = EndType.AdminCanceled;
                     }
                     else
@@ -311,18 +322,16 @@
                         endType = EndType.Expired;
                     }
 
-                    // Create the assignment
                     var assignment = new Assignment
-                    (
-                        Id: assignmentId++,
-                        CallId: call.Id,
-                        VolunteerId: volunteer.Id,
-                        StartTime: startTime,
-                        EndTime: endTime,
-                        EndType: endType
-                    );
+                    {
+                        Id = assignmentId++,
+                        CallId = call.Id,
+                        VolunteerId = volunteer.Id,
+                        StartTime = startTime,
+                        EndTime = endTime,
+                        EndType = endType
+                    };
 
-                    // Save the assignment in the database
                     s_dal.Assignment.Create(assignment);
                 }
             }

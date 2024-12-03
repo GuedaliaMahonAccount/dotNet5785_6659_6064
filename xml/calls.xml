@@ -1,0 +1,473 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ArrayOfCall xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Call>
+    <Id>1</Id>
+    <CallType>OpenAtRisk</CallType>
+    <Address>גרנדר קניון, David Tuviyahu Ave 125, Be'er Sheva</Address>
+    <Latitude>31.250640869140625</Latitude>
+    <Longitude>34.771663665771484</Longitude>
+    <StartTime>2021-12-13T00:00:00</StartTime>
+    <Description>Preparing nutritious meals for soldiers stationed at remote bases.</Description>
+    <DeadLine>2021-12-14T23:00:00</DeadLine>
+  </Call>
+  <Call>
+    <Id>2</Id>
+    <CallType>Open</CallType>
+    <Address>דרך אליהו נאוי 28, Beersheba</Address>
+    <Latitude>31.246780395507812</Latitude>
+    <Longitude>34.81570053100586</Longitude>
+    <StartTime>2021-12-09T00:00:00</StartTime>
+    <Description>Delivering fresh food and supplies to soldiers on active duty.</Description>
+    <DeadLine xsi:nil="true" />
+  </Call>
+  <Call>
+    <Id>3</Id>
+    <CallType>Closed</CallType>
+    <Address>מתחם תחנת הדלק אלון, 31, Arad</Address>
+    <Latitude>31.249767303466797</Latitude>
+    <Longitude>35.19145584106445</Longitude>
+    <StartTime>2021-12-18T00:00:00</StartTime>
+    <Description>Collecting uniforms and other clothing items from soldiers for cleaning.</Description>
+    <DeadLine>2021-12-18T11:00:00</DeadLine>
+  </Call>
+  <Call>
+    <Id>4</Id>
+    <CallType>InTreatment</CallType>
+    <Address>Mivtsa Nakhshon Street 60, Be'er Sheva</Address>
+    <Latitude>31.260501861572266</Latitude>
+    <Longitude>34.787322998046875</Longitude>
+    <StartTime>2021-12-15T00:00:00</StartTime>
+    <Description>Organizing and washing laundry for soldiers in the field.</Description>
+    <DeadLine>2021-12-15T11:00:00</DeadLine>
+  </Call>
+  <Call>
+    <Id>5</Id>
+    <CallType>Closed</CallType>
+    <Address>Yitzhack I. Rager Boulevard 24, Be'er Sheva</Address>
+    <Latitude>31.247364044189453</Latitude>
+    <Longitude>34.797813415527344</Longitude>
+    <StartTime>2021-12-29T00:00:00</StartTime>
+    <Description>Providing transportation for soldiers moving between training sites.</Description>
+    <DeadLine xsi:nil="true" />
+  </Call>
+  <Call>
+    <Id>6</Id>
+    <CallType>InTreatmentAtRisk</CallType>
+    <Address>Tsvi Bornstein Street 312, Yeruham</Address>
+    <Latitude>30.988506317138672</Latitude>
+    <Longitude>34.92795181274414</Longitude>
+    <StartTime>2021-12-17T00:00:00</StartTime>
+    <Description>Repairing essential equipment used by soldiers in field operations.</Description>
+    <DeadLine>2021-12-18T20:00:00</DeadLine>
+  </Call>
+  <Call>
+    <Id>7</Id>
+    <CallType>Closed</CallType>
+    <Address>איזור תעשייה, הפועלים 5, דימונה</Address>
+    <Latitude>31.062822341918945</Latitude>
+    <Longitude>35.019203186035156</Longitude>
+    <StartTime>2021-12-15T00:00:00</StartTime>
+    <Description>Supplying soldiers with needed clothing and protective gear.</Description>
+    <DeadLine xsi:nil="true" />
+  </Call>
+  <Call>
+    <Id>8</Id>
+    <CallType>Open</CallType>
+    <Address>Herzl Street 43, Be'er Sheva</Address>
+    <Latitude>31.23963737487793</Latitude>
+    <Longitude>34.78774642944336</Longitude>
+    <StartTime>2021-12-09T00:00:00</StartTime>
+    <Description>Helping set up temporary shelters for soldiers during training exercises.</Description>
+    <DeadLine xsi:nil="true" />
+  </Call>
+  <Call>
+    <Id>9</Id>
+    <CallType>Closed</CallType>
+    <Address>Derekh Hebron 21, Beersheba</Address>
+    <Latitude>31.23919677734375</Latitude>
+    <Longitude>34.79679489135742</Longitude>
+    <StartTime>2021-12-25T00:00:00</StartTime>
+    <Description>Cleaning facilities used by soldiers to maintain hygiene and morale.</Description>
+    <DeadLine xsi:nil="true" />
+  </Call>
+  <Call>
+    <Id>10</Id>
+    <CallType>InTreatment</CallType>
+    <Address>Derekh Hebron 4, Beersheba</Address>
+    <Latitude>31.23776626586914</Latitude>
+    <Longitude>34.79442596435547</Longitude>
+    <StartTime>2021-12-12T00:00:00</StartTime>
+    <Description>Assisting with basic medical care and first aid for injured soldiers.</Description>
+    <DeadLine>2021-12-14T22:00:00</DeadLine>
+  </Call>
+  <Call>
+    <Id>11</Id>
+    <CallType>Closed</CallType>
+    <Address>Kornmehl Farm M.E. Ramat Negev D.N. Halutza</Address>
+    <Latitude>30.972753524780273</Latitude>
+    <Longitude>34.775508880615234</Longitude>
+    <StartTime>2021-12-22T00:00:00</StartTime>
+    <Description>Providing mental health support for soldiers dealing with stress.</Description>
+    <DeadLine xsi:nil="true" />
+  </Call>
+  <Call>
+    <Id>12</Id>
+    <CallType>OpenAtRisk</CallType>
+    <Address>רסקו סנטר, HaTikva 8, Beersheba</Address>
+    <Latitude>31.247425079345703</Latitude>
+    <Longitude>34.79861831665039</Longitude>
+    <StartTime>2021-12-29T00:00:00</StartTime>
+    <Description>Offering training in first aid and basic survival skills to new recruits.</Description>
+    <DeadLine>2021-12-29T20:00:00</DeadLine>
+  </Call>
+  <Call>
+    <Id>13</Id>
+    <CallType>InTreatment</CallType>
+    <Address>40, Tlalim</Address>
+    <Latitude>30.993568420410156</Latitude>
+    <Longitude>34.76435852050781</Longitude>
+    <StartTime>2021-12-26T00:00:00</StartTime>
+    <Description>Organizing recreational activities to boost soldier morale.</Description>
+    <DeadLine xsi:nil="true" />
+  </Call>
+  <Call>
+    <Id>14</Id>
+    <CallType>Expired</CallType>
+    <Address>קניון פרץ סנטר, דימונה</Address>
+    <Latitude>31.059932708740234</Latitude>
+    <Longitude>35.02031326293945</Longitude>
+    <StartTime>2021-12-09T00:00:00</StartTime>
+    <Description>Preparing hot drinks and snacks for soldiers on cold night shifts.</Description>
+    <DeadLine xsi:nil="true" />
+  </Call>
+  <Call>
+    <Id>15</Id>
+    <CallType>InTreatmentAtRisk</CallType>
+    <Address>פרץ סנטר - אזור תעשיה דרומי, Dimona</Address>
+    <Latitude>31.059932708740234</Latitude>
+    <Longitude>35.02031326293945</Longitude>
+    <StartTime>2021-12-24T00:00:00</StartTime>
+    <Description>Collecting food and clothing donations from the community for soldiers.</Description>
+    <DeadLine>2021-12-26T20:00:00</DeadLine>
+  </Call>
+  <Call>
+    <Id>16</Id>
+    <CallType>Expired</CallType>
+    <Address>Tsvi Taub Street 7, Be'er Sheva</Address>
+    <Latitude>31.221654891967773</Latitude>
+    <Longitude>34.80015182495117</Longitude>
+    <StartTime>2021-12-18T00:00:00</StartTime>
+    <Description>Performing vehicle maintenance for transport vehicles used by soldiers.</Description>
+    <DeadLine xsi:nil="true" />
+  </Call>
+  <Call>
+    <Id>17</Id>
+    <CallType>Closed</CallType>
+    <Address>Ha-Bdil Street 17, ב״ש</Address>
+    <Latitude>31.22600746154785</Latitude>
+    <Longitude>34.80962371826172</Longitude>
+    <StartTime>2021-12-15T00:00:00</StartTime>
+    <Description>Tutoring soldiers in subjects they need help with for future studies.</Description>
+    <DeadLine xsi:nil="true" />
+  </Call>
+  <Call>
+    <Id>18</Id>
+    <CallType>OpenAtRisk</CallType>
+    <Address>ברוך קטינקא 2 ישפרו פלאנט, Beersheba</Address>
+    <Latitude>31.224416732788086</Latitude>
+    <Longitude>34.801448822021484</Longitude>
+    <StartTime>2021-12-07T00:00:00</StartTime>
+    <Description>Distributing hygiene kits including soap, shampoo, and other essentials.</Description>
+    <DeadLine>2021-12-08T23:00:00</DeadLine>
+  </Call>
+  <Call>
+    <Id>19</Id>
+    <CallType>InTreatment</CallType>
+    <Address>MALL-7, הע"ל, Be'er Sheva</Address>
+    <Latitude>31.233304977416992</Latitude>
+    <Longitude>34.79651641845703</Longitude>
+    <StartTime>2021-12-26T00:00:00</StartTime>
+    <Description>Helping coordinate logistical support for upcoming training exercises.</Description>
+    <DeadLine>2021-12-27T22:00:00</DeadLine>
+  </Call>
+  <Call>
+    <Id>20</Id>
+    <CallType>InTreatmentAtRisk</CallType>
+    <Address>Kfar Hadarom Street 1, Be'er Sheva</Address>
+    <Latitude>31.236061096191406</Latitude>
+    <Longitude>34.788185119628906</Longitude>
+    <StartTime>2021-12-30T00:00:00</StartTime>
+    <Description>Setting up basic technology and communication equipment for soldiers.</Description>
+    <DeadLine>2022-01-01T03:00:00</DeadLine>
+  </Call>
+  <Call>
+    <Id>21</Id>
+    <CallType>Expired</CallType>
+    <Address>Kakal Street 55-79, Be'er Sheva</Address>
+    <Latitude>31.23809051513672</Latitude>
+    <Longitude>34.79120635986328</Longitude>
+    <StartTime>2021-12-26T00:00:00</StartTime>
+    <Description>Translating important documents for soldiers in bilingual units.</Description>
+    <DeadLine>2021-12-28T15:00:00</DeadLine>
+  </Call>
+  <Call>
+    <Id>22</Id>
+    <CallType>OpenAtRisk</CallType>
+    <Address>HaAtsmaut Street 14, Be'er Sheva</Address>
+    <Latitude>31.238554000854492</Latitude>
+    <Longitude>34.792415618896484</Longitude>
+    <StartTime>2021-12-21T00:00:00</StartTime>
+    <Description>Assisting soldiers with completing essential paperwork and filing forms.</Description>
+    <DeadLine xsi:nil="true" />
+  </Call>
+  <Call>
+    <Id>23</Id>
+    <CallType>Closed</CallType>
+    <Address>Kakal Street 79, Be'er Sheva</Address>
+    <Latitude>31.238510131835938</Latitude>
+    <Longitude>34.790679931640625</Longitude>
+    <StartTime>2021-12-27T00:00:00</StartTime>
+    <Description>Responding to urgent calls for transportation of supplies or soldiers.</Description>
+    <DeadLine>2021-12-27T06:00:00</DeadLine>
+  </Call>
+  <Call>
+    <Id>24</Id>
+    <CallType>Closed</CallType>
+    <Address>Ha-Histadrut Street 22, Be'er Sheva</Address>
+    <Latitude>31.238101959228516</Latitude>
+    <Longitude>34.787559509277344</Longitude>
+    <StartTime>2021-12-08T00:00:00</StartTime>
+    <Description>Delivering personalized care packages from families to the front lines.</Description>
+    <DeadLine>2021-12-09T02:00:00</DeadLine>
+  </Call>
+  <Call>
+    <Id>25</Id>
+    <CallType>InTreatment</CallType>
+    <Address>דרום, Kakal Street 78, Be'er Sheva</Address>
+    <Latitude>31.238834381103516</Latitude>
+    <Longitude>34.79079818725586</Longitude>
+    <StartTime>2021-12-12T00:00:00</StartTime>
+    <Description>Preparing meals specifically tailored to meet dietary needs of soldiers.</Description>
+    <DeadLine>2021-12-13T03:00:00</DeadLine>
+  </Call>
+  <Call>
+    <Id>26</Id>
+    <CallType>Closed</CallType>
+    <Address>מתחם B7, Heil Handasa 2, Beersheba</Address>
+    <Latitude>31.243331909179688</Latitude>
+    <Longitude>34.81254577636719</Longitude>
+    <StartTime>2021-12-07T00:00:00</StartTime>
+    <Description>Transporting heavy equipment needed for soldier training operations.</Description>
+    <DeadLine>2021-12-09T04:00:00</DeadLine>
+  </Call>
+  <Call>
+    <Id>27</Id>
+    <CallType>Closed</CallType>
+    <Address>מתחם ביג, חיל ההנדסה 1, באר שבע</Address>
+    <Latitude>31.244752883911133</Latitude>
+    <Longitude>34.812564849853516</Longitude>
+    <StartTime>2021-12-31T00:00:00</StartTime>
+    <Description>Collecting and distributing warm clothing for soldiers in colder areas.</Description>
+    <DeadLine>2022-01-02T01:00:00</DeadLine>
+  </Call>
+  <Call>
+    <Id>28</Id>
+    <CallType>Open</CallType>
+    <Address>Heil Handasa Street 6, Be'er Sheva</Address>
+    <Latitude>31.24431610107422</Latitude>
+    <Longitude>34.81277084350586</Longitude>
+    <StartTime>2021-12-03T00:00:00</StartTime>
+    <Description>Assisting in setting up recreation areas for downtime between exercises.</Description>
+    <DeadLine>2021-12-03T10:00:00</DeadLine>
+  </Call>
+  <Call>
+    <Id>29</Id>
+    <CallType>Closed</CallType>
+    <Address>Eliyahu Nawi Street, Be'er Sheva</Address>
+    <Latitude>31.249269485473633</Latitude>
+    <Longitude>34.817874908447266</Longitude>
+    <StartTime>2021-12-29T00:00:00</StartTime>
+    <Description>Offering counseling services for soldiers dealing with homesickness.</Description>
+    <DeadLine xsi:nil="true" />
+  </Call>
+  <Call>
+    <Id>30</Id>
+    <CallType>OpenAtRisk</CallType>
+    <Address>Kakal Street 195, Be'er Sheva</Address>
+    <Latitude>31.239761352539062</Latitude>
+    <Longitude>34.78896713256836</Longitude>
+    <StartTime>2021-12-30T00:00:00</StartTime>
+    <Description>Planning group activities to help soldiers relax and build camaraderie.</Description>
+    <DeadLine>2022-01-01T11:00:00</DeadLine>
+  </Call>
+  <Call>
+    <Id>31</Id>
+    <CallType>OpenAtRisk</CallType>
+    <Address>מרכז ביג, Derekh Hebron 21, Be'er Sheva</Address>
+    <Latitude>31.244369506835938</Latitude>
+    <Longitude>34.811485290527344</Longitude>
+    <StartTime>2021-12-11T00:00:00</StartTime>
+    <Description>Delivering hot drinks to soldiers on long patrols in winter weather.</Description>
+    <DeadLine xsi:nil="true" />
+  </Call>
+  <Call>
+    <Id>32</Id>
+    <CallType>Closed</CallType>
+    <Address>Heil Handasa Street 1, Be'er Sheva</Address>
+    <Latitude>31.244752883911133</Latitude>
+    <Longitude>34.812564849853516</Longitude>
+    <StartTime>2021-12-30T00:00:00</StartTime>
+    <Description>Organizing community drives to gather essential supplies for soldiers.</Description>
+    <DeadLine xsi:nil="true" />
+  </Call>
+  <Call>
+    <Id>33</Id>
+    <CallType>InTreatmentAtRisk</CallType>
+    <Address>Derekh Hebron 66, Beersheba</Address>
+    <Latitude>31.244115829467773</Latitude>
+    <Longitude>34.806087493896484</Longitude>
+    <StartTime>2021-12-05T00:00:00</StartTime>
+    <Description>Assisting with maintenance of field equipment essential for missions.</Description>
+    <DeadLine>2021-12-05T11:00:00</DeadLine>
+  </Call>
+  <Call>
+    <Id>34</Id>
+    <CallType>Open</CallType>
+    <Address>Herzl Street 55, Be'er Sheva</Address>
+    <Latitude>31.241090774536133</Latitude>
+    <Longitude>34.789058685302734</Longitude>
+    <StartTime>2021-12-17T00:00:00</StartTime>
+    <Description>Providing mentorship to young soldiers adjusting to military life.</Description>
+    <DeadLine xsi:nil="true" />
+  </Call>
+  <Call>
+    <Id>35</Id>
+    <CallType>Closed</CallType>
+    <Address>Yitshak Ben Zvi Street 4, Be'er Sheva</Address>
+    <Latitude>31.243946075439453</Latitude>
+    <Longitude>34.796566009521484</Longitude>
+    <StartTime>2021-12-28T00:00:00</StartTime>
+    <Description>Supplying individual hygiene kits to soldiers returning from exercises.</Description>
+    <DeadLine xsi:nil="true" />
+  </Call>
+  <Call>
+    <Id>36</Id>
+    <CallType>Open</CallType>
+    <Address>Yitshak Nafha Street 36 א', Be'er Sheva</Address>
+    <Latitude>31.24761199951172</Latitude>
+    <Longitude>34.81064224243164</Longitude>
+    <StartTime>2021-12-11T00:00:00</StartTime>
+    <Description>Coordinating supply logistics for a large training mission.</Description>
+    <DeadLine xsi:nil="true" />
+  </Call>
+  <Call>
+    <Id>37</Id>
+    <CallType>Expired</CallType>
+    <Address>קניון עזריאלי הנגב, Be'er Sheva</Address>
+    <Latitude>31.24372673034668</Latitude>
+    <Longitude>34.794620513916016</Longitude>
+    <StartTime>2021-12-24T00:00:00</StartTime>
+    <Description>Assisting soldiers with technical issues in their communication gear.</Description>
+    <DeadLine xsi:nil="true" />
+  </Call>
+  <Call>
+    <Id>38</Id>
+    <CallType>Closed</CallType>
+    <Address>Eli'ezer Smoli Street 1, Be'er Sheva</Address>
+    <Latitude>31.238365173339844</Latitude>
+    <Longitude>34.772621154785156</Longitude>
+    <StartTime>2021-12-04T00:00:00</StartTime>
+    <Description>Translating training materials for soldiers in multilingual units.</Description>
+    <DeadLine>2021-12-05T21:00:00</DeadLine>
+  </Call>
+  <Call>
+    <Id>39</Id>
+    <CallType>Open</CallType>
+    <Address>Sderot Johana Jabotinsky 11, Beersheba</Address>
+    <Latitude>31.238365173339844</Latitude>
+    <Longitude>34.772621154785156</Longitude>
+    <StartTime>2021-12-20T00:00:00</StartTime>
+    <Description>Helping soldiers complete required paperwork after basic training.</Description>
+    <DeadLine xsi:nil="true" />
+  </Call>
+  <Call>
+    <Id>40</Id>
+    <CallType>OpenAtRisk</CallType>
+    <Address>Yitshak Nafha Street 25, Be'er Sheva</Address>
+    <Latitude>31.23865509033203</Latitude>
+    <Longitude>34.77408218383789</Longitude>
+    <StartTime>2021-12-09T00:00:00</StartTime>
+    <Description>Responding to emergency calls for urgent medical supplies.</Description>
+    <DeadLine xsi:nil="true" />
+  </Call>
+  <Call>
+    <Id>41</Id>
+    <CallType>InTreatmentAtRisk</CallType>
+    <Address>Ha-Tikva Street 8, Be'er Sheva</Address>
+    <Latitude>31.246126174926758</Latitude>
+    <Longitude>34.81205368041992</Longitude>
+    <StartTime>2021-12-07T00:00:00</StartTime>
+    <Description>Distributing care packages from local organizations to active soldiers.</Description>
+    <DeadLine xsi:nil="true" />
+  </Call>
+  <Call>
+    <Id>42</Id>
+    <CallType>Expired</CallType>
+    <Address>Sderot Yerushalayim 2, Beersheba</Address>
+    <Latitude>31.24749755859375</Latitude>
+    <Longitude>34.79863739013672</Longitude>
+    <StartTime>2021-12-17T00:00:00</StartTime>
+    <Description>Preparing food packages for quick delivery to soldiers on night shifts.</Description>
+    <DeadLine>2021-12-17T05:00:00</DeadLine>
+  </Call>
+  <Call>
+    <Id>43</Id>
+    <CallType>Open</CallType>
+    <Address>תחנת דלק פז, Sderot Yerushalayim 4, Beersheba</Address>
+    <Latitude>31.24545669555664</Latitude>
+    <Longitude>34.7814826965332</Longitude>
+    <StartTime>2021-12-30T00:00:00</StartTime>
+    <Description>Transporting medical equipment to field locations where soldiers train.</Description>
+    <DeadLine xsi:nil="true" />
+  </Call>
+  <Call>
+    <Id>44</Id>
+    <CallType>OpenAtRisk</CallType>
+    <Address>מגדלי אביסרור, שדרות יצחק רגר 53, באר שבע</Address>
+    <Latitude>31.24573516845703</Latitude>
+    <Longitude>34.78148651123047</Longitude>
+    <StartTime>2021-12-10T00:00:00</StartTime>
+    <Description>Repairing damaged uniforms and gear for soldiers in remote areas.</Description>
+    <DeadLine>2021-12-12T14:00:00</DeadLine>
+  </Call>
+  <Call>
+    <Id>45</Id>
+    <CallType>Expired</CallType>
+    <Address>David Tuviyahu Ave 125, Beersheba</Address>
+    <Latitude>31.253814697265625</Latitude>
+    <Longitude>34.7983283996582</Longitude>
+    <StartTime>2021-12-17T00:00:00</StartTime>
+    <Description>Setting up sleeping areas in temporary camps for training exercises.</Description>
+    <DeadLine xsi:nil="true" />
+  </Call>
+  <Call>
+    <Id>46</Id>
+    <CallType>OpenAtRisk</CallType>
+    <Address>Derech Metsada 47, Beersheba</Address>
+    <Latitude>31.250640869140625</Latitude>
+    <Longitude>34.771663665771484</Longitude>
+    <StartTime>2021-12-31T00:00:00</StartTime>
+    <Description>Sanitizing and organizing common areas in field bases.</Description>
+    <DeadLine>2021-12-31T22:00:00</DeadLine>
+  </Call>
+  <Call>
+    <Id>47</Id>
+    <CallType>InTreatmentAtRisk</CallType>
+    <Address>מרכז הנגב דרך מצדה 6, Beersheba</Address>
+    <Latitude>31.250640869140625</Latitude>
+    <Longitude>34.771663665771484</Longitude>
+    <StartTime>2021-12-26T00:00:00</StartTime>
+    <Description>Providing basic first aid support to soldiers in rugged environments.</Description>
+    <DeadLine xsi:nil="true" />
+  </Call>
+</ArrayOfCall>

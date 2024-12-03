@@ -1,5 +1,12 @@
 ﻿namespace DO;
 
+/// <summary>
+/// DalXMLFileLoadCreateException
+/// </summary>
+public class DalXMLFileLoadCreateException : Exception
+{
+    public DalXMLFileLoadCreateException(string? message) : base(message) { }
+}
 public class DalDoesNotExistException : Exception
 {
     public DalDoesNotExistException(string? message) : base(message) { }
