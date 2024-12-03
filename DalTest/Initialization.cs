@@ -337,9 +337,9 @@
             }
         }
 
-        public static void Do(IDal dal)
+        public static void Do()
         {
-            s_dal = dal;
+            s_dal = DalApi.Factory.Get;
             Console.WriteLine("Reset Configuration values and List values...");
             s_dal.ResetDB();
             CreateVolunteers();

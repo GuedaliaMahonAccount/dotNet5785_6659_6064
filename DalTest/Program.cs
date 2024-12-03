@@ -7,8 +7,7 @@ namespace DalTest
     internal class Program
     {
 
-        static readonly IDal s_dal = new DalXml();
-
+static readonly IDal s_dal = Factory.Get;
 
         /// <summary>
         /// main
@@ -57,7 +56,7 @@ namespace DalTest
                                 ShowSubMenu("Volunteer"); // Show Submenu for Volunteer
                                 break;
                             case MainMenuOption.InitializeData:
-                                Initialization.Do(s_dal); // Initialize Data
+                                Initialization.Do(); // Initialize Data
                                 break;
                             case MainMenuOption.DisplayAllData:
                                 DisplayAllData(); // Display All Data in the Database
