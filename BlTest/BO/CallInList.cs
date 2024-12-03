@@ -10,42 +10,42 @@ namespace BO
         /// <summary>
         /// The unique identifier for the call.
         /// </summary>
-        public int CallId { get; set; }
+        public int CallId { get; init; }
 
         /// <summary>
         /// The type of the call.
         /// </summary>
-        public CallType CallType { get; set; }
+        public CallType CallType { get; init; }
 
         /// <summary>
         /// The start time of the call.
         /// </summary>
-        public DateTime StartTime { get; set; }
+        public DateTime StartTime { get; init; }
 
         /// <summary>
         /// The total duration of the call.
         /// </summary>
-        public TimeSpan Duration { get; set; }
+        public TimeSpan Duration { get; init; }
 
         /// <summary>
         /// The name of the last volunteer assigned to the call.
         /// </summary>
-        public string LastVolunteerName { get; set; }
+        public string LastVolunteerName { get; init; }
 
         /// <summary>
         /// The time passed since the last volunteer's completion of their assignment.
         /// </summary>
-        public TimeSpan LastCompletionDuration { get; set; }
+        public TimeSpan LastCompletionDuration { get; init; }
 
         /// <summary>
         /// The current status of the call.
         /// </summary>
-        public CallType Status { get; set; }
+        public CallType Status { get; init; }
 
         /// <summary>
         /// The number of assignments associated with the call.
         /// </summary>
-        public int AssignmentCount { get; set; }
+        public int AssignmentCount { get; init; }
 
         /// <summary>
         /// Overrides ToString for debugging purposes.

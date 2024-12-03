@@ -10,27 +10,27 @@ namespace BO
         /// <summary>
         /// The unique identifier of the volunteer assigned to the call.
         /// </summary>
-        public int? VolunteerId { get; set; }
+        public int? VolunteerId { get; init; }
 
         /// <summary>
         /// The name of the assigned volunteer.
         /// </summary>
-        public string VolunteerName { get; set; }
+        public string VolunteerName { get; init; }
 
         /// <summary>
         /// The time the volunteer started the assignment.
         /// </summary>
-        public DateTime? StartTime { get; set; }
+        public DateTime? StartTime { get; init; }
 
         /// <summary>
         /// The time the volunteer completed the assignment.
         /// </summary>
-        public DateTime? EndTime { get; set; }
+        public DateTime? EndTime { get; init; }
 
         /// <summary>
         /// The type of assignment.
         /// </summary>
-        public EndType EndType { get; set; }
+        public EndType EndType { get; init; }
 
         /// <summary>
         /// Overrides ToString for debugging purposes.
