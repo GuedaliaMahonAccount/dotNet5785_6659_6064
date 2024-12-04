@@ -17,9 +17,4 @@
 	  <ProjectReference Include="..\DalList\DalList.csproj" />
 	  <ProjectReference Include="..\DalXml\DalXml.csproj" />
 	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="BlImplementation\" />
-	  <Folder Include="BlImplementation\" />
-	</ItemGroup>
 </Project>
