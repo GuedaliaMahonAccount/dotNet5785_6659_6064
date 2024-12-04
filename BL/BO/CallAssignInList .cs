@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Helpers;
+using System;
 
 namespace BO
 {
@@ -38,7 +39,7 @@ namespace BO
         /// <returns>A string representation of the CallAssignInList object.</returns>
         public override string ToString()
         {
-            return this.ToStringReflection();
+            return this.ToStringProperty();
         }
     }
 }

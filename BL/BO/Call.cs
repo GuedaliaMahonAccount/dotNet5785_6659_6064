@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Helpers;
 
 namespace BO
 {
@@ -61,7 +62,7 @@ namespace BO
         /// <returns>A string representation of the Call object.</returns>
         public override string ToString()
         {
-            return this.ToStringReflection();
+            return this.ToStringProperty();
         }
     }
 }
