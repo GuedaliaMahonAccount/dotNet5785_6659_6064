@@ -6,7 +6,7 @@ namespace BlImplementation
 {
     internal class AdminImplementation : IAdmin
     {
-        public void AdvanceClock(TimeUnit timeUnit)
+        public void UpdateClock(TimeUnit timeUnit)
         {
             throw new NotImplementedException();
         }
