@@ -6,7 +6,7 @@ namespace BlApi
     public interface IAdmin
     {
         DateTime GetCurrentTime();
-        void AdvanceClock(BO.TimeUnit timeUnit);
+        void UpdateClock(BO.TimeUnit timeUnit);
         TimeSpan GetRiskTime();
         void SetRiskTime(TimeSpan riskTimeSpan);
         void ResetDatabase();
