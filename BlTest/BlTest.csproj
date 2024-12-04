@@ -10,9 +10,4 @@
 		<AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
 		<UseCommonOutputDirectory>true</UseCommonOutputDirectory>
 	</PropertyGroup>
-	<ItemGroup>
-	  <Folder Include="BlApi\" />
-	  <Folder Include="BlImplementation\" />
-	  <Folder Include="Helpers\" />
-	</ItemGroup>
 </Project>

@@ -78,3 +78,12 @@ public enum EndType
     AdminCanceled,        // The administrator canceled the volunteer's assignment before the maximum allowed time.
     Expired               // The call was canceled as it was not handled before the maximum allowed time.
 }
+
+public enum TimeUnit
+{
+    MINUTE,
+    HOUR,
+    DAY,
+    MONTH,
+    YEAR
+}
