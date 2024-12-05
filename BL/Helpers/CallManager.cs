@@ -1,6 +1,8 @@
-﻿using BlApi;
-using DalApi;
+﻿using DalApi;
 using System;
+using System.IO;
+using System.Net;
+using System.Text.Json;
 
 namespace Helpers
 {
@@ -11,11 +13,6 @@ namespace Helpers
         /// <summary>
         /// Calculates the distance between two geographic points.
         /// </summary>
-        /// <param name="lat1">Latitude of the first point.</param>
-        /// <param name="lon1">Longitude of the first point.</param>
-        /// <param name="lat2">Latitude of the second point.</param>
-        /// <param name="lon2">Longitude of the second point.</param>
-        /// <returns>The distance in kilometers.</returns>
         public static double CalculateDistance(double lat1, double lon1, double lat2, double lon2)
         {
             const double R = 6371; // Earth's radius in kilometers
@@ -30,50 +27,78 @@ namespace Helpers
             return R * c; // Distance in kilometers
         }
 
-        /// <summary>
-        /// Converts degrees to radians.
-        /// </summary>
-        /// <param name="degrees">The angle in degrees.</param>
-        /// <returns>The angle in radians.</returns>
         private static double DegreesToRadians(double degrees)
         {
             return degrees * Math.PI / 180;
         }
 
         /// <summary>
-        /// check if the coordinate are valide
+        /// Retrieves coordinates from an address using LocationIQ API.
         /// </summary>
-        public static bool IsValidCoordinate(double latitude, double longitude)
+        public static (double latitude, double longitude)? GetCoordinatesFromAddress(string address)
         {
-            return latitude >= -90 && latitude <= 90 && longitude >= -180 && longitude <= 180;
+            if (string.IsNullOrWhiteSpace(address))
+                return null;
+
+            string apiKey = "67520387b42a2384305556nqrdb57df";
+            string url = $"https://api.locationiq.com/v1/search.php?key={apiKey}&q={WebUtility.UrlEncode(address)}&format=json";
+
+            try
+            {
+                var request = WebRequest.Create(url);
+                request.Method = "GET";
+                using (var response = request.GetResponse())
+                using (var stream = response.GetResponseStream())
+                using (var reader = new StreamReader(stream))
+                {
+                    var result = reader.ReadToEnd();
+
+                    // Parse JSON using System.Text.Json
+                    var json = JsonDocument.Parse(result);
+                    var root = json.RootElement;
+
+                    if (root.GetArrayLength() > 0)
+                    {
+                        var firstResult = root[0];
+                        var latitude = double.Parse(firstResult.GetProperty("lat").GetString());
+                        var longitude = double.Parse(firstResult.GetProperty("lon").GetString());
+                        return (latitude, longitude);
+                    }
+                    return null; // No results
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error fetching coordinates: {ex.Message}");
+                return null;
+            }
+        }
+        public static bool ValidAddress(string address)
+        {
+            var coordinates = GetCoordinatesFromAddress(address);
+            return coordinates.HasValue; // If coordinates are returned, the address is real.
+        }
+        public static bool AreCoordinatesMatching(string address, double latitude, double longitude)
+        {
+            var resolvedCoordinates = GetCoordinatesFromAddress(address);
+            if (!resolvedCoordinates.HasValue)
+                return false;
+
+            const double tolerance = 0.0001; // Adjust as necessary.
+            return Math.Abs(resolvedCoordinates.Value.latitude - latitude) <= tolerance &&
+                   Math.Abs(resolvedCoordinates.Value.longitude - longitude) <= tolerance;
         }
 
-        /// <summary>
-        /// Validates if the requester is authorized to cancel the assignment.
-        /// </summary>
-        /// <param name="requesterId">ID of the person making the cancellation request.</param>
-        /// <param name="volunteerId">ID of the volunteer assigned to the assignment.</param>
-        /// <returns>True if the requester is authorized; otherwise, false.</returns>
-        /// <summary>
-        /// Validates if the requester is authorized to cancel the assignment.
-        /// </summary>
-        /// <param name="requesterId">ID of the person making the cancellation request.</param>
-        /// <param name="volunteerId">ID of the volunteer assigned to the assignment.</param>
-        /// <returns>True if the requester is authorized; otherwise, false.</returns>
         public static bool IsRequesterAuthorizedToCancel(int requesterId, int volunteerId)
         {
-            // Check if the requester is the volunteer assigned to the call
             if (requesterId == volunteerId)
                 return true;
 
-            // Check if the requester is a manager (e.g., has the Admin role)
             var requester = s_dal.Volunteer.Read(requesterId);
-            if (requester != null && requester.Role == DO.Role.Admin) // Replace Role.Admin with your specific Admin enum value
+            if (requester != null && requester.Role == DO.Role.Admin)
                 return true;
 
-            // If neither condition is met, the requester is not authorized
             return false;
         }
-
     }
 }
