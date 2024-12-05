@@ -4,6 +4,7 @@ using BO;
 using DO;
 using System.Collections.Generic;
 using System.Numerics;
+using System.Text.RegularExpressions;
 using System.Xml.Linq;
 
 internal class VolunteerImplementation : IVolunteer
@@ -149,25 +150,128 @@ internal class VolunteerImplementation : IVolunteer
 
 
 
-    public void UpdateVolunteer(int requesterId, BO.Volunteer updatedVolunteer)
+    public void UpdateVolunteerDetails(int requesterId, BO.Volunteer updatedVolunteer)
     {
+        if (requesterId != updatedVolunteer.Id)
+        {
+            throw new UnauthorizedAccessException("Only the volunteer or a manager can update the details.");
+        }
+
+        //בדיקה שכל הערכים תקינים
+        //ValidateVolunteerDetails(updatedVolunteer);
+
+        var existingVolunteer = _dal.Volunteer.Read(updatedVolunteer.Id);
+
+        if (existingVolunteer == null)
+        {
+            throw new VolunteerNotFoundException($"Volunteer with ID {updatedVolunteer.Id} not found.");
+        }
+
+        var updatedVolunteerDO = new DO.Volunteer
+        {
+            Id = updatedVolunteer.Id,
+            Name = updatedVolunteer.Name,
+            Phone = updatedVolunteer.Phone,
+            Email = updatedVolunteer.Email,
+            IsActive = updatedVolunteer.IsActive,
+            Role = (DO.Role)updatedVolunteer.Role,
+            DistanceType = (DO.DistanceType)updatedVolunteer.DistanceType,
+            Password = updatedVolunteer.Password,
+            Address = updatedVolunteer.Address,
+            Latitude = updatedVolunteer.Latitude,
+            Longitude = updatedVolunteer.Longitude,
+            MaxDistance = updatedVolunteer.MaxDistance
+        };
+
+        if (requesterId != updatedVolunteer.Id)
+        {
+            updatedVolunteerDO.Role = existingVolunteer.Role;
+        }
+
+        _dal.Volunteer.Update(updatedVolunteerDO);
+    }
+
+    private void ValidateVolunteerDetails(Volunteer volunteer)
+    {
+        if (!IsValidEmail(volunteer.Email))
+        {
+            throw new ArgumentException("Invalid email format.");
+        }
+
+        if (!IsValidIsraeliId(volunteer.Id))
+        {
+            throw new ArgumentException("Invalid Israeli ID number.");
+        }
+
+        if (!IsValidAddress(volunteer.Address, out double? latitude, out double? longitude))
+        {
+            throw new ArgumentException("Invalid address.");
+        }
+
+        volunteer.Latitude = latitude;
+        volunteer.Longitude = longitude;
+        if (volunteer.MaxDistance < 0)
+        {
+            throw new ArgumentException("Max distance cannot be negative.");
+        }
+    }
+
+    private bool IsValidEmail(string email)
+    {
+        return Regex.IsMatch(email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$");
+    }
+
+    private bool IsValidIsraeliId(int id)
+    {
+        string idString = id.ToString().PadLeft(9, '0');
+        int sum = 0;
+        for (int i = 0; i < 9; i++)
+        {
+            int digit = idString[i] - '0';
+            sum += (i % 2 == 0) ? digit : (digit * 2 > 9) ? digit * 2 - 9 : digit * 2;
+        }
+        return sum % 10 == 0;
+    }
+
+    private bool IsValidAddress(string address, out double? latitude, out double? longitude)
+    {
+        // בדיקת תקינות הכתובת וקבלת קווי האורך והרוחב
+        // ניתן להשתמש בשירותי מיפוי כמו Google Maps API לקבלת פרטי הכתובת
+        // לדוגמה:
+        // var location = GetLocationFromAddress(address);
+        // latitude = location.Latitude;
+        // longitude = location.Longitude;
+        // return location != null;
+
+        // במקרה זה, נחזיר ערכים דיפולטיביים
+        latitude = null;
+        longitude = null;
+        return true;
+    }
+}
+
+public class VolunteerNotFoundException : Exception
+{
+    public VolunteerNotFoundException(string message) : base(message) { }
+}
+
+
+
+
+public void AddVolunteer(BO.Volunteer newVolunteer)
+    {
+
         throw new NotImplementedException();
     }
 
 
 
-
-
-    public void AddVolunteer(BO.Volunteer newVolunteer)
-    {
-
-        throw new NotImplementedException();
-    }
-
-    public void DeleteVolunteer(int volunteerId)
+public void DeleteVolunteer(int volunteerId)
     {
         throw new NotImplementedException();
     }
 }
+
+
 
 
