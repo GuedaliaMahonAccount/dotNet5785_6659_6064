@@ -10,7 +10,7 @@ namespace BlApi
     public interface IVolunteer
     {
         string Login(string username, string password);
-        IEnumerable<VolunteerInList> GetVolunteersList(bool? isActive, VolunteerInList? sortBy);
+        IEnumerable<VolunteerInList> GetVolunteersList(bool? isActive = null, VolunteerInListSortFields? sortByField = null);
         Volunteer GetVolunteerDetails(int id);
         void UpdateVolunteer(int requesterId, Volunteer updatedVolunteer);
         void DeleteVolunteer(int volunteerId);

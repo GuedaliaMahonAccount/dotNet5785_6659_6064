@@ -87,3 +87,15 @@ public enum TimeUnit
     MONTH,
     YEAR
 }
+
+public enum VolunteerInListSortFields
+{
+    Id,
+    Name,
+    Phone,
+    IsActive,
+    Role,
+    Latitude,
+    Longitude,
+}
+

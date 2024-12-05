@@ -17,6 +17,12 @@ public class DalAlreadyExistsException : Exception
     public DalAlreadyExistsException(string? message) : base(message) { }
 }
 
+public class InvalidValueException : Exception
+{
+    public InvalidValueException(string? message) : base(message) { }
+}
+
+
 public class DalDeletionImpossible : Exception
 {
     public DalDeletionImpossible(string? message) : base(message) { }
@@ -116,4 +122,9 @@ public class InvalidDateException : Exception
 public class UnknownTypeException : Exception
 {
     public UnknownTypeException(string? message) : base(message) { }
+}
+
+public class ArgumentNullException : Exception
+{
+    public ArgumentNullException(string? message) : base(message) { }
 }

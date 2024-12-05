@@ -2,8 +2,11 @@
 
 namespace BlImplementation
 {
+
     internal class CallImplementation : ICall
     {
+        private readonly DalApi.IDal _dal = DalApi.Factory.Get;
+
         public void AddCall(BO.Call Newcall)
         {
             throw new NotImplementedException();
