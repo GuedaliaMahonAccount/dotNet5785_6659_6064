@@ -14,3 +14,8 @@ namespace BO
             : base(message, inner) { }
     }
 }
+
+public class VolunteerNotFoundException : Exception
+{
+    public VolunteerNotFoundException(string message) : base(message) { }
+}
