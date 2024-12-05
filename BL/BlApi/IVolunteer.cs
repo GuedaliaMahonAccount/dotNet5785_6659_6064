@@ -14,7 +14,7 @@ namespace BlApi
         Volunteer GetVolunteerDetails(int volunteerId);
         void UpdateVolunteer(int requesterId, Volunteer updatedVolunteer);
         void DeleteVolunteer(int volunteerId);
-        void AddVolunteer(Volunteer newVolunteer);
+        void AddVolunteer(Volunteer volunteer);
     }
 }
 

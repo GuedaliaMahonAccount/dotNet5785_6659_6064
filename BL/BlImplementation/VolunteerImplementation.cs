@@ -1,11 +1,11 @@
 ﻿namespace BlImplementation;
 using BlApi;
-using BO;
-using DO;
+using Helpers;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
+using System.Linq;
 
 internal class VolunteerImplementation : IVolunteer
 {
@@ -62,7 +62,7 @@ internal class VolunteerImplementation : IVolunteer
             };
             if (volunteer.CurrentCall != null)
             {
-                var callInProgress = new CallInProgress
+                var callInProgress = new BO.CallInProgress
                 {
                     Id = volunteer.CurrentCall.Id,
                     CallId = volunteer.CurrentCall.CallId,
@@ -83,7 +83,7 @@ internal class VolunteerImplementation : IVolunteer
         {
             throw;
         }
-    } 
+    }
 
 
 
@@ -147,131 +147,173 @@ internal class VolunteerImplementation : IVolunteer
 
 
 
-
-
-
-    public void UpdateVolunteerDetails(int requesterId, BO.Volunteer updatedVolunteer)
+    public void UpdateVolunteer(int requesterId, BO.Volunteer updatedVolunteer)
     {
-        if (requesterId != updatedVolunteer.Id)
+        var currentVolunteer = _dal.Volunteer.Read(updatedVolunteer.Id);
+        // Validate that the requester is either the volunteer themselves or an admin
+        if (!VolunteerManager.IsRequesterAuthorizedToCancel(requesterId, updatedVolunteer.Id))
         {
-            throw new UnauthorizedAccessException("Only the volunteer or a manager can update the details.");
+            throw new UnauthorizedAccessException("The requester is not authorized to update this volunteer.");
         }
 
-        //בדיקה שכל הערכים תקינים
-        //ValidateVolunteerDetails(updatedVolunteer);
+        // Check all fields
+        if (!VolunteerManager.ValidId(updatedVolunteer.Id.ToString()))
+            throw new ArgumentException("Invalid ID.");
 
-        var existingVolunteer = _dal.Volunteer.Read(updatedVolunteer.Id);
+        if (!VolunteerManager.ValidName(updatedVolunteer.Name)) // Use the single name field
+            throw new ArgumentException("Invalid name.");
 
-        if (existingVolunteer == null)
-        {
-            throw new VolunteerNotFoundException($"Volunteer with ID {updatedVolunteer.Id} not found.");
-        }
+        if (!VolunteerManager.ValidPhone(updatedVolunteer.Phone))
+            throw new ArgumentException("Invalid phone number.");
 
+        if (!VolunteerManager.ValidEmail(updatedVolunteer.Email))
+            throw new ArgumentException("Invalid email.");
+
+        if (!VolunteerManager.ValidAddress(updatedVolunteer.Address))
+            throw new ArgumentException("Invalid address.");
+
+        // Ensure coordinates are not null and valid
+        if (!updatedVolunteer.Latitude.HasValue || !updatedVolunteer.Longitude.HasValue)
+            throw new ArgumentException("Coordinates cannot be null.");
+
+        if (!VolunteerManager.ValidLatitude(updatedVolunteer.Latitude.Value) || !VolunteerManager.ValidLongitude(updatedVolunteer.Longitude.Value))
+            throw new ArgumentException("Invalid coordinates.");
+
+        // Ensure coordinates match the address
+        if (!VolunteerManager.AreCoordinatesMatching(updatedVolunteer.Address, updatedVolunteer.Latitude.Value, updatedVolunteer.Longitude.Value))
+            throw new ArgumentException("Coordinates do not match the address.");
+
+        if (currentVolunteer == null)
+            throw new ArgumentException("Volunteer with the given ID does not exist.");
+
+        // Check which fields have changed
+        bool hasChanged = false;
         var updatedVolunteerDO = new DO.Volunteer
         {
             Id = updatedVolunteer.Id,
             Name = updatedVolunteer.Name,
             Phone = updatedVolunteer.Phone,
             Email = updatedVolunteer.Email,
-            IsActive = updatedVolunteer.IsActive,
-            Role = (DO.Role)updatedVolunteer.Role,
-            DistanceType = (DO.DistanceType)updatedVolunteer.DistanceType,
-            Password = updatedVolunteer.Password,
             Address = updatedVolunteer.Address,
-            Latitude = updatedVolunteer.Latitude,
-            Longitude = updatedVolunteer.Longitude,
-            MaxDistance = updatedVolunteer.MaxDistance
+            Latitude = updatedVolunteer.Latitude.Value,
+            Longitude = updatedVolunteer.Longitude.Value,
+            Role = (DO.Role)updatedVolunteer.Role,
+            IsActive = updatedVolunteer.IsActive
         };
 
-        if (requesterId != updatedVolunteer.Id)
+        // Only admin can change the role
+        if (requesterId != updatedVolunteer.Id && updatedVolunteerDO.Role != currentVolunteer.Role)
         {
-            updatedVolunteerDO.Role = existingVolunteer.Role;
+            throw new UnauthorizedAccessException("Only admin can change the role.");
         }
 
-        _dal.Volunteer.Update(updatedVolunteerDO);
-    }
-
-    private void ValidateVolunteerDetails(Volunteer volunteer)
-    {
-        if (!IsValidEmail(volunteer.Email))
+        // Update the volunteer in the database
+        try
         {
-            throw new ArgumentException("Invalid email format.");
+            _dal.Volunteer.Update(updatedVolunteerDO);
         }
-
-        if (!IsValidIsraeliId(volunteer.Id))
+        catch (Exception ex)
         {
-            throw new ArgumentException("Invalid Israeli ID number.");
-        }
-
-        if (!IsValidAddress(volunteer.Address, out double? latitude, out double? longitude))
-        {
-            throw new ArgumentException("Invalid address.");
-        }
-
-        volunteer.Latitude = latitude;
-        volunteer.Longitude = longitude;
-        if (volunteer.MaxDistance < 0)
-        {
-            throw new ArgumentException("Max distance cannot be negative.");
+            throw new Exception("Failed to update volunteer in the database.", ex);
         }
     }
 
-    private bool IsValidEmail(string email)
-    {
-        return Regex.IsMatch(email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$");
-    }
-
-    private bool IsValidIsraeliId(int id)
-    {
-        string idString = id.ToString().PadLeft(9, '0');
-        int sum = 0;
-        for (int i = 0; i < 9; i++)
-        {
-            int digit = idString[i] - '0';
-            sum += (i % 2 == 0) ? digit : (digit * 2 > 9) ? digit * 2 - 9 : digit * 2;
-        }
-        return sum % 10 == 0;
-    }
-
-    private bool IsValidAddress(string address, out double? latitude, out double? longitude)
-    {
-        // בדיקת תקינות הכתובת וקבלת קווי האורך והרוחב
-        // ניתן להשתמש בשירותי מיפוי כמו Google Maps API לקבלת פרטי הכתובת
-        // לדוגמה:
-        // var location = GetLocationFromAddress(address);
-        // latitude = location.Latitude;
-        // longitude = location.Longitude;
-        // return location != null;
-
-        // במקרה זה, נחזיר ערכים דיפולטיביים
-        latitude = null;
-        longitude = null;
-        return true;
-    }
-}
-
-public class VolunteerNotFoundException : Exception
-{
-    public VolunteerNotFoundException(string message) : base(message) { }
-}
 
 
 
 
-public void AddVolunteer(BO.Volunteer newVolunteer)
-    {
 
-        throw new NotImplementedException();
-    }
+
 
 
 
 public void DeleteVolunteer(int volunteerId)
+{
+    try
     {
-        throw new NotImplementedException();
+        // Check if the volunteer exists
+        var volunteer = _dal.Volunteer.Read(volunteerId);
+        if (volunteer == null)
+        {
+            throw new ArgumentException("Volunteer with the given ID does not exist.");
+        }
+
+        // Check if the volunteer can be deleted
+        var calls = _dal.Call.ReadAll().Where(c => c.Id == volunteerId);
+        if (calls.Any())
+        {
+            throw new InvalidOperationException("Cannot delete volunteer who is currently or has previously handled calls.");
+        }
+
+        // Attempt to delete the volunteer
+        _dal.Volunteer.Delete(volunteerId);
+    }
+    catch (Exception ex)
+    {
+        // Catch and rethrow exceptions to the presentation layer
+        throw new Exception("Failed to delete volunteer.", ex);
     }
 }
 
 
+
+
+
+public void AddVolunteer(BO.Volunteer volunteer)
+    {
+        // Validate all fields
+        if (!VolunteerManager.ValidId(volunteer.Id.ToString()))
+            throw new ArgumentException("Invalid ID.");
+
+        if (!VolunteerManager.ValidName(volunteer.Name)) 
+            throw new ArgumentException("Invalid name.");
+
+        if (!VolunteerManager.ValidPhone(volunteer.Phone))
+            throw new ArgumentException("Invalid phone number.");
+
+        if (!VolunteerManager.ValidEmail(volunteer.Email))
+            throw new ArgumentException("Invalid email.");
+
+        if (!VolunteerManager.ValidAddress(volunteer.Address))
+            throw new ArgumentException("Invalid address.");
+
+        // Ensure coordinates are not null and valid
+        if (!volunteer.Latitude.HasValue || !volunteer.Longitude.HasValue)
+            throw new ArgumentException("Coordinates cannot be null.");
+
+        if (!VolunteerManager.ValidLatitude(volunteer.Latitude.Value) || !VolunteerManager.ValidLongitude(volunteer.Longitude.Value))
+            throw new ArgumentException("Invalid coordinates.");
+
+        // Ensure coordinates match the address
+        if (!VolunteerManager.AreCoordinatesMatching(volunteer.Address, volunteer.Latitude.Value, volunteer.Longitude.Value))
+            throw new ArgumentException("Coordinates do not match the address.");
+
+        // Create a new DO.Volunteer object
+        var newVolunteer = new DO.Volunteer
+        {
+            Id = volunteer.Id,
+            Name = volunteer.Name,
+            Phone = volunteer.Phone,
+            Email = volunteer.Email,
+            Address = volunteer.Address,
+            Latitude = volunteer.Latitude.Value,
+            Longitude = volunteer.Longitude.Value,
+            Role = (DO.Role)volunteer.Role, // Convert BO.Role to DO.Role
+            IsActive = volunteer.IsActive
+        };
+        try
+        {
+            // Attempt to add the volunteer to the database
+            _dal.Volunteer.Create(newVolunteer);
+        }
+        catch (Exception ex)
+        {
+            // Catch and rethrow exceptions to the presentation layer
+            throw new Exception("Failed to add volunteer.", ex);
+        }
+    }
+
+
+}
 
 
