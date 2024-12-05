@@ -78,7 +78,6 @@ public enum EndType
     AdminCanceled,        // The administrator canceled the volunteer's assignment before the maximum allowed time.
     Expired               // The call was canceled as it was not handled before the maximum allowed time.
 }
-
 public enum TimeUnit
 {
     MINUTE,
@@ -87,7 +86,6 @@ public enum TimeUnit
     MONTH,
     YEAR
 }
-
 public enum VolunteerInListSortFields
 {
     Id,
@@ -98,4 +96,26 @@ public enum VolunteerInListSortFields
     Latitude,
     Longitude,
 }
-
+public enum CallFilterField
+{
+    CallType,
+    Status
+}
+public enum CallSortField
+{
+    CallType,
+    StartTime,
+    Duration
+}
+public enum ClosedCallSortField
+{
+    StartTime,
+    EndTime,
+    ResolutionTime
+}
+public enum OpenCallSortField
+{
+    StartTime,
+    LastUpdateTime,
+    Distance
+}
