@@ -99,3 +99,13 @@ public enum VolunteerInListSortFields
     Longitude,
 }
 
+public class DataLayerException : Exception
+{
+    public DataLayerException(string message) : base(message) { }
+}
+
+public class BusinessLayerException : Exception
+{
+    public BusinessLayerException(string message, Exception innerException) : base(message, innerException) { }
+}
+

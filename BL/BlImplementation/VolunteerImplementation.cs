@@ -1,5 +1,7 @@
 ﻿namespace BlImplementation;
 using BlApi;
+using BO;
+using DO;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Xml.Linq;
@@ -27,21 +29,70 @@ internal class VolunteerImplementation : IVolunteer
         }
     }
 
-    public void AddVolunteer(BO.Volunteer newVolunteer)
-    {
 
-        throw new NotImplementedException();
-    }
 
-    public void DeleteVolunteer(int volunteerId)
-    {
-        throw new NotImplementedException();
-    }
 
-    public BO.Volunteer GetVolunteerDetails(int id)
+    public BO.Volunteer GetVolunteerDetails(int volunteerId)
     {
-        throw new NotImplementedException();
-    }
+        try
+        {
+            var volunteersFromDal = _dal.Volunteer.ReadAll();
+
+            var volunteerData = volunteersFromDal.FirstOrDefault(v => v.Id == volunteerId);
+
+            if (volunteerData == null)
+            {
+                throw new VolunteerNotFoundException($"Volunteer with ID {volunteerId} not found.");
+            }
+            var volunteer = new BO.Volunteer
+            {
+                Id = volunteerData.Id,
+                Name = volunteerData.Name,
+                Phone = volunteerData.Phone,
+                Email = volunteerData.Email,
+                IsActive = volunteerData.IsActive,
+                Role = (BO.Role)volunteerData.Role,
+                DistanceType = (BO.DistanceType)volunteerData.DistanceType,
+                Password = volunteerData.Password,
+                Address = volunteerData.Address,
+                Latitude = volunteerData.Latitude,
+                Longitude = volunteerData.Longitude,
+                MaxDistance = volunteerData.MaxDistance
+            };
+            if (volunteer.CurrentCall != null)
+            {
+                var callInProgress = new CallInProgress
+                {
+                    Id = volunteer.CurrentCall.Id,
+                    CallId = volunteer.CurrentCall.CallId,
+                    CallType = volunteer.CurrentCall.CallType,
+                    GeneralDescription = volunteer.CurrentCall.GeneralDescription,
+                    AdditionalNotes = volunteer.CurrentCall.AdditionalNotes,
+                    StartTime = volunteer.CurrentCall.StartTime,
+                    EstimatedCompletionTime = volunteer.CurrentCall.EstimatedCompletionTime,
+                    AssignmentStartTime = volunteer.CurrentCall.AssignmentStartTime,
+                    Distance = volunteer.CurrentCall.Distance,
+                    Status = volunteer.CurrentCall.Status
+                };
+                volunteer.CurrentCall = callInProgress;
+            }
+            return volunteer;
+        }
+        catch (Exception ex)
+        {
+            throw;
+        }
+    } 
+
+
+
+
+
+
+
+
+
+
 
     public IEnumerable<BO.VolunteerInList> GetVolunteersList(bool? isActive = null, BO.VolunteerInListSortFields? sortByField = null)
     {
@@ -77,8 +128,6 @@ internal class VolunteerImplementation : IVolunteer
                     case BO.VolunteerInListSortFields.Longitude:
                         volunteersFromDal = volunteersFromDal.OrderBy(v => v.Longitude);
                         break;
-
-                     
                     default:
                         throw new ArgumentException("Invalid sort field", nameof(sortByField));
                 }
@@ -101,6 +150,21 @@ internal class VolunteerImplementation : IVolunteer
 
 
     public void UpdateVolunteer(int requesterId, BO.Volunteer updatedVolunteer)
+    {
+        throw new NotImplementedException();
+    }
+
+
+
+
+
+    public void AddVolunteer(BO.Volunteer newVolunteer)
+    {
+
+        throw new NotImplementedException();
+    }
+
+    public void DeleteVolunteer(int volunteerId)
     {
         throw new NotImplementedException();
     }
