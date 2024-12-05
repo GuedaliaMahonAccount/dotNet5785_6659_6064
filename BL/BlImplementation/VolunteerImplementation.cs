@@ -87,7 +87,7 @@ internal class VolunteerImplementation : IVolunteer
             {
                 volunteersFromDal = volunteersFromDal.OrderBy(v => v.Id);
             }
-            return BO.volunteersFromDal;
+            return (IEnumerable<BO.VolunteerInList>)volunteersFromDal;
         }
         catch (Exception ex)
         {
