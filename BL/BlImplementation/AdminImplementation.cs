@@ -3,7 +3,6 @@ using BO;
 using Dal;
 using Helpers;
 
-
 namespace BlImplementation
 {
     internal class AdminImplementation : IAdmin
@@ -12,61 +11,99 @@ namespace BlImplementation
 
         public void UpdateClock(TimeUnit timeUnit)
         {
-            DateTime newClock;
-
-            switch (timeUnit)
+            try
             {
-                case TimeUnit.MINUTE:
-                    newClock = ClockManager.Now.AddMinutes(1);
-                    break;
-                case TimeUnit.HOUR:
-                    newClock = ClockManager.Now.AddHours(1);
-                    break;
-                case TimeUnit.DAY:
-                    newClock = ClockManager.Now.AddDays(1);
-                    break;
-                case TimeUnit.MONTH:
-                    newClock = ClockManager.Now.AddMonths(1);
-                    break;
-                case TimeUnit.YEAR:
-                    newClock = ClockManager.Now.AddYears(1);
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(timeUnit), "Invalid TimeUnit provided.");
-            }
+                DateTime newClock;
 
-            ClockManager.UpdateClock(newClock);
+                switch (timeUnit)
+                {
+                    case TimeUnit.MINUTE:
+                        newClock = ClockManager.Now.AddMinutes(1);
+                        break;
+                    case TimeUnit.HOUR:
+                        newClock = ClockManager.Now.AddHours(1);
+                        break;
+                    case TimeUnit.DAY:
+                        newClock = ClockManager.Now.AddDays(1);
+                        break;
+                    case TimeUnit.MONTH:
+                        newClock = ClockManager.Now.AddMonths(1);
+                        break;
+                    case TimeUnit.YEAR:
+                        newClock = ClockManager.Now.AddYears(1);
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(timeUnit), "Invalid TimeUnit provided.");
+                }
+
+                ClockManager.UpdateClock(newClock);
+            }
+            catch (Exception ex)
+            {
+                throw new BO.LogicException($"Error updating clock: {ex.Message}", ex);
+            }
         }
 
         public DateTime GetCurrentTime()
         {
-            return ClockManager.Now;
+            try
+            {
+                return ClockManager.Now;
+            }
+            catch (Exception ex)
+            {
+                throw new BO.LogicException($"Error retrieving current time: {ex.Message}", ex);
+            }
         }
 
         public TimeSpan GetRiskTime()
         {
-            return _dal.Config.RiskRange;
+            try
+            {
+                return _dal.Config.RiskRange;
+            }
+            catch (Exception ex)
+            {
+                throw new BO.LogicException($"Error retrieving risk time: {ex.Message}", ex);
+            }
         }
 
         public void InitializeDatabase()
         {
-            ResetDatabase();
-            // Add default data
-            //
-            //
-            //
-            //
-            Console.WriteLine("Database initialized successfully with default data.");
+            try
+            {
+                ResetDatabase();
+                DalTest.Initialization.Do();
+                ClockManager.UpdateClock(ClockManager.Now);
+            }
+            catch (Exception ex)
+            {
+                throw new BO.LogicException($"Error initializing database: {ex.Message}", ex);
+            }
         }
 
         public void ResetDatabase()
         {
-            _dal.ResetDB();
+            try
+            {
+                _dal.ResetDB();
+            }
+            catch (Exception ex)
+            {
+                throw new BO.LogicException($"Error resetting database: {ex.Message}", ex);
+            }
         }
 
         public void SetRiskTime(TimeSpan riskTimeSpan)
         {
-            _dal.Config.RiskRange = riskTimeSpan;
+            try
+            {
+                _dal.Config.RiskRange = riskTimeSpan;
+            }
+            catch (Exception ex)
+            {
+                throw new BO.LogicException($"Error setting risk time: {ex.Message}", ex);
+            }
         }
     }
 }
