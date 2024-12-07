@@ -1,8 +1,7 @@
 ﻿using DalApi;
-using System;
-using System.IO;
 using System.Net;
 using System.Text.Json;
+using BO;
 
 namespace Helpers
 {
@@ -100,5 +99,119 @@ namespace Helpers
 
             return false;
         }
+
+
+
+        /// <summary>
+        /// Updates all open calls whose deadlines have passed and closes them with the status "Expired".
+        /// </summary>
+        public static void UpdateExpiredCalls()
+        {
+            var systemTime = DateTime.Now;
+
+            // Retrieve all calls from the DAL (assuming DO.Call objects)
+            var calls = s_dal.Call.ReadAll();
+
+            // Convert DO.Call objects to BO.Call (assuming a conversion helper exists)
+            var boCalls = calls.Select(call => ConvertToBOCall(call)).ToList();
+
+            // Iterate through calls whose deadline has passed
+            foreach (var call in boCalls)
+            {
+                if (call.DeadLine.HasValue && call.DeadLine.Value < systemTime && !IsCallClosed(call))
+                {
+                    // Check if call has no assignment
+                    if (call.Assignments == null || !call.Assignments.Any())
+                    {
+                        // Add a new assignment with "Expired Cancellation"
+                        var newAssignment = new BO.CallAssignInList
+                        {
+                            VolunteerId = null,
+                            VolunteerName = null,
+                            StartTime = DateTime.MinValue,
+                            EndTime = systemTime,
+                            EndType = EndType.Expired // Assuming an enum value
+                        };
+
+                        call.Assignments?.Add(newAssignment);
+                    }
+                    else
+                    {
+                        // Update the last assignment if EndTime is null
+                        var openAssignment = call.Assignments.LastOrDefault(a => a.EndTime == null);
+                        var updatedAssignment = new BO.CallAssignInList
+                        {
+                            VolunteerId = openAssignment.VolunteerId,
+                            VolunteerName = openAssignment.VolunteerName,
+                            StartTime = openAssignment.StartTime,
+                            EndTime = systemTime,
+                            EndType = EndType.Expired
+                        };
+
+                        // Replace the existing assignment in the list
+                        var index = call.Assignments.IndexOf(openAssignment);
+                        if (index >= 0)
+                        {
+                            call.Assignments[index] = updatedAssignment;
+                        }
+
+                    }
+
+                    // Convert BO.Call back to DO.Call
+                    var updatedDOCall = ConvertToDOCall(call);
+
+                    // Update the call in the DAL
+                    s_dal.Call.Update(updatedDOCall);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Helper method to determine if a call is already closed.
+        /// </summary>
+        /// <param name="call">The call to check.</param>
+        /// <returns>True if the call is closed, otherwise false.</returns>
+        private static bool IsCallClosed(BO.Call call)
+        {
+            return call.Assignments != null && call.Assignments.Any(a => a.EndTime != null && a.EndType != null);
+        }
+
+        /// <summary>
+        /// Converts a DO.Call object to a BO.Call object.
+        /// </summary>
+        private static BO.Call ConvertToBOCall(DO.Call doCall)
+        {
+            return new BO.Call
+            {
+                Id = doCall.Id,
+                CallType = (BO.CallType)doCall.CallType,
+                Address = doCall.Address,
+                Latitude = doCall.Latitude,
+                Longitude = doCall.Longitude,
+                StartTime = doCall.StartTime,
+                Description = doCall.Description,
+                DeadLine = doCall.DeadLine,
+                Assignments = new List<BO.CallAssignInList>() // Convert assignments if needed
+            };
+        }
+
+        /// <summary>
+        /// Converts a BO.Call object to a DO.Call object.
+        /// </summary>
+        private static DO.Call ConvertToDOCall(BO.Call boCall)
+        {
+            return new DO.Call
+            {
+                Id = boCall.Id,
+                CallType = (DO.CallType)boCall.CallType,
+                Address = boCall.Address,
+                Latitude = boCall.Latitude ?? 0, // Assuming default value
+                Longitude = boCall.Longitude ?? 0, // Assuming default value
+                StartTime = boCall.StartTime,
+                Description = boCall.Description,
+                DeadLine = boCall.DeadLine
+            };
+        }
+
     }
 }

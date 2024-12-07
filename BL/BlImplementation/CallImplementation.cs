@@ -33,9 +33,12 @@ namespace BlImplementation
                 if (string.IsNullOrWhiteSpace(newCall.Address))
                     throw new BO.LogicException("Address cannot be empty.");
 
+                if (newCall.Latitude == null || newCall.Longitude == null)
+                    throw new BO.LogicException("Latitude and Longitude cannot be null.");
+
                 // Validate the address and coordinates
                 CallManager.ValidAddress(newCall.Address);
-                CallManager.AreCoordinatesMatching(newCall.Address, newCall.Latitude, newCall.Longitude);
+                CallManager.AreCoordinatesMatching(newCall.Address, newCall.Latitude.Value, newCall.Longitude.Value);
 
                 // Convert BO.Call to DO.Call
                 var callDO = new DO.Call
@@ -43,8 +46,8 @@ namespace BlImplementation
                     Id: newCall.Id,
                     CallType: (DO.CallType)newCall.CallType,
                     Address: newCall.Address,
-                    Latitude: newCall.Latitude,
-                    Longitude: newCall.Longitude,
+                    Latitude: newCall.Latitude.Value,
+                    Longitude: newCall.Longitude.Value,
                     StartTime: newCall.StartTime,
                     Description: newCall.Description,
                     DeadLine: newCall.DeadLine
@@ -632,8 +635,12 @@ namespace BlImplementation
                     throw new BO.LogicException("The deadline must be later than the start time.");
 
                 // Validate latitude and longitude for the address
-                if (!CallManager.AreCoordinatesMatching(call.Address, call.Latitude, call.Longitude))
+                if (call.Latitude == null || call.Longitude == null)
+                    throw new BO.LogicException("Latitude and Longitude cannot be null.");
+
+                if (!CallManager.AreCoordinatesMatching(call.Address, call.Latitude.Value, call.Longitude.Value))
                     throw new BO.LogicException("Invalid address coordinates (latitude or longitude).");
+
                 if (!CallManager.ValidAddress(call.Address))
                     throw new BO.LogicException("Invalid address format.");
 
@@ -643,8 +650,8 @@ namespace BlImplementation
                     Id: call.Id,
                     CallType: (DO.CallType)call.CallType,
                     Address: call.Address,
-                    Latitude: call.Latitude,
-                    Longitude: call.Longitude,
+                    Latitude: call.Latitude.Value,
+                    Longitude: call.Longitude.Value,
                     StartTime: call.StartTime,
                     Description: call.Description,
                     DeadLine: call.DeadLine

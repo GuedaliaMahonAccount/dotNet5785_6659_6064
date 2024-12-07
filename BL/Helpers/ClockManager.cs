@@ -38,7 +38,7 @@ internal static class ClockManager //stage 4
         //Go through all students to update properties that are affected by the clock update
         //(students becomes not active after 5 years etc.)
 
-        StudentManager.PeriodicStudentsUpdates(oldClock, newClock); //stage 4
+        CallManager.UpdateExpiredCalls(); //stage 4
         //etc ...
 
         //Calling all the observers of clock update
@@ -46,62 +46,7 @@ internal static class ClockManager //stage 4
     }
 
 
-    /// <summary>
-    /// Updates all open calls whose deadlines have passed and closes them with the status "Expired".
-    /// </summary>
-    public static void UpdateExpiredCalls()
-    {
-        var systemTime = DateTime.Now;
 
-        // Retrieve all calls
-        var calls = _dal.Call.ReadAll();
-
-        // Iterate through calls whose deadline has passed
-        foreach (var call in calls)
-        {
-            if (call.DeadLine.HasValue && call.DeadLine.Value < systemTime && !IsCallClosed(call))
-            {
-                // Check if call has no assignment
-                if (!call.Assignments.Any())
-                {
-                    // Add a new assignment with "Expired Cancellation"
-                    var newAssignment = new BO.CallAssignInList
-                    {
-                        VolunteerId = null,
-                        VolunteerName = null,
-                        StartTime = null,
-                        EndTime = systemTime,
-                        EndType = EndType.Expired // Assuming an enum value
-                    };
-
-                    call.Assignments.Add(newAssignment);
-                }
-                else
-                {
-                    // Update the last assignment if EndTime is null
-                    var openAssignment = call.Assignments.LastOrDefault(a => a.EndTime == null);
-                    if (openAssignment != null)
-                    {
-                        openAssignment.EndTime = systemTime;
-                        openAssignment.EndType = EndType.Expired;
-                    }
-                }
-
-                // Update the call in the DAL
-                _dal.Call.Update(call);
-            }
-        }
-    }
-
-    /// <summary>
-    /// Helper method to determine if a call is already closed.
-    /// </summary>
-    /// <param name="call">The call to check.</param>
-    /// <returns>True if the call is closed, otherwise false.</returns>
-    private static bool IsCallClosed(BO.Call call)
-    {
-        return call.Assignments.Any(a => a.EndTime != null && a.EndType != null);
-    }
 
     #endregion Stage 4
 
@@ -153,7 +98,8 @@ internal static class ClockManager //stage 4
             //TO_DO:
             //Add calls here to any logic simulation that was required in stage 7
             //for example: course registration simulation
-            StudentManager.SimulateCourseRegistrationAndGrade(); //stage 7
+
+            //StudentManager.SimulateCourseRegistrationAndGrade(); //stage 7
 
             //etc...
             #endregion Stage 7
