@@ -323,13 +323,13 @@ namespace BlImplementation
                                       CallId = call.Id,
                                       CallType = (BO.CallType)call.CallType,
                                       StartTime = call.StartTime,
-                                      Duration = latestAssignment?.EndTime.HasValue == true
+                                      LeftTimeToExpire = latestAssignment?.EndTime.HasValue == true
                                           ? latestAssignment.EndTime.Value - call.StartTime
                                           : TimeSpan.Zero,
                                       LastVolunteerName = latestAssignment != null
                                           ? _dal.Volunteer.Read(latestAssignment.VolunteerId)?.Name ?? "Unknown"
                                           : "None",
-                                      LastCompletionDuration = latestAssignment?.EndTime.HasValue == true
+                                      LeftTimeTocomplete = latestAssignment?.EndTime.HasValue == true
                                           ? DateTime.Now - latestAssignment.EndTime.Value
                                           : TimeSpan.Zero,
                                       Status = latestAssignment == null
@@ -360,7 +360,7 @@ namespace BlImplementation
                     {
                         BO.CallSortField.CallType => callsInList.OrderBy(call => call.CallType),
                         BO.CallSortField.StartTime => callsInList.OrderBy(call => call.StartTime),
-                        BO.CallSortField.Duration => callsInList.OrderBy(call => call.Duration),
+                        BO.CallSortField.Duration => callsInList.OrderBy(call => call.LeftTimeToExpire),
                         _ => callsInList.OrderBy(call => call.CallId)
                     };
                 }
@@ -438,10 +438,10 @@ namespace BlImplementation
                         {
                             Id = call.Id,
                             CallType = (BO.CallType)call.CallType,
-                            Description = call.Description ?? "No description provided",
-                            StartTime = call.StartTime,
-                            EndTime = assignment.EndTime.Value, // EndTime is guaranteed to be non-null
-                            ResolutionTime = assignment.EndTime,
+                            Address = call.Address ?? "No description provided",
+                            OpenTime = call.StartTime,
+                            StartAssignementTime = assignment.StartTime, // EndTime is guaranteed to be non-null
+                            EndTime = assignment.EndTime,
                             EndType = (BO.EndType)assignment.EndType!
                         });
 
@@ -460,9 +460,9 @@ namespace BlImplementation
                 {
                     closedCalls = sortField switch
                     {
-                        BO.ClosedCallSortField.StartTime => closedCalls.OrderBy(c => c.StartTime),
+                        BO.ClosedCallSortField.StartTime => closedCalls.OrderBy(c => c.OpenTime),
                         BO.ClosedCallSortField.EndTime => closedCalls.OrderBy(c => c.EndTime),
-                        BO.ClosedCallSortField.ResolutionTime => closedCalls.OrderBy(c => c.ResolutionTime),
+                        BO.ClosedCallSortField.ResolutionTime => closedCalls.OrderBy(c => c.StartAssignementTime),
                         _ => closedCalls.OrderBy(c => c.Id)
                     };
                 }

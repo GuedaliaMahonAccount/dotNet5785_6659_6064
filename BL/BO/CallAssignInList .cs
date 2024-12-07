@@ -14,10 +14,10 @@ namespace BO
     public class CallAssignInList
     {
         public int? VolunteerId { get; init; }
-        public string VolunteerName { get; init; }
-        public DateTime? StartTime { get; init; }
+        public string? VolunteerName { get; init; }
+        public DateTime StartTime { get; init; }
         public DateTime? EndTime { get; init; }
-        public EndType EndType { get; init; }
+        public EndType? EndType { get; init; }
 
         public override string ToString()
         {

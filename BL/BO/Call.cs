@@ -21,13 +21,13 @@ namespace BO
     {
         public int Id { get; init; }
         public CallType CallType { get; set; }
-        public string Address { get; set; }
-        public double Latitude { get; set; }
-        public double Longitude { get; set; }
+        public string? Address { get; set; }
+        public double? Latitude { get; set; }
+        public double? Longitude { get; set; }
         public DateTime StartTime { get; set; }
         public string? Description { get; set; }
         public DateTime? DeadLine { get; set; }
-        public List<CallAssignInList> Assignments { get; set; } = new List<CallAssignInList>();
+        public List<CallAssignInList>? Assignments { get; set; } = new List<CallAssignInList>();
 
         public override string ToString()
         {

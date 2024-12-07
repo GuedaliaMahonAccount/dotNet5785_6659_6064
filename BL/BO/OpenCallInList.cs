@@ -18,10 +18,10 @@ namespace BO
     {
         public int Id { get; init; }
         public CallType CallType { get; init; }
-        public string Description { get; init; }
+        public string? Description { get; init; }
         public string Address { get; init; }
         public DateTime StartTime { get; init; }
-        public DateTime MaxEndTime { get; init; }
+        public DateTime? MaxEndTime { get; init; }
         public double Distance { get; init; }
 
         public override string ToString()

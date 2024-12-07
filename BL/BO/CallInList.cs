@@ -16,12 +16,12 @@ namespace BO
 {
     public class CallInList
     {
-        public int CallId { get; init; }
+        public int? CallId { get; init; }
         public CallType CallType { get; init; }
         public DateTime StartTime { get; init; }
-        public TimeSpan Duration { get; init; }
-        public string LastVolunteerName { get; init; }
-        public TimeSpan LastCompletionDuration { get; init; }
+        public TimeSpan? LeftTimeToExpire { get; init; }
+        public string? LastVolunteerName { get; init; }
+        public TimeSpan? LeftTimeTocomplete { get; init; }
         public CallType Status { get; init; }
         public int AssignmentCount { get; init; }
 

@@ -21,8 +21,8 @@ namespace BO
         public int Id { get; init; }
         public int CallId { get; init; }
         public CallType CallType { get; init; }
-        public string GeneralDescription { get; init; }
-        public string AdditionalNotes { get; init; }
+        public string? GeneralDescription { get; init; }
+        public string Address { get; init; }
         public DateTime StartTime { get; init; }
         public DateTime? EstimatedCompletionTime { get; init; }
         public DateTime AssignmentStartTime { get; init; }

@@ -110,7 +110,7 @@ internal class VolunteerImplementation : IVolunteer
                     CallId = volunteer.CurrentCall.CallId,
                     CallType = volunteer.CurrentCall.CallType,
                     GeneralDescription = volunteer.CurrentCall.GeneralDescription,
-                    AdditionalNotes = volunteer.CurrentCall.AdditionalNotes,
+                    Address = volunteer.CurrentCall.Address,
                     StartTime = volunteer.CurrentCall.StartTime,
                     EstimatedCompletionTime = volunteer.CurrentCall.EstimatedCompletionTime,
                     AssignmentStartTime = volunteer.CurrentCall.AssignmentStartTime,

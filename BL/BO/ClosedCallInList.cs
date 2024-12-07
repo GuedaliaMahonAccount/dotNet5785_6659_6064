@@ -18,11 +18,11 @@ namespace BO
     {
         public int Id { get; init; }
         public CallType CallType { get; init; }
-        public string Description { get; init; }
-        public DateTime StartTime { get; init; }
-        public DateTime EndTime { get; init; }
-        public DateTime? ResolutionTime { get; init; }
-        public EndType EndType { get; init; }
+        public string Address { get; init; }
+        public DateTime OpenTime { get; init; }
+        public DateTime StartAssignementTime { get; init; }
+        public DateTime? EndTime { get; init; }
+        public EndType? EndType { get; init; }
 
         public override string ToString()
         {

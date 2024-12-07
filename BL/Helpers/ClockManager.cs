@@ -44,6 +44,65 @@ internal static class ClockManager //stage 4
         //Calling all the observers of clock update
         ClockUpdatedObservers?.Invoke(); //prepared for stage 5
     }
+
+
+    /// <summary>
+    /// Updates all open calls whose deadlines have passed and closes them with the status "Expired".
+    /// </summary>
+    public static void UpdateExpiredCalls()
+    {
+        var systemTime = DateTime.Now;
+
+        // Retrieve all calls
+        var calls = _dal.Call.ReadAll();
+
+        // Iterate through calls whose deadline has passed
+        foreach (var call in calls)
+        {
+            if (call.DeadLine.HasValue && call.DeadLine.Value < systemTime && !IsCallClosed(call))
+            {
+                // Check if call has no assignment
+                if (!call.Assignments.Any())
+                {
+                    // Add a new assignment with "Expired Cancellation"
+                    var newAssignment = new BO.CallAssignInList
+                    {
+                        VolunteerId = null,
+                        VolunteerName = null,
+                        StartTime = null,
+                        EndTime = systemTime,
+                        EndType = EndType.Expired // Assuming an enum value
+                    };
+
+                    call.Assignments.Add(newAssignment);
+                }
+                else
+                {
+                    // Update the last assignment if EndTime is null
+                    var openAssignment = call.Assignments.LastOrDefault(a => a.EndTime == null);
+                    if (openAssignment != null)
+                    {
+                        openAssignment.EndTime = systemTime;
+                        openAssignment.EndType = EndType.Expired;
+                    }
+                }
+
+                // Update the call in the DAL
+                _dal.Call.Update(call);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Helper method to determine if a call is already closed.
+    /// </summary>
+    /// <param name="call">The call to check.</param>
+    /// <returns>True if the call is closed, otherwise false.</returns>
+    private static bool IsCallClosed(BO.Call call)
+    {
+        return call.Assignments.Any(a => a.EndTime != null && a.EndType != null);
+    }
+
     #endregion Stage 4
 
 
