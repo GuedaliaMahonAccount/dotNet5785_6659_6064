@@ -195,14 +195,5 @@ namespace Helpers
             return false;
         }
 
-        public static bool ValidLongitude(double longitude)
-        {
-            return longitude >= -180 && longitude <= 180;
-        }
-
-        public static bool ValidLatitude(double latitude)
-        {
-            return latitude >= -90 && latitude <= 90;
-        }
     }
 }
