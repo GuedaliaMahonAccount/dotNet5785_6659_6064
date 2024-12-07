@@ -8,6 +8,20 @@ namespace BlImplementation
     {
         private readonly DalApi.IDal _dal = DalApi.Factory.Get;
 
+
+        /// <summary>
+        /// Adds a new call to the system. 
+        /// Validates the input, ensures the address and coordinates are correct, and converts the BO.Call object to DO.Call before saving it in the database.
+        /// </summary>
+        /// <param name="newCall">The call object containing the details of the new call to be added.</param>
+        /// <exception cref="ArgumentNullException">Thrown when the provided call object is null.</exception>
+        /// <exception cref="BO.LogicException">
+        /// Thrown when:
+        /// - The address is empty or invalid.
+        /// - The address and coordinates do not match.
+        /// - The call already exists in the system.
+        /// - Other unexpected errors occur during the addition process.
+        /// </exception>
         public void AddCall(BO.Call newCall)
         {
             try
@@ -21,7 +35,7 @@ namespace BlImplementation
 
                 // Validate the address and coordinates
                 CallManager.ValidAddress(newCall.Address);
-                CallManager.AreCoordinatesMatching(newCall.Address ,newCall.Latitude, newCall.Longitude);
+                CallManager.AreCoordinatesMatching(newCall.Address, newCall.Latitude, newCall.Longitude);
 
                 // Convert BO.Call to DO.Call
                 var callDO = new DO.Call
@@ -49,6 +63,19 @@ namespace BlImplementation
             }
         }
 
+        /// <summary>
+        /// Cancels an assignment based on the requester's authorization and the assignment's current status. 
+        /// Updates the assignment with the cancellation details if the operation is valid.
+        /// </summary>
+        /// <param name="requesterId">The ID of the person requesting the cancellation (can be a volunteer or an admin).</param>
+        /// <param name="assignmentId">The ID of the assignment to be canceled.</param>
+        /// <exception cref="BO.LogicException">
+        /// Thrown when:
+        /// - No assignment is found with the provided ID.
+        /// - The requester is not authorized to cancel the assignment.
+        /// - The assignment is already completed or expired.
+        /// - Other unexpected errors occur during the cancellation process.
+        /// </exception>
         public void CancelCall(int requesterId, int assignmentId)
         {
             try
@@ -100,6 +127,19 @@ namespace BlImplementation
             }
         }
 
+        /// <summary>
+        /// Marks an assignment as completed by the assigned volunteer. 
+        /// Validates the assignment's status and the volunteer's authorization before updating the assignment's completion details.
+        /// </summary>
+        /// <param name="volunteerId">The ID of the volunteer completing the assignment.</param>
+        /// <param name="assignmentId">The ID of the assignment to be completed.</param>
+        /// <exception cref="BO.LogicException">
+        /// Thrown when:
+        /// - The assignment is not found in the system.
+        /// - The volunteer is not authorized to complete the assignment.
+        /// - The assignment is already completed, canceled, or expired.
+        /// - Other unexpected errors occur during the completion process.
+        /// </exception>
         public void CompleteCall(int volunteerId, int assignmentId)
         {
             try
@@ -141,6 +181,18 @@ namespace BlImplementation
             }
         }
 
+        /// <summary>
+        /// Deletes a call from the system. 
+        /// Ensures the call is in an open state and has not been assigned to any volunteer before deletion.
+        /// </summary>
+        /// <param name="callId">The ID of the call to be deleted.</param>
+        /// <exception cref="BO.LogicException">
+        /// Thrown when:
+        /// - The call is not found in the system.
+        /// - The call is not in the 'Open' status.
+        /// - The call has been assigned to one or more volunteers.
+        /// - Other unexpected errors occur during the deletion process.
+        /// </exception>
         public void DeleteCall(int callId)
         {
             try
@@ -179,6 +231,16 @@ namespace BlImplementation
             }
         }
 
+        /// <summary>
+        /// Retrieves detailed information about a specific call, including its assignments and volunteer information.
+        /// </summary>
+        /// <param name="callId">The ID of the call to retrieve.</param>
+        /// <returns>A <see cref="BO.Call"/> object containing the call details and a list of its assignments.</returns>
+        /// <exception cref="BO.LogicException">
+        /// Thrown when:
+        /// - The call is not found in the system.
+        /// - Other unexpected errors occur during the retrieval process.
+        /// </exception>
         public BO.Call GetCallDetails(int callId)
         {
             try
@@ -236,46 +298,48 @@ namespace BlImplementation
             }
         }
 
+        /// <summary>
+        /// Retrieves a list of calls with aggregated assignment and volunteer data.
+        /// Includes filtering and sorting options, and uses `select new` to construct the result objects.
+        /// </summary>
+        /// <param name="filterField">Optional field to filter calls by.</param>
+        /// <param name="filterValue">Value to filter calls by.</param>
+        /// <param name="sortField">Optional sorting field.</param>
+        /// <returns>A collection of calls with summarized details.</returns>
         public IEnumerable<BO.CallInList> GetCallList(Enum? filterField, object? filterValue, Enum? sortField)
         {
             try
             {
-                // Retrieve all calls and assignments from the DAL
                 var callsDO = _dal.Call.ReadAll();
                 var assignmentsDO = _dal.Assignment.ReadAll();
 
-                // Map calls to BO.CallInList with aggregated assignment data
-                var callsInList = callsDO.Select(call =>
-                {
-                    var relatedAssignments = assignmentsDO.Where(a => a.CallId == call.Id);
-                    var latestAssignment = relatedAssignments
-                        .OrderByDescending(a => a.StartTime)
-                        .FirstOrDefault();
+                var callsInList = from call in callsDO
+                                  let relatedAssignments = assignmentsDO.Where(a => a.CallId == call.Id)
+                                  let latestAssignment = relatedAssignments
+                                      .OrderByDescending(a => a.StartTime)
+                                      .FirstOrDefault()
+                                  select new BO.CallInList
+                                  {
+                                      CallId = call.Id,
+                                      CallType = (BO.CallType)call.CallType,
+                                      StartTime = call.StartTime,
+                                      Duration = latestAssignment?.EndTime.HasValue == true
+                                          ? latestAssignment.EndTime.Value - call.StartTime
+                                          : TimeSpan.Zero,
+                                      LastVolunteerName = latestAssignment != null
+                                          ? _dal.Volunteer.Read(latestAssignment.VolunteerId)?.Name ?? "Unknown"
+                                          : "None",
+                                      LastCompletionDuration = latestAssignment?.EndTime.HasValue == true
+                                          ? DateTime.Now - latestAssignment.EndTime.Value
+                                          : TimeSpan.Zero,
+                                      Status = latestAssignment == null
+                                          ? BO.CallType.Open
+                                          : latestAssignment.EndTime == null
+                                              ? BO.CallType.InTreatment
+                                              : BO.CallType.Closed,
+                                      AssignmentCount = relatedAssignments.Count()
+                                  };
 
-                    return new BO.CallInList
-                    {
-                        CallId = call.Id,
-                        CallType = (BO.CallType)call.CallType,
-                        StartTime = call.StartTime,
-                        Duration = latestAssignment?.EndTime.HasValue == true
-                            ? latestAssignment.EndTime.Value - call.StartTime
-                            : TimeSpan.Zero,
-                        LastVolunteerName = latestAssignment != null
-                            ? _dal.Volunteer.Read(latestAssignment.VolunteerId)?.Name ?? "Unknown"
-                            : "None",
-                        LastCompletionDuration = latestAssignment?.EndTime.HasValue == true
-                            ? DateTime.Now - latestAssignment.EndTime.Value
-                            : TimeSpan.Zero,
-                        Status = latestAssignment == null
-                            ? BO.CallType.Open
-                            : latestAssignment.EndTime == null
-                                ? BO.CallType.InTreatment
-                                : BO.CallType.Closed,
-                        AssignmentCount = relatedAssignments.Count()
-                    };
-                });
-
-                // Apply filtering
                 if (filterField != null && filterValue != null)
                 {
                     callsInList = filterField switch
@@ -286,7 +350,6 @@ namespace BlImplementation
                     };
                 }
 
-                // Apply sorting
                 if (sortField == null)
                 {
                     callsInList = callsInList.OrderBy(call => call.CallId);
@@ -310,26 +373,27 @@ namespace BlImplementation
             }
         }
 
+        /// <summary>
+        /// Retrieves the quantities of calls grouped by their type. 
+        /// Uses LINQ `group by` to count the occurrences of each call type.
+        /// </summary>
+        /// <returns>An array of integers representing the count of calls for each call type.</returns>
         public int[] GetCallQuantities()
         {
             try
             {
-                // Retrieve all calls from the DAL
                 var callsDO = _dal.Call.ReadAll();
 
-                // Group calls by their CallType and count the occurrences
-                var groupedQuantities = callsDO
-                    .GroupBy(call => (int)call.CallType) // Group by CallType enum value
-                    .ToDictionary(group => group.Key, group => group.Count());
+                var groupedQuantities = from call in callsDO
+                                        group call by (int)call.CallType into callGroup
+                                        select new { CallType = callGroup.Key, Count = callGroup.Count() };
 
-                // Determine the maximum CallType value to ensure the array covers all statuses
                 int maxStatus = Enum.GetValues(typeof(DO.CallType)).Cast<int>().Max();
 
-                // Create an array of size maxStatus + 1 and populate it with quantities
                 var quantities = new int[maxStatus + 1];
-                foreach (var kvp in groupedQuantities)
+                foreach (var group in groupedQuantities)
                 {
-                    quantities[kvp.Key] = kvp.Value;
+                    quantities[group.CallType] = group.Count;
                 }
 
                 return quantities;
@@ -340,6 +404,18 @@ namespace BlImplementation
             }
         }
 
+        /// <summary>
+        /// Retrieves a list of closed calls handled by a specific volunteer, including optional filtering and sorting.
+        /// </summary>
+        /// <param name="volunteerId">The ID of the volunteer whose closed calls are to be retrieved.</param>
+        /// <param name="callType">Optional filter for the call type.</param>
+        /// <param name="sortField">Optional sorting field for the results.</param>
+        /// <returns>
+        /// A collection of <see cref="BO.ClosedCallInList"/> objects containing details of the closed calls handled by the volunteer.
+        /// </returns>
+        /// <exception cref="BO.LogicException">
+        /// Thrown when an error occurs during the retrieval or processing of the closed calls.
+        /// </exception>
         public IEnumerable<BO.ClosedCallInList> GetClosedCalls(int volunteerId, Enum? callType, Enum? sortField)
         {
             try
@@ -399,51 +475,49 @@ namespace BlImplementation
             }
         }
 
+        /// <summary>
+        /// Retrieves a list of open calls that are either "Open" or "OpenAtRisk" for a specific volunteer.
+        /// Includes filtering by call type and sorting options. Uses `let` to compute distances between locations.
+        /// </summary>
+        /// <param name="volunteerId">The ID of the volunteer.</param>
+        /// <param name="callType">Optional filter for the call type.</param>
+        /// <param name="sortField">Optional sorting field.</param>
+        /// <returns>A collection of open calls with details.</returns>
         public IEnumerable<BO.OpenCallInList> GetOpenCalls(int volunteerId, Enum? callType, Enum? sortField)
         {
             try
             {
-                // Retrieve all calls and volunteer details from the DAL
                 var callsDO = _dal.Call.ReadAll();
                 var volunteerDO = _dal.Volunteer.Read(volunteerId);
 
                 if (volunteerDO == null)
                     throw new BO.LogicException($"Volunteer with ID {volunteerId} not found.");
 
-                // Filter open calls ("Open" or "OpenAtRisk" status)
-                var openCalls = callsDO.Where(call =>
-                    call.CallType == DO.CallType.Open || call.CallType == DO.CallType.OpenAtRisk);
+                var openCallsWithDetails = from call in callsDO
+                                           where call.CallType == DO.CallType.Open || call.CallType == DO.CallType.OpenAtRisk
+                                           let distance = CallManager.CalculateDistance(
+                                               volunteerDO.Latitude ?? 0, volunteerDO.Longitude ?? 0,
+                                               call.Latitude, call.Longitude
+                                           )
+                                           select new BO.OpenCallInList
+                                           {
+                                               Id = call.Id,
+                                               CallType = (BO.CallType)call.CallType,
+                                               Description = call.Description ?? "No description provided",
+                                               Address = call.Address ?? "Unknown",
+                                               StartTime = call.StartTime,
+                                               MaxEndTime = call.DeadLine ?? DateTime.MaxValue,
+                                               Distance = distance
+                                           };
 
-                // Calculate distances and map to BO.OpenCallInList
-                var openCallsWithDetails = openCalls.Select(call =>
-                {
-                    var distance = CallManager.CalculateDistance(
-                        volunteerDO.Latitude ?? 0, volunteerDO.Longitude ?? 0,
-                        call.Latitude, call.Longitude
-                    );
-
-                    return new BO.OpenCallInList
-                    {
-                        Id = call.Id,
-                        CallType = (BO.CallType)call.CallType,
-                        Description = call.Description ?? "No description provided",
-                        Address = call.Address ?? "Unknown",
-                        StartTime = call.StartTime,
-                        MaxEndTime = call.DeadLine ?? DateTime.MaxValue,
-                        Distance = distance
-                    };
-                });
-
-                // Filter by callType if provided
                 if (callType != null)
                 {
                     openCallsWithDetails = openCallsWithDetails.Where(c => c.CallType.Equals(callType));
                 }
 
-                // Sort the results
                 if (sortField == null)
                 {
-                    openCallsWithDetails = openCallsWithDetails.OrderBy(c => c.Id); // Default sorting by call ID
+                    openCallsWithDetails = openCallsWithDetails.OrderBy(c => c.Id);
                 }
                 else
                 {
@@ -463,6 +537,20 @@ namespace BlImplementation
             }
         }
 
+        /// <summary>
+        /// Assigns a volunteer to a specific call. 
+        /// Ensures that the call is open, unassigned, and not expired before creating the assignment.
+        /// </summary>
+        /// <param name="volunteerId">The ID of the volunteer to be assigned to the call.</param>
+        /// <param name="callId">The ID of the call to be assigned to the volunteer.</param>
+        /// <exception cref="BO.LogicException">
+        /// Thrown when:
+        /// - The call does not exist.
+        /// - The volunteer does not exist.
+        /// - The call is already assigned or in progress.
+        /// - The call is expired.
+        /// - Other unexpected errors occur during the assignment process.
+        /// </exception>
         public void selectionCall(int volunteerId, int callId)
         {
             try
@@ -515,6 +603,20 @@ namespace BlImplementation
             }
         }
 
+        /// <summary>
+        /// Updates the details of an existing call in the system.
+        /// Validates the input and ensures the call details are consistent before updating the database.
+        /// </summary>
+        /// <param name="call">The updated call object containing the new details.</param>
+        /// <exception cref="ArgumentNullException">Thrown when the provided call object is null.</exception>
+        /// <exception cref="BO.LogicException">
+        /// Thrown when:
+        /// - The call's address is empty or invalid.
+        /// - The call's deadline is earlier than or equal to its start time.
+        /// - The latitude and longitude do not match the address.
+        /// - The call does not exist in the system.
+        /// - Other unexpected errors occur during the update process.
+        /// </exception>
         public void UpdateCall(BO.Call call)
         {
             try
@@ -533,7 +635,7 @@ namespace BlImplementation
                 if (!CallManager.AreCoordinatesMatching(call.Address, call.Latitude, call.Longitude))
                     throw new BO.LogicException("Invalid address coordinates (latitude or longitude).");
                 if (!CallManager.ValidAddress(call.Address))
-                    throw new BO.LogicException("Invalid address format."); 
+                    throw new BO.LogicException("Invalid address format.");
 
                 // Convert BO.Call to DO.Call
                 var callDO = new DO.Call
