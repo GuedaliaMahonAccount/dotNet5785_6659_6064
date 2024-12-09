@@ -2,6 +2,8 @@
 using System;
 using System.Collections.Generic;
 
+namespace BlApi;
+
 public interface IBl
 {
     ICall Call { get; }
