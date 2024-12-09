@@ -102,7 +102,7 @@ Option Options:
                     s_bl.Volunteer.AddVolunteer(volunteer);
                     break;
                 case Option.CALL:
-                    createCall(out Call call);
+                    Call call = CreateCall();
                     s_bl.Call.AddCall(call);
                     break;
                 case Option.ADMIN:
@@ -168,7 +168,7 @@ Option Options:
                     break;
                 case Option.CALL:
                     Call call = s_bl.Call.GetCallDetails(id);
-                    updateCall(call);
+                    UpdateCall(call);
                     s_bl.Call.UpdateCall(call);
                     break;
                 case Option.ADMIN:
@@ -199,6 +199,8 @@ Option Options:
             }
         }
 
+
+        //vounteer
         private static void createVolunteer(out Volunteer volunteer)
         {
             Console.Write("Enter Name: ");
@@ -302,34 +304,227 @@ Option Options:
                 volunteer.MaxDistance = maxDistance;
         }
 
-        private static void createCall(out Call call)
+
+        //calls
+        private static Call CreateCall()
         {
-            Console.Write("Enter Call Type: ");
-            string callTypeInput = Console.ReadLine() ?? throw new FormatException("Wrong input");
-            if (!Enum.TryParse(callTypeInput, out CallType callType))
-                throw new FormatException("Invalid Call Type");
+            Call call = new Call();
 
-            Console.Write("Enter Call Description: ");
-            string description = Console.ReadLine() ?? throw new FormatException("Wrong input");
 
-            call = new Call
+            call.CallType = CallType.Open;
+
+
+            // Prompt for Address
+            while (true)
             {
-                CallType = callType,
-                Description = description
-            };
+                Console.Write("Enter Address: ");
+                string address = Console.ReadLine();
+
+                if (!string.IsNullOrWhiteSpace(address))
+                {
+                    call.Address = address;
+                    break;
+                }
+
+                Console.WriteLine("Address cannot be empty. Please try again.");
+            }
+
+            // Prompt for Latitude and Longitude
+            while (true)
+            {
+                try
+                {
+                    Console.Write("Enter Latitude: ");
+                    call.Latitude = double.Parse(Console.ReadLine() ?? throw new FormatException("Latitude is required."));
+
+                    Console.Write("Enter Longitude: ");
+                    call.Longitude = double.Parse(Console.ReadLine() ?? throw new FormatException("Longitude is required."));
+                    break;
+                }
+                catch (FormatException ex)
+                {
+                    Console.WriteLine($"Invalid input: {ex.Message}. Please try again.");
+                }
+            }
+
+            // Prompt for Description
+            while (true)
+            {
+                Console.Write("Enter Call Description: ");
+                string description = Console.ReadLine();
+
+                if (!string.IsNullOrWhiteSpace(description))
+                {
+                    call.Description = description;
+                    break;
+                }
+
+                Console.WriteLine("Description cannot be empty. Please try again.");
+            }
+
+            // Prompt for StartTime
+            while (true)
+            {
+                try
+                {
+                    Console.Write("Enter Start Time (yyyy-MM-dd HH:mm): ");
+                    call.StartTime = DateTime.Parse(Console.ReadLine() ?? throw new FormatException("Start Time is required."));
+                    break;
+                }
+                catch (FormatException ex)
+                {
+                    Console.WriteLine($"Invalid input: {ex.Message}. Please try again.");
+                }
+            }
+
+            // Prompt for DeadLine
+            while (true)
+            {
+                try
+                {
+                    Console.Write("Enter Deadline (yyyy-MM-dd HH:mm): ");
+                    call.DeadLine = DateTime.Parse(Console.ReadLine() ?? throw new FormatException("Deadline is required."));
+                    break;
+                }
+                catch (FormatException ex)
+                {
+                    Console.WriteLine($"Invalid input: {ex.Message}. Please try again.");
+                }
+            }
+
+            return call;
         }
 
-        private static void updateCall(Call call)
+        private static void UpdateCall(Call call)
         {
-            Console.Write("Enter New Call Type: ");
-            string callTypeInput = Console.ReadLine() ?? call.CallType.ToString();
-            if (!Enum.TryParse(callTypeInput, out CallType callType))
-                throw new FormatException("Invalid Call Type");
+            // Display current CallType and prompt for update
+            Console.WriteLine($"Current Call Type: {call.CallType}");
+            while (true)
+            {
+                Console.Write("Enter New Call Type (press Enter to keep current): ");
+                string callTypeInput = Console.ReadLine();
 
-            call.CallType = callType;
+                if (string.IsNullOrWhiteSpace(callTypeInput))
+                {
+                    // Keep the existing CallType if no input is provided
+                    break;
+                }
 
-            Console.Write("Enter New Call Description: ");
-            call.Description = Console.ReadLine() ?? call.Description;
+                if (Enum.TryParse(callTypeInput, out CallType callType))
+                {
+                    call.CallType = callType;
+                    break;
+                }
+
+                Console.WriteLine("Invalid Call Type. Please try again.");
+            }
+
+            // Prompt for updated description
+            Console.WriteLine($"Current Description: {call.Description}");
+            Console.Write("Enter New Call Description (press Enter to keep current): ");
+            string descriptionInput = Console.ReadLine();
+            if (!string.IsNullOrWhiteSpace(descriptionInput))
+            {
+                call.Description = descriptionInput;
+            }
+
+            // Prompt for updated address
+            Console.WriteLine($"Current Address: {call.Address}");
+            Console.Write("Enter New Address (press Enter to keep current): ");
+            string addressInput = Console.ReadLine();
+            if (!string.IsNullOrWhiteSpace(addressInput))
+            {
+                call.Address = addressInput;
+            }
+
+            // Prompt for updated Latitude and Longitude
+            Console.WriteLine($"Current Latitude: {call.Latitude}, Current Longitude: {call.Longitude}");
+            while (true)
+            {
+                Console.Write("Enter New Latitude (press Enter to keep current): ");
+                string latitudeInput = Console.ReadLine();
+
+                if (string.IsNullOrWhiteSpace(latitudeInput))
+                {
+                    // Keep existing Latitude if no input is provided
+                    break;
+                }
+
+                if (double.TryParse(latitudeInput, out double latitude))
+                {
+                    call.Latitude = latitude;
+                    break;
+                }
+
+                Console.WriteLine("Invalid Latitude. Please try again.");
+            }
+
+            while (true)
+            {
+                Console.Write("Enter New Longitude (press Enter to keep current): ");
+                string longitudeInput = Console.ReadLine();
+
+                if (string.IsNullOrWhiteSpace(longitudeInput))
+                {
+                    // Keep existing Longitude if no input is provided
+                    break;
+                }
+
+                if (double.TryParse(longitudeInput, out double longitude))
+                {
+                    call.Longitude = longitude;
+                    break;
+                }
+
+                Console.WriteLine("Invalid Longitude. Please try again.");
+            }
+
+            // Prompt for updated StartTime
+            Console.WriteLine($"Current Start Time: {call.StartTime}");
+            while (true)
+            {
+                Console.Write("Enter New Start Time (yyyy-MM-dd HH:mm, press Enter to keep current): ");
+                string startTimeInput = Console.ReadLine();
+
+                if (string.IsNullOrWhiteSpace(startTimeInput))
+                {
+                    // Keep existing StartTime if no input is provided
+                    break;
+                }
+
+                if (DateTime.TryParse(startTimeInput, out DateTime startTime))
+                {
+                    call.StartTime = startTime;
+                    break;
+                }
+
+                Console.WriteLine("Invalid Start Time. Please try again.");
+            }
+
+            // Prompt for updated Deadline
+            Console.WriteLine($"Current Deadline: {call.DeadLine}");
+            while (true)
+            {
+                Console.Write("Enter New Deadline (yyyy-MM-dd HH:mm, press Enter to keep current): ");
+                string deadlineInput = Console.ReadLine();
+
+                if (string.IsNullOrWhiteSpace(deadlineInput))
+                {
+                    // Keep existing Deadline if no input is provided
+                    break;
+                }
+
+                if (DateTime.TryParse(deadlineInput, out DateTime deadline))
+                {
+                    call.DeadLine = deadline;
+                    break;
+                }
+
+                Console.WriteLine("Invalid Deadline. Please try again.");
+            }
+
+            Console.WriteLine("Call updated successfully!");
         }
+
     }
 }
