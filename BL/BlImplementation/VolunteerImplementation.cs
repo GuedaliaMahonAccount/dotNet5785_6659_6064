@@ -19,38 +19,32 @@ internal class VolunteerImplementation : IVolunteer
     /// <returns>
     /// A string representing the role of the authenticated volunteer.
     /// </returns>
-    /// <exception cref="BO.LogicException">
+    /// <exception cref="BlDoesNotExistException">
     /// Thrown when:
     /// - The username and password combination does not match any volunteer.
     /// - Other unexpected errors occur during the login process.
     /// </exception>
     public string Login(string username, string password)
     {
-        try
+
+        // Retrieve all volunteers from the DAL
+        var volunteersFromDal = _dal.Volunteer.ReadAll();
+
+        // Convert the provided password to string (if necessary)
+        string passwordAsString = password.ToString();
+
+        // Find the volunteer with matching username and password
+        var vol = volunteersFromDal.FirstOrDefault(v => v.Name == username && v.Password == passwordAsString);
+
+        if (vol == null)
         {
-            // Retrieve all volunteers from the DAL
-            var volunteersFromDal = _dal.Volunteer.ReadAll();
-
-            // Convert the provided password to string (if necessary)
-            string passwordAsString = password.ToString();
-
-            // Find the volunteer with matching username and password
-            var vol = volunteersFromDal.FirstOrDefault(v => v.Name == username && v.Password == passwordAsString);
-
-            if (vol == null)
-            {
-                // Volunteer not found or incorrect password
-                throw new BO.LogicException("Volunteer not found or incorrect password.");
-            }
-
-            // Return the role of the authenticated volunteer
-            return vol.Role.ToString();
+            // Volunteer not found or incorrect password
+            throw new BlDoesNotExistException("Volunteer not found or incorrect password.");
         }
-        catch (DO.ArgumentNullException ex)
-        {
-            // Handle specific case where a null argument causes an exception
-            throw new BO.LogicException(ex.Message);
-        }
+
+        // Return the role of the authenticated volunteer
+        return vol.Role.ToString();
+
     }
 
     /// <summary>
@@ -63,70 +57,64 @@ internal class VolunteerImplementation : IVolunteer
     /// - Geographic information like address, latitude, longitude, and max distance.
     /// - Details of the current call in progress, if applicable.
     /// </returns>
-    /// <exception cref="BO.LogicException">
+    /// <exception cref="BlDoesNotExistException">
     /// Thrown when:
     /// - The volunteer with the specified ID is not found.
     /// - An error occurs during the retrieval or processing of volunteer data.
     /// </exception>
     public BO.Volunteer GetVolunteerDetails(int volunteerId)
     {
-        try
+
+        // Retrieve all volunteers from the DAL
+        var volunteersFromDal = _dal.Volunteer.ReadAll();
+
+        // Find the specific volunteer by ID
+        var volunteerData = volunteersFromDal.FirstOrDefault(v => v.Id == volunteerId);
+
+        if (volunteerData == null)
         {
-            // Retrieve all volunteers from the DAL
-            var volunteersFromDal = _dal.Volunteer.ReadAll();
+            // Volunteer not found
+            throw new BlDoesNotExistException($"Volunteer with ID {volunteerId} not found.");
+        }
 
-            // Find the specific volunteer by ID
-            var volunteerData = volunteersFromDal.FirstOrDefault(v => v.Id == volunteerId);
+        // Map the DO.Volunteer data to a BO.Volunteer object
+        var volunteer = new BO.Volunteer
+        {
+            Id = volunteerData.Id,
+            Name = volunteerData.Name,
+            Phone = volunteerData.Phone,
+            Email = volunteerData.Email,
+            IsActive = volunteerData.IsActive,
+            Role = (BO.Role)volunteerData.Role,
+            DistanceType = (BO.DistanceType)volunteerData.DistanceType,
+            Password = volunteerData.Password,
+            Address = volunteerData.Address,
+            Latitude = volunteerData.Latitude,
+            Longitude = volunteerData.Longitude,
+            MaxDistance = volunteerData.MaxDistance
+        };
 
-            if (volunteerData == null)
+        // Map the current call in progress if applicable
+        if (volunteer.CurrentCall != null)
+        {
+            var callInProgress = new BO.CallInProgress
             {
-                // Volunteer not found
-                throw new LogicException($"Volunteer with ID {volunteerId} not found.");
-            }
-
-            // Map the DO.Volunteer data to a BO.Volunteer object
-            var volunteer = new BO.Volunteer
-            {
-                Id = volunteerData.Id,
-                Name = volunteerData.Name,
-                Phone = volunteerData.Phone,
-                Email = volunteerData.Email,
-                IsActive = volunteerData.IsActive,
-                Role = (BO.Role)volunteerData.Role,
-                DistanceType = (BO.DistanceType)volunteerData.DistanceType,
-                Password = volunteerData.Password,
-                Address = volunteerData.Address,
-                Latitude = volunteerData.Latitude,
-                Longitude = volunteerData.Longitude,
-                MaxDistance = volunteerData.MaxDistance
+                Id = volunteer.CurrentCall.Id,
+                CallId = volunteer.CurrentCall.CallId,
+                CallType = volunteer.CurrentCall.CallType,
+                GeneralDescription = volunteer.CurrentCall.GeneralDescription,
+                Address = volunteer.CurrentCall.Address,
+                StartTime = volunteer.CurrentCall.StartTime,
+                EstimatedCompletionTime = volunteer.CurrentCall.EstimatedCompletionTime,
+                AssignmentStartTime = volunteer.CurrentCall.AssignmentStartTime,
+                Distance = volunteer.CurrentCall.Distance,
+                Status = volunteer.CurrentCall.Status
             };
-
-            // Map the current call in progress if applicable
-            if (volunteer.CurrentCall != null)
-            {
-                var callInProgress = new BO.CallInProgress
-                {
-                    Id = volunteer.CurrentCall.Id,
-                    CallId = volunteer.CurrentCall.CallId,
-                    CallType = volunteer.CurrentCall.CallType,
-                    GeneralDescription = volunteer.CurrentCall.GeneralDescription,
-                    Address = volunteer.CurrentCall.Address,
-                    StartTime = volunteer.CurrentCall.StartTime,
-                    EstimatedCompletionTime = volunteer.CurrentCall.EstimatedCompletionTime,
-                    AssignmentStartTime = volunteer.CurrentCall.AssignmentStartTime,
-                    Distance = volunteer.CurrentCall.Distance,
-                    Status = volunteer.CurrentCall.Status
-                };
-                volunteer.CurrentCall = callInProgress;
-            }
-
-            return volunteer;
+            volunteer.CurrentCall = callInProgress;
         }
-        catch (Exception ex)
-        {
-            // Handle any unexpected errors
-            throw new LogicException("Error occurred while processing the volunteer details.", ex);
-        }
+
+        return volunteer;
+
     }
 
     /// <summary>
@@ -140,68 +128,62 @@ internal class VolunteerImplementation : IVolunteer
     /// <returns>
     /// A collection of <see cref="BO.VolunteerInList"/> objects representing the filtered and sorted list of volunteers.
     /// </returns>
-    /// <exception cref="BO.LogicException">
+    /// <exception cref="LogicException">
     /// Thrown when:
     /// - An invalid sorting field is provided.
     /// - Other unexpected errors occur during the retrieval or processing of the volunteer list.
     /// </exception>
     public IEnumerable<BO.VolunteerInList> GetVolunteersList(bool? isActive = null, BO.VolunteerInListSortFields? sortByField = null)
     {
-        try
+
+        // Retrieve all volunteers from the DAL
+        var volunteersFromDal = _dal.Volunteer.ReadAll();
+
+        // Filter by activity status if specified
+        if (isActive.HasValue)
         {
-            // Retrieve all volunteers from the DAL
-            var volunteersFromDal = _dal.Volunteer.ReadAll();
-
-            // Filter by activity status if specified
-            if (isActive.HasValue)
-            {
-                volunteersFromDal = volunteersFromDal.Where(v => v.IsActive == isActive.Value);
-            }
-
-            // Apply sorting based on the specified field
-            if (sortByField.HasValue)
-            {
-                switch (sortByField.Value)
-                {
-                    case BO.VolunteerInListSortFields.Id:
-                        volunteersFromDal = volunteersFromDal.OrderBy(v => v.Id);
-                        break;
-                    case BO.VolunteerInListSortFields.Name:
-                        volunteersFromDal = volunteersFromDal.OrderBy(v => v.Name);
-                        break;
-                    case BO.VolunteerInListSortFields.Phone:
-                        volunteersFromDal = volunteersFromDal.OrderBy(v => v.Phone);
-                        break;
-                    case BO.VolunteerInListSortFields.IsActive:
-                        volunteersFromDal = volunteersFromDal.OrderBy(v => v.IsActive);
-                        break;
-                    case BO.VolunteerInListSortFields.Role:
-                        volunteersFromDal = volunteersFromDal.OrderBy(v => v.Role);
-                        break;
-                    case BO.VolunteerInListSortFields.Latitude:
-                        volunteersFromDal = volunteersFromDal.OrderBy(v => v.Latitude);
-                        break;
-                    case BO.VolunteerInListSortFields.Longitude:
-                        volunteersFromDal = volunteersFromDal.OrderBy(v => v.Longitude);
-                        break;
-                    default:
-                        throw new LogicException("Invalid sort field provided.");
-                }
-            }
-            else
-            {
-                // Default sorting by ID
-                volunteersFromDal = volunteersFromDal.OrderBy(v => v.Id);
-            }
-
-            // Convert the data to the expected BO.VolunteerInList format
-            return (IEnumerable<BO.VolunteerInList>)volunteersFromDal;
+            volunteersFromDal = volunteersFromDal.Where(v => v.IsActive == isActive.Value);
         }
-        catch (Exception ex)
+
+        // Apply sorting based on the specified field
+        if (sortByField.HasValue)
         {
-            // Handle any unexpected errors
-            throw new LogicException("Error occurred while processing the volunteer list.", ex);
+            switch (sortByField.Value)
+            {
+                case BO.VolunteerInListSortFields.Id:
+                    volunteersFromDal = volunteersFromDal.OrderBy(v => v.Id);
+                    break;
+                case BO.VolunteerInListSortFields.Name:
+                    volunteersFromDal = volunteersFromDal.OrderBy(v => v.Name);
+                    break;
+                case BO.VolunteerInListSortFields.Phone:
+                    volunteersFromDal = volunteersFromDal.OrderBy(v => v.Phone);
+                    break;
+                case BO.VolunteerInListSortFields.IsActive:
+                    volunteersFromDal = volunteersFromDal.OrderBy(v => v.IsActive);
+                    break;
+                case BO.VolunteerInListSortFields.Role:
+                    volunteersFromDal = volunteersFromDal.OrderBy(v => v.Role);
+                    break;
+                case BO.VolunteerInListSortFields.Latitude:
+                    volunteersFromDal = volunteersFromDal.OrderBy(v => v.Latitude);
+                    break;
+                case BO.VolunteerInListSortFields.Longitude:
+                    volunteersFromDal = volunteersFromDal.OrderBy(v => v.Longitude);
+                    break;
+                default:
+                    throw new LogicException("Invalid sort field provided.");
+            }
         }
+        else
+        {
+            // Default sorting by ID
+            volunteersFromDal = volunteersFromDal.OrderBy(v => v.Id);
+        }
+
+        // Convert the data to the expected BO.VolunteerInList format
+        return (IEnumerable<BO.VolunteerInList>)volunteersFromDal;
+
     }
 
     /// <summary>
@@ -210,7 +192,7 @@ internal class VolunteerImplementation : IVolunteer
     /// </summary>
     /// <param name="requesterId">The ID of the user (admin or the volunteer themselves) making the update request.</param>
     /// <param name="updatedVolunteer">A <see cref="BO.Volunteer"/> object containing the updated volunteer details.</param>
-    /// <exception cref="BO.LogicException">
+    /// <exception cref="BlInvalidValueException">
     /// Thrown when:
     /// - The requester is not authorized to update the volunteer.
     /// - Validation for any field (ID, name, phone, email, address, coordinates) fails.
@@ -231,30 +213,30 @@ internal class VolunteerImplementation : IVolunteer
 
         // Check all fields
         if (!VolunteerManager.ValidId(updatedVolunteer.Id.ToString()))
-            throw new LogicException("Invalid ID.");
+            throw new BlInvalidValueException("Invalid ID.");
 
         if (!VolunteerManager.ValidName(updatedVolunteer.Name)) // Validate name
-            throw new LogicException("Invalid name.");
+            throw new BlInvalidValueException("Invalid name.");
 
         if (!VolunteerManager.ValidPhone(updatedVolunteer.Phone)) // Validate phone
-            throw new LogicException("Invalid phone number.");
+            throw new BlInvalidValueException("Invalid phone number.");
 
         if (!VolunteerManager.ValidEmail(updatedVolunteer.Email)) // Validate email
-            throw new LogicException("Invalid email.");
+            throw new BlInvalidValueException("Invalid email.");
 
         if (!VolunteerManager.ValidAddress(updatedVolunteer.Address)) // Validate address
-            throw new LogicException("Invalid address.");
+            throw new BlInvalidValueException("Invalid address.");
 
         // Ensure coordinates are not null and valid
         if (!updatedVolunteer.Latitude.HasValue || !updatedVolunteer.Longitude.HasValue)
-            throw new LogicException("Coordinates cannot be null.");
+            throw new BlNullPropertyException("Coordinates cannot be null.");
 
         // Ensure coordinates match the address
         if (!VolunteerManager.AreCoordinatesMatching(updatedVolunteer.Address, updatedVolunteer.Latitude.Value, updatedVolunteer.Longitude.Value))
-            throw new LogicException("Coordinates do not match the address.");
+            throw new BlInvalidValueException("Coordinates do not match the address.");
 
         if (currentVolunteer == null)
-            throw new LogicException("Volunteer with the given ID does not exist.");
+            throw new BlDoesNotExistException("Volunteer with the given ID does not exist.");
 
         // Check which fields have changed
         var updatedVolunteerDO = new DO.Volunteer
@@ -277,14 +259,8 @@ internal class VolunteerImplementation : IVolunteer
         }
 
         // Update the volunteer in the database
-        try
-        {
-            _dal.Volunteer.Update(updatedVolunteerDO);
-        }
-        catch (Exception ex)
-        {
-            throw new LogicException("Failed to update volunteer in the database.", ex);
-        }
+        _dal.Volunteer.Update(updatedVolunteerDO);
+
     }
 
     /// <summary>
@@ -292,7 +268,7 @@ internal class VolunteerImplementation : IVolunteer
     /// Ensures the volunteer exists and has no associated or previously handled calls before deletion.
     /// </summary>
     /// <param name="volunteerId">The unique ID of the volunteer to be deleted.</param>
-    /// <exception cref="BO.LogicException">
+    /// <exception cref="BlDeletionImpossibleException">
     /// Thrown when:
     /// - The volunteer does not exist in the database.
     /// - The volunteer has associated or previously handled calls, making them ineligible for deletion.
@@ -300,30 +276,24 @@ internal class VolunteerImplementation : IVolunteer
     /// </exception>
     public void DeleteVolunteer(int volunteerId)
     {
-        try
-        {
-            // Check if the volunteer exists
-            var volunteer = _dal.Volunteer.Read(volunteerId);
-            if (volunteer == null)
-            {
-                throw new LogicException("Volunteer with the given ID does not exist.");
-            }
 
-            // Check if the volunteer can be deleted
-            var calls = _dal.Call.ReadAll().Where(c => c.Id == volunteerId);
-            if (calls.Any())
-            {
-                throw new LogicException("Cannot delete volunteer who is currently or has previously handled calls.");
-            }
-
-            // Attempt to delete the volunteer
-            _dal.Volunteer.Delete(volunteerId);
-        }
-        catch (Exception ex)
+        // Check if the volunteer exists
+        var volunteer = _dal.Volunteer.Read(volunteerId);
+        if (volunteer == null)
         {
-            // Catch and rethrow exceptions to the presentation layer
-            throw new LogicException("Failed to delete volunteer.", ex);
+            throw new BlDoesNotExistException("Volunteer with the given ID does not exist.");
         }
+
+        // Check if the volunteer can be deleted
+        var calls = _dal.Call.ReadAll().Where(c => c.Id == volunteerId);
+        if (calls.Any())
+        {
+            throw new BlDeletionImpossibleException("Cannot delete volunteer who is currently or has previously handled calls.");
+        }
+
+        // Attempt to delete the volunteer
+        _dal.Volunteer.Delete(volunteerId);
+
     }
 
     /// <summary>
@@ -333,7 +303,7 @@ internal class VolunteerImplementation : IVolunteer
     /// <param name="volunteer">
     /// A <see cref="BO.Volunteer"/> object containing the details of the volunteer to be added.
     /// </param>
-    /// <exception cref="BO.LogicException">
+    /// <exception cref="BlInvalidValueException">
     /// Thrown when:
     /// - The ID is invalid.
     /// - The name, phone number, email, or address does not meet validation requirements.
@@ -344,27 +314,27 @@ internal class VolunteerImplementation : IVolunteer
     {
         // Validate all fields
         if (!VolunteerManager.ValidId(volunteer.Id.ToString()))
-            throw new LogicException("Invalid ID.");
+            throw new BlInvalidValueException("Invalid ID.");
 
         if (!VolunteerManager.ValidName(volunteer.Name))
-            throw new LogicException("Invalid name.");
+            throw new BlInvalidValueException("Invalid name.");
 
         if (!VolunteerManager.ValidPhone(volunteer.Phone))
-            throw new LogicException("Invalid phone number.");
+            throw new BlInvalidValueException("Invalid phone number.");
 
         if (!VolunteerManager.ValidEmail(volunteer.Email))
-            throw new LogicException("Invalid email.");
+            throw new BlInvalidValueException("Invalid email.");
 
         if (!VolunteerManager.ValidAddress(volunteer.Address))
-            throw new LogicException("Invalid address.");
+            throw new BlInvalidValueException("Invalid address.");
 
         // Ensure coordinates are not null and valid
         if (!volunteer.Latitude.HasValue || !volunteer.Longitude.HasValue)
-            throw new LogicException("Coordinates cannot be null.");
+            throw new BlInvalidValueException("Coordinates cannot be null.");
 
         // Ensure coordinates match the address
         if (!VolunteerManager.AreCoordinatesMatching(volunteer.Address, volunteer.Latitude.Value, volunteer.Longitude.Value))
-            throw new LogicException("Coordinates do not match the address.");
+            throw new BlInvalidValueException("Coordinates do not match the address.");
 
         // Create a new DO.Volunteer object
         var newVolunteer = new DO.Volunteer

@@ -13,40 +13,43 @@ internal static class ClockManager //stage 4
     /// <summary>
     /// Property for providing current application's clock value for any BL class that may need it
     /// </summary>
-    internal static DateTime Now { get => _dal.Config.Clock; } //stage 4
-
+    internal static DateTime Now
+    {
+        get
+        {
+            // No try-catch, throw the exception directly if it occurs
+            return _dal.Config.Clock;
+        }
+    }
     /// <summary>
     /// Method to perform application's clock from any BL class as may be required
     /// </summary>
     /// <param name="newClock">updated clock value</param>
-    internal static void UpdateClock(DateTime newClock) //stage 4-7
+    internal static void UpdateClock(DateTime newClock)
     {
-        // new Thread(() => { // stage 7 - not sure - still under investigation - see stage 7 instructions after it will be released        
-        updateClock(newClock);//stage 4-6
-        // }).Start(); // stage 7 as above
+        // No try-catch, throw the exception directly if it occurs
+        updateClock(newClock);
     }
-
-    private static void updateClock(DateTime newClock) // prepared for stage 7 as DRY to eliminate needless repetition
+    private static void updateClock(DateTime newClock)
     {
-        var oldClock = _dal.Config.Clock; //stage 4
-        _dal.Config.Clock = newClock; //stage 4
+        try
+        {
+            var oldClock = _dal.Config.Clock; // This line could throw an exception, for example, if _dal is null or invalid.
+            _dal.Config.Clock = newClock; // If this fails, an exception will be thrown, and we won't catch it here.
 
-        //TO_DO:
-        //Add calls here to any logic method that should be called periodically,
-        //after each clock update
-        //for example, Periodic students' updates:
-        //Go through all students to update properties that are affected by the clock update
-        //(students becomes not active after 5 years etc.)
+            // Add calls to any logic method that should be called periodically, after each clock update.
+            // For example: Periodic student updates:
+            CallManager.UpdateExpiredCalls(); // This could throw an exception too, and it will be thrown up to the caller.
 
-        CallManager.UpdateExpiredCalls(); //stage 4
-        //etc ...
-
-        //Calling all the observers of clock update
-        ClockUpdatedObservers?.Invoke(); //prepared for stage 5
+            // Calling all the observers of the clock update.
+            ClockUpdatedObservers?.Invoke(); // This is also susceptible to throwing exceptions.
+        }
+        catch (Exception ex)
+        {
+            // Throw the exception upwards without catching locally, the caller will handle it
+            throw new BlUnknownTypeException("Error updating clock.", ex);
+        }
     }
-
-
-
 
     #endregion Stage 4
 
