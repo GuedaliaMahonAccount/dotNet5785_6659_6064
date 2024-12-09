@@ -5,23 +5,6 @@ using BO;
 
 namespace BlTest
 {
-    public enum OPTION
-    {
-        EXIT,
-        VOLUNTEER,
-        CALL,
-        ADMIN
-    }
-
-    public enum CRUD
-    {
-        EXIT,
-        CREATE,
-        READ,
-        READ_ALL,
-        UPDATE,
-        DELETE
-    }
 
     internal class Program
     {
