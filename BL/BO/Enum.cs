@@ -120,14 +120,14 @@ public enum OpenCallSortField
     Distance
 }
 
-public enum OPTION
+public enum Option
 {
     EXIT,
     VOLUNTEER,
     CALL,
     ADMIN
 }
-public enum CRUD
+public enum Crud
 {
     EXIT,
     CREATE,

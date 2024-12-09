@@ -14,12 +14,12 @@ namespace BlTest
         {
             try
             {
-                OPTION option = showMainMenu();
+                Option Option = showMainMenu();
 
-                while (OPTION.EXIT != option)
+                while (Option.EXIT != Option)
                 {
-                    handleCRUDOptions(option);
-                    option = showMainMenu();
+                    handleCRUDOptions(Option);
+                    Option = showMainMenu();
                 }
             }
             catch (Exception ex)
@@ -28,29 +28,29 @@ namespace BlTest
             }
         }
 
-        private static OPTION showMainMenu()
+        private static Option showMainMenu()
         {
             int choice;
             do
             {
                 Console.WriteLine(@"
-OPTION Options:
+Option Options:
 0 - Exit
 1 - Volunteer
 2 - Call
 3 - Admin");
             }
             while (!int.TryParse(Console.ReadLine(), out choice));
-            return (OPTION)choice;
+            return (Option)choice;
         }
 
-        private static CRUD showCrudMenu(OPTION entity)
+        private static Crud showCrudMenu(Option entity)
         {
             int choice;
             do
             {
                 Console.WriteLine(@$"
-{entity} CRUD Options:
+{entity} Crud Options:
 0 - Exit
 1 - Create 
 2 - Read
@@ -59,28 +59,28 @@ OPTION Options:
 5 - Delete");
             }
             while (!int.TryParse(Console.ReadLine(), out choice));
-            return (CRUD)choice;
+            return (Crud)choice;
         }
 
-        private static void handleCRUDOptions(OPTION entity)
+        private static void handleCRUDOptions(Option entity)
         {
             try
             {
                 switch (showCrudMenu(entity))
                 {
-                    case CRUD.CREATE:
+                    case Crud.CREATE:
                         handleCreate(entity);
                         break;
-                    case CRUD.READ:
+                    case Crud.READ:
                         handleRead(entity);
                         break;
-                    case CRUD.READ_ALL:
+                    case Crud.READ_ALL:
                         handleReadAll(entity);
                         break;
-                    case CRUD.UPDATE:
+                    case Crud.UPDATE:
                         handleUpdate(entity);
                         break;
-                    case CRUD.DELETE:
+                    case Crud.DELETE:
                         handleDelete(entity);
                         break;
                     default:
@@ -93,26 +93,26 @@ OPTION Options:
             }
         }
 
-        private static void handleCreate(OPTION entity)
+        private static void handleCreate(Option entity)
         {
             switch (entity)
             {
-                case OPTION.VOLUNTEER:
+                case Option.VOLUNTEER:
                     createVolunteer(out Volunteer volunteer);
                     s_bl.Volunteer.AddVolunteer(volunteer);
                     break;
-                case OPTION.CALL:
+                case Option.CALL:
                     createCall(out Call call);
                     s_bl.Call.AddCall(call);
                     break;
-                case OPTION.ADMIN:
+                case Option.ADMIN:
                     break;
                 default:
                     break;
             }
         }
 
-        private static void handleRead(OPTION entity)
+        private static void handleRead(Option entity)
         {
             Console.WriteLine("Enter an id");
             if (!int.TryParse(Console.ReadLine(), out int id))
@@ -120,32 +120,32 @@ OPTION Options:
 
             switch (entity)
             {
-                case OPTION.VOLUNTEER:
+                case Option.VOLUNTEER:
                     Console.WriteLine(s_bl.Volunteer.GetVolunteerDetails(id));
                     break;
-                case OPTION.CALL:
+                case Option.CALL:
                     Console.WriteLine(s_bl.Call.GetCallDetails(id));
                     break;
-                case OPTION.ADMIN:
+                case Option.ADMIN:
                     break;
                 default:
                     break;
             }
         }
 
-        private static void handleReadAll(OPTION entity)
+        private static void handleReadAll(Option entity)
         {
             switch (entity)
             {
-                case OPTION.VOLUNTEER:
+                case Option.VOLUNTEER:
                     foreach (var item in s_bl.Volunteer.GetVolunteersList())
                         Console.WriteLine(item);
                     break;
-                case OPTION.CALL:
+                case Option.CALL:
                     foreach (var item in s_bl.Call.GetCallList(null, null, null))
                         Console.WriteLine(item);
                     break;
-                case OPTION.ADMIN:
+                case Option.ADMIN:
                     // Admin read all logic if needed
                     break;
                 default:
@@ -153,7 +153,7 @@ OPTION Options:
             }
         }
 
-        private static void handleUpdate(OPTION entity)
+        private static void handleUpdate(Option entity)
         {
             Console.WriteLine("Enter an id");
             if (!int.TryParse(Console.ReadLine(), out int id))
@@ -161,24 +161,24 @@ OPTION Options:
 
             switch (entity)
             {
-                case OPTION.VOLUNTEER:
+                case Option.VOLUNTEER:
                     Volunteer volunteer = s_bl.Volunteer.GetVolunteerDetails(id);
                     updateVolunteer(volunteer);
                     s_bl.Volunteer.UpdateVolunteer(id, volunteer);
                     break;
-                case OPTION.CALL:
+                case Option.CALL:
                     Call call = s_bl.Call.GetCallDetails(id);
                     updateCall(call);
                     s_bl.Call.UpdateCall(call);
                     break;
-                case OPTION.ADMIN:
+                case Option.ADMIN:
                     break;
                 default:
                     break;
             }
         }
 
-        private static void handleDelete(OPTION entity)
+        private static void handleDelete(Option entity)
         {
             Console.WriteLine("Enter an id");
             if (!int.TryParse(Console.ReadLine(), out int id))
@@ -186,13 +186,13 @@ OPTION Options:
 
             switch (entity)
             {
-                case OPTION.VOLUNTEER:
+                case Option.VOLUNTEER:
                     s_bl.Volunteer.DeleteVolunteer(id);
                     break;
-                case OPTION.CALL:
+                case Option.CALL:
                     s_bl.Call.DeleteCall(id);
                     break;
-                case OPTION.ADMIN:
+                case Option.ADMIN:
                     break;
                 default:
                     break;
