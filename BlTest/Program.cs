@@ -10,25 +10,47 @@ namespace BlTest
     {
         static readonly IBl s_bl = Factory.Get();
 
+
+        /// <summary>
+        /// main
+        /// </summary>
+        /// <param name="args"></param>
         static void Main(string[] args)
         {
             try
             {
-                Option Option = showMainMenu();
+                Option option = ShowMainMenu();
 
-                while (Option.EXIT != Option)
+                while (option != Option.EXIT)
                 {
-                    handleCRUDOptions(Option);
-                    Option = showMainMenu();
+                    switch (option)
+                    {
+                        case Option.VOLUNTEER:
+                            HandleVolunteerOption();
+                            break;
+
+                        case Option.CALL:
+                            HandleCallOption();
+                            break;
+
+                        case Option.ADMIN:
+                            HandleAdminOption();
+                            break;
+
+                        default:
+                            Console.WriteLine("Invalid option. Please try again.");
+                            break;
+                    }
+
+                    option = ShowMainMenu();
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
+                Console.WriteLine($"An error occurred: {ex.Message}");
             }
         }
-
-        private static Option showMainMenu()
+        private static Option ShowMainMenu()
         {
             int choice;
             do
@@ -44,269 +66,317 @@ Option Options:
             return (Option)choice;
         }
 
-        private static Crud showCrudMenu(Option entity)
-        {
-            int choice;
-            do
-            {
-                Console.WriteLine(@$"
-{entity} Crud Options:
-0 - Exit
-1 - Create 
-2 - Read
-3 - ReadAll
-4 - Update 
-5 - Delete");
-            }
-            while (!int.TryParse(Console.ReadLine(), out choice));
-            return (Crud)choice;
-        }
 
-        private static void handleCRUDOptions(Option entity)
+        /// <summary>
+        /// each entities Menu
+        /// </summary>
+        /// <param name="entity"></param>
+        static void HandleAdminOption()
         {
-            try
-            {
-                switch (showCrudMenu(entity))
-                {
-                    case Crud.CREATE:
-                        handleCreate(entity);
-                        break;
-                    case Crud.READ:
-                        handleRead(entity);
-                        break;
-                    case Crud.READ_ALL:
-                        handleReadAll(entity);
-                        break;
-                    case Crud.UPDATE:
-                        handleUpdate(entity);
-                        break;
-                    case Crud.DELETE:
-                        handleDelete(entity);
-                        break;
-                    default:
-                        return;
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
-            }
-        }
+            Console.WriteLine("Admin Menu:");
+            Console.WriteLine("1 - Get Current Time");
+            Console.WriteLine("2 - Update Clock");
+            Console.WriteLine("3 - Get Risk Time");
+            Console.WriteLine("4 - Set Risk Time");
+            Console.WriteLine("5 - Reset Database");
+            Console.WriteLine("6 - Initialize Database");
+            Console.WriteLine("0 - Return to Main Menu");
 
-        private static void handleCreate(Option entity)
-        {
-            switch (entity)
+            Console.Write("Choose an option: ");
+            int choice = int.TryParse(Console.ReadLine(), out int input) ? input : -1;
+
+            switch (choice)
             {
-                case Option.VOLUNTEER:
-                    createVolunteer(out Volunteer volunteer);
-                    s_bl.Volunteer.AddVolunteer(volunteer);
+                case 1:
+                    GetCurrentTime();
                     break;
-                case Option.CALL:
-                    Call call = CreateCall();
-                    s_bl.Call.AddCall(call);
+                case 2:
+                    UpdateClock();
                     break;
-                case Option.ADMIN:
+                case 3:
+                    GetRiskTime();
+                    break;
+                case 4:
+                    SetRiskTime();
+                    break;
+                case 5:
+                    ResetDatabase();
+                    break;
+                case 6:
+                    InitializeDatabase();
+                    break;
+                case 0:
+                    Console.WriteLine("Returning to main menu...");
                     break;
                 default:
+                    Console.WriteLine("Invalid choice. Please try again.");
                     break;
             }
         }
-
-        private static void handleRead(Option entity)
+        static void HandleCallOption()
         {
-            Console.WriteLine("Enter an id");
-            if (!int.TryParse(Console.ReadLine(), out int id))
-                Console.WriteLine("Wrong input");
+            Console.WriteLine("Call Menu:");
+            Console.WriteLine("1 - Get Call Quantities");
+            Console.WriteLine("2 - Get Call List");
+            Console.WriteLine("3 - Get Call Details");
+            Console.WriteLine("4 - Update Call");
+            Console.WriteLine("5 - Delete Call");
+            Console.WriteLine("6 - Add Call");
+            Console.WriteLine("7 - Get Closed Calls");
+            Console.WriteLine("8 - Get Open Calls");
+            Console.WriteLine("9 - Complete Call");
+            Console.WriteLine("10 - Cancel Call");
+            Console.WriteLine("11 - Selection Call");
+            Console.WriteLine("0 - Return to Main Menu");
 
-            switch (entity)
+            Console.Write("Choose an option: ");
+            int choice = int.TryParse(Console.ReadLine(), out int input) ? input : -1;
+
+            switch (choice)
             {
-                case Option.VOLUNTEER:
-                    Console.WriteLine(s_bl.Volunteer.GetVolunteerDetails(id));
+                case 1:
+                    GetCallQuantities();
                     break;
-                case Option.CALL:
-                    Console.WriteLine(s_bl.Call.GetCallDetails(id));
+                case 2:
+                    GetCallList();
                     break;
-                case Option.ADMIN:
+                case 3:
+                    GetCallDetails();
+                    break;
+                case 4:
+                    UpdateCall();
+                    break;
+                case 5:
+                    DeleteCall();
+                    break;
+                case 6:
+                    AddCall();
+                    break;
+                case 7:
+                    GetClosedCalls();
+                    break;
+                case 8:
+                    GetOpenCalls();
+                    break;
+                case 9:
+                    CompleteCall();
+                    break;
+                case 10:
+                    CancelCall();
+                    break;
+                case 11:
+                    SelectionCall();
+                    break;
+                case 0:
+                    Console.WriteLine("Returning to main menu...");
                     break;
                 default:
+                    Console.WriteLine("Invalid choice. Please try again.");
                     break;
             }
         }
-
-        private static void handleReadAll(Option entity)
+        static void HandleVolunteerOption()
         {
-            switch (entity)
+            Console.WriteLine("Volunteer Menu:");
+            Console.WriteLine("1 - Login");
+            Console.WriteLine("2 - Get Volunteers List");
+            Console.WriteLine("3 - Get Volunteer Details");
+            Console.WriteLine("4 - Update Volunteer");
+            Console.WriteLine("5 - Delete Volunteer");
+            Console.WriteLine("6 - Add Volunteer");
+            Console.WriteLine("0 - Return to Main Menu");
+
+            Console.Write("Choose an option: ");
+            int choice = int.TryParse(Console.ReadLine(), out int input) ? input : -1;
+
+            switch (choice)
             {
-                case Option.VOLUNTEER:
-                    foreach (var item in s_bl.Volunteer.GetVolunteersList())
-                        Console.WriteLine(item);
+                case 1:
+                    Login();
                     break;
-                case Option.CALL:
-                    foreach (var item in s_bl.Call.GetCallList(null, null, null))
-                        Console.WriteLine(item);
+                case 2:
+                    GetVolunteersList();
                     break;
-                case Option.ADMIN:
-                    // Admin read all logic if needed
+                case 3:
+                    GetVolunteerDetails();
+                    break;
+                case 4:
+                    UpdateVolunteer();
+                    break;
+                case 5:
+                    DeleteVolunteer();
+                    break;
+                case 6:
+                    AddVolunteer();
+                    break;
+                case 0:
+                    Console.WriteLine("Returning to main menu...");
                     break;
                 default:
-                    break;
-            }
-        }
-
-        private static void handleUpdate(Option entity)
-        {
-            Console.WriteLine("Enter an id");
-            if (!int.TryParse(Console.ReadLine(), out int id))
-                Console.WriteLine("Wrong input");
-
-            switch (entity)
-            {
-                case Option.VOLUNTEER:
-                    Volunteer volunteer = s_bl.Volunteer.GetVolunteerDetails(id);
-                    updateVolunteer(volunteer);
-                    s_bl.Volunteer.UpdateVolunteer(id, volunteer);
-                    break;
-                case Option.CALL:
-                    Call call = s_bl.Call.GetCallDetails(id);
-                    UpdateCall(call);
-                    s_bl.Call.UpdateCall(call);
-                    break;
-                case Option.ADMIN:
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        private static void handleDelete(Option entity)
-        {
-            Console.WriteLine("Enter an id");
-            if (!int.TryParse(Console.ReadLine(), out int id))
-                Console.WriteLine("Wrong input");
-
-            switch (entity)
-            {
-                case Option.VOLUNTEER:
-                    s_bl.Volunteer.DeleteVolunteer(id);
-                    break;
-                case Option.CALL:
-                    s_bl.Call.DeleteCall(id);
-                    break;
-                case Option.ADMIN:
-                    break;
-                default:
+                    Console.WriteLine("Invalid choice. Please try again.");
                     break;
             }
         }
 
 
-        //vounteer
-        private static void createVolunteer(out Volunteer volunteer)
+
+
+
+        /// <summary>
+        /// vounteer fonctions
+        /// </summary>
+        private static void Login()
         {
-            Console.Write("Enter Name: ");
-            string name = Console.ReadLine() ?? throw new FormatException("Wrong input");
 
-            Console.Write("Enter Phone: ");
-            string phone = Console.ReadLine() ?? throw new FormatException("Wrong input");
+        }
+        private static void GetVolunteersList()
+        {
 
-            Console.Write("Enter Email: ");
-            string email = Console.ReadLine() ?? throw new FormatException("Wrong input");
+        }
+        private static void GetVolunteerDetails()
+        {
 
-            Console.Write("Enter IsActive (true/false): ");
-            if (!bool.TryParse(Console.ReadLine(), out bool isActive))
-                throw new FormatException("Wrong input");
+        }
+        private static void UpdateVolunteer()
+        {
 
-            Console.Write("Enter Role: ");
-            string roleInput = Console.ReadLine() ?? throw new FormatException("Wrong input");
-            if (!Enum.TryParse(roleInput, out Role role))
-                throw new FormatException("Invalid Role");
+        }
+        private static void DeleteVolunteer()
+        {
 
-            Console.Write("Enter DistanceType: ");
-            string distanceTypeInput = Console.ReadLine() ?? throw new FormatException("Wrong input");
-            if (!Enum.TryParse(distanceTypeInput, out DistanceType distanceType))
-                throw new FormatException("Invalid DistanceType");
+        }
+        private static void AddVolunteer()
+        {
 
-            Console.Write("Enter Password: ");
-            string password = Console.ReadLine() ?? throw new FormatException("Wrong input");
-
-            Console.Write("Enter Address: ");
-            string address = Console.ReadLine() ?? throw new FormatException("Wrong input");
-
-            Console.Write("Enter Latitude: ");
-            if (!double.TryParse(Console.ReadLine(), out double latitude))
-                throw new FormatException("Wrong input");
-
-            Console.Write("Enter Longitude: ");
-            if (!double.TryParse(Console.ReadLine(), out double longitude))
-                throw new FormatException("Wrong input");
-
-            Console.Write("Enter MaxDistance: ");
-            if (!double.TryParse(Console.ReadLine(), out double maxDistance))
-                throw new FormatException("Wrong input");
-
-            volunteer = new Volunteer
-            {
-                Name = name,
-                Phone = phone,
-                Email = email,
-                IsActive = isActive,
-                Role = role,
-                DistanceType = distanceType,
-                Password = password,
-                Address = address,
-                Latitude = latitude,
-                Longitude = longitude,
-                MaxDistance = maxDistance
-            };
         }
 
-        private static void updateVolunteer(Volunteer volunteer)
+        //private static void CreateVolunteer(out Volunteer volunteer)
+        //{
+        //    Console.Write("Enter Name: ");
+        //    string name = Console.ReadLine() ?? throw new FormatException("Wrong input");
+
+        //    Console.Write("Enter Phone: ");
+        //    string phone = Console.ReadLine() ?? throw new FormatException("Wrong input");
+
+        //    Console.Write("Enter Email: ");
+        //    string email = Console.ReadLine() ?? throw new FormatException("Wrong input");
+
+        //    Console.Write("Enter IsActive (true/false): ");
+        //    if (!bool.TryParse(Console.ReadLine(), out bool isActive))
+        //        throw new FormatException("Wrong input");
+
+        //    Console.Write("Enter Role: ");
+        //    string roleInput = Console.ReadLine() ?? throw new FormatException("Wrong input");
+        //    if (!Enum.TryParse(roleInput, out Role role))
+        //        throw new FormatException("Invalid Role");
+
+        //    Console.Write("Enter DistanceType: ");
+        //    string distanceTypeInput = Console.ReadLine() ?? throw new FormatException("Wrong input");
+        //    if (!Enum.TryParse(distanceTypeInput, out DistanceType distanceType))
+        //        throw new FormatException("Invalid DistanceType");
+
+        //    Console.Write("Enter Password: ");
+        //    string password = Console.ReadLine() ?? throw new FormatException("Wrong input");
+
+        //    Console.Write("Enter Address: ");
+        //    string address = Console.ReadLine() ?? throw new FormatException("Wrong input");
+
+        //    Console.Write("Enter Latitude: ");
+        //    if (!double.TryParse(Console.ReadLine(), out double latitude))
+        //        throw new FormatException("Wrong input");
+
+        //    Console.Write("Enter Longitude: ");
+        //    if (!double.TryParse(Console.ReadLine(), out double longitude))
+        //        throw new FormatException("Wrong input");
+
+        //    Console.Write("Enter MaxDistance: ");
+        //    if (!double.TryParse(Console.ReadLine(), out double maxDistance))
+        //        throw new FormatException("Wrong input");
+
+        //    volunteer = new Volunteer
+        //    {
+        //        Name = name,
+        //        Phone = phone,
+        //        Email = email,
+        //        IsActive = isActive,
+        //        Role = role,
+        //        DistanceType = distanceType,
+        //        Password = password,
+        //        Address = address,
+        //        Latitude = latitude,
+        //        Longitude = longitude,
+        //        MaxDistance = maxDistance
+        //    };
+        //}
+        //private static void UpdateVolunteer(Volunteer volunteer)
+        //{
+        //    Console.Write("Enter New Name: ");
+        //    volunteer.Name = Console.ReadLine() ?? volunteer.Name;
+
+        //    Console.Write("Enter New Phone: ");
+        //    volunteer.Phone = Console.ReadLine() ?? volunteer.Phone;
+
+        //    Console.Write("Enter New Email: ");
+        //    volunteer.Email = Console.ReadLine() ?? volunteer.Email;
+
+        //    Console.Write("Enter New IsActive (true/false): ");
+        //    if (bool.TryParse(Console.ReadLine(), out bool isActive))
+        //        volunteer.IsActive = isActive;
+
+        //    Console.Write("Enter New Role: ");
+        //    string roleInput = Console.ReadLine() ?? volunteer.Role.ToString();
+        //    if (Enum.TryParse(roleInput, out Role role))
+        //        volunteer.Role = role;
+
+        //    Console.Write("Enter New DistanceType: ");
+        //    string distanceTypeInput = Console.ReadLine() ?? volunteer.DistanceType.ToString();
+        //    if (Enum.TryParse(distanceTypeInput, out DistanceType distanceType))
+        //        volunteer.DistanceType = distanceType;
+
+        //    Console.Write("Enter New Password: ");
+        //    volunteer.Password = Console.ReadLine() ?? volunteer.Password;
+
+        //    Console.Write("Enter New Address: ");
+        //    volunteer.Address = Console.ReadLine() ?? volunteer.Address;
+
+        //    Console.Write("Enter New Latitude: ");
+        //    if (double.TryParse(Console.ReadLine(), out double latitude))
+        //        volunteer.Latitude = latitude;
+
+        //    Console.Write("Enter New Longitude: ");
+        //    if (double.TryParse(Console.ReadLine(), out double longitude))
+        //        volunteer.Longitude = longitude;
+
+        //    Console.Write("Enter New MaxDistance: ");
+        //    if (double.TryParse(Console.ReadLine(), out double maxDistance))
+        //        volunteer.MaxDistance = maxDistance;
+        //}
+
+
+        /// <summary>
+        /// calls fonctions
+        /// </summary>
+        private static void GetCallQuantities()
         {
-            Console.Write("Enter New Name: ");
-            volunteer.Name = Console.ReadLine() ?? volunteer.Name;
 
-            Console.Write("Enter New Phone: ");
-            volunteer.Phone = Console.ReadLine() ?? volunteer.Phone;
-
-            Console.Write("Enter New Email: ");
-            volunteer.Email = Console.ReadLine() ?? volunteer.Email;
-
-            Console.Write("Enter New IsActive (true/false): ");
-            if (bool.TryParse(Console.ReadLine(), out bool isActive))
-                volunteer.IsActive = isActive;
-
-            Console.Write("Enter New Role: ");
-            string roleInput = Console.ReadLine() ?? volunteer.Role.ToString();
-            if (Enum.TryParse(roleInput, out Role role))
-                volunteer.Role = role;
-
-            Console.Write("Enter New DistanceType: ");
-            string distanceTypeInput = Console.ReadLine() ?? volunteer.DistanceType.ToString();
-            if (Enum.TryParse(distanceTypeInput, out DistanceType distanceType))
-                volunteer.DistanceType = distanceType;
-
-            Console.Write("Enter New Password: ");
-            volunteer.Password = Console.ReadLine() ?? volunteer.Password;
-
-            Console.Write("Enter New Address: ");
-            volunteer.Address = Console.ReadLine() ?? volunteer.Address;
-
-            Console.Write("Enter New Latitude: ");
-            if (double.TryParse(Console.ReadLine(), out double latitude))
-                volunteer.Latitude = latitude;
-
-            Console.Write("Enter New Longitude: ");
-            if (double.TryParse(Console.ReadLine(), out double longitude))
-                volunteer.Longitude = longitude;
-
-            Console.Write("Enter New MaxDistance: ");
-            if (double.TryParse(Console.ReadLine(), out double maxDistance))
-                volunteer.MaxDistance = maxDistance;
         }
+        private static void GetCallList()
+        {
 
+        }
+        private static void GetCallDetails()
+        {
 
-        //calls
-        private static Call CreateCall()
+        }
+        private static void UpdateCall()
+        {
+
+        }
+        private static void DeleteCall()
+        {
+
+        }
+        private static void AddCall()
         {
             Call call = new Call();
 
@@ -394,136 +464,54 @@ Option Options:
 
             return call;
         }
-
-        private static void UpdateCall(Call call)
+        private static void GetClosedCalls()
         {
-            // Display current CallType and prompt for update
-            Console.WriteLine($"Current Call Type: {call.CallType}");
-            while (true)
-            {
-                Console.Write("Enter New Call Type (press Enter to keep current): ");
-                string callTypeInput = Console.ReadLine();
 
-                if (string.IsNullOrWhiteSpace(callTypeInput))
-                {
-                    // Keep the existing CallType if no input is provided
-                    break;
-                }
+        }
+        private static void GetOpenCalls()
+        {
 
-                if (Enum.TryParse(callTypeInput, out CallType callType))
-                {
-                    call.CallType = callType;
-                    break;
-                }
+        }
+        private static void CompleteCall()
+        {
 
-                Console.WriteLine("Invalid Call Type. Please try again.");
-            }
+        }
+        private static void CancelCall()
+        {
 
-            // Prompt for updated description
-            Console.WriteLine($"Current Description: {call.Description}");
-            Console.Write("Enter New Call Description (press Enter to keep current): ");
-            string descriptionInput = Console.ReadLine();
-            if (!string.IsNullOrWhiteSpace(descriptionInput))
-            {
-                call.Description = descriptionInput;
-            }
+        }
+        private static void SelectionCall()
+        {
 
-            // Prompt for updated address
-            Console.WriteLine($"Current Address: {call.Address}");
-            Console.Write("Enter New Address (press Enter to keep current): ");
-            string addressInput = Console.ReadLine();
-            if (!string.IsNullOrWhiteSpace(addressInput))
-            {
-                call.Address = addressInput;
-            }
+        }
 
-            // Prompt for updated Latitude and Longitude
-            Console.WriteLine($"Current Latitude: {call.Latitude}, Current Longitude: {call.Longitude}");
-            while (true)
-            {
-                Console.Write("Enter New Latitude (press Enter to keep current): ");
-                string latitudeInput = Console.ReadLine();
 
-                if (string.IsNullOrWhiteSpace(latitudeInput))
-                {
-                    // Keep existing Latitude if no input is provided
-                    break;
-                }
+        /// <summary>
+        /// admin fonctions
+        /// </summary>
+        private static void GetCurrentTime()
+        {
 
-                if (double.TryParse(latitudeInput, out double latitude))
-                {
-                    call.Latitude = latitude;
-                    break;
-                }
+        }
+        private static void UpdateClock()
+        {
 
-                Console.WriteLine("Invalid Latitude. Please try again.");
-            }
+        }
+        private static void GetRiskTime()
+        {
 
-            while (true)
-            {
-                Console.Write("Enter New Longitude (press Enter to keep current): ");
-                string longitudeInput = Console.ReadLine();
+        }
+        private static void SetRiskTime()
+        {
 
-                if (string.IsNullOrWhiteSpace(longitudeInput))
-                {
-                    // Keep existing Longitude if no input is provided
-                    break;
-                }
+        }
+        private static void ResetDatabase()
+        {
 
-                if (double.TryParse(longitudeInput, out double longitude))
-                {
-                    call.Longitude = longitude;
-                    break;
-                }
+        }
+        private static void InitializeDatabase()
+        {
 
-                Console.WriteLine("Invalid Longitude. Please try again.");
-            }
-
-            // Prompt for updated StartTime
-            Console.WriteLine($"Current Start Time: {call.StartTime}");
-            while (true)
-            {
-                Console.Write("Enter New Start Time (yyyy-MM-dd HH:mm, press Enter to keep current): ");
-                string startTimeInput = Console.ReadLine();
-
-                if (string.IsNullOrWhiteSpace(startTimeInput))
-                {
-                    // Keep existing StartTime if no input is provided
-                    break;
-                }
-
-                if (DateTime.TryParse(startTimeInput, out DateTime startTime))
-                {
-                    call.StartTime = startTime;
-                    break;
-                }
-
-                Console.WriteLine("Invalid Start Time. Please try again.");
-            }
-
-            // Prompt for updated Deadline
-            Console.WriteLine($"Current Deadline: {call.DeadLine}");
-            while (true)
-            {
-                Console.Write("Enter New Deadline (yyyy-MM-dd HH:mm, press Enter to keep current): ");
-                string deadlineInput = Console.ReadLine();
-
-                if (string.IsNullOrWhiteSpace(deadlineInput))
-                {
-                    // Keep existing Deadline if no input is provided
-                    break;
-                }
-
-                if (DateTime.TryParse(deadlineInput, out DateTime deadline))
-                {
-                    call.DeadLine = deadline;
-                    break;
-                }
-
-                Console.WriteLine("Invalid Deadline. Please try again.");
-            }
-
-            Console.WriteLine("Call updated successfully!");
         }
 
     }
