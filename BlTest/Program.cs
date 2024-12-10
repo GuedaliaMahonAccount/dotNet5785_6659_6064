@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿
 using BlApi;
 using BO;
 
@@ -462,7 +461,7 @@ Option Options:
                 }
             }
 
-            return call;
+            s_bl.Call.AddCall(call);
         }
         private static void GetClosedCalls()
         {

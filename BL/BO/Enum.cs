@@ -127,12 +127,3 @@ public enum Option
     CALL,
     ADMIN
 }
-public enum Crud
-{
-    EXIT,
-    CREATE,
-    READ,
-    READ_ALL,
-    UPDATE,
-    DELETE
-}
