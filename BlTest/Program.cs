@@ -647,33 +647,151 @@ Option Options:
         /// <summary>
         /// calls fonctions
         /// </summary>
+        ///
+        //
+        /// <summary>
+        /// Retrieves the quantities of calls grouped by type.
+        /// </summary>
         private static void GetCallQuantities()
         {
-
+            try
+            {
+                int[] callQuantities = s_bl.Call.GetCallQuantities();
+                Console.WriteLine("Call Quantities by Type:");
+                foreach (BO.CallType callType in Enum.GetValues(typeof(BO.CallType)))
+                {
+                    Console.WriteLine($"{callType}: {callQuantities[(int)callType]}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred while retrieving call quantities: {ex.Message}");
+            }
         }
+        /// <summary>
+        /// Retrieves and displays the list of calls.
+        /// </summary>
         private static void GetCallList()
         {
-
+            try
+            {
+                var calls = s_bl.Call.GetCallList(null, null, null);
+                Console.WriteLine("Call List:");
+                foreach (var call in calls)
+                {
+                    Console.WriteLine($"ID: {call.CallId}, Type: {call.CallType}, Status: {call.Status}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred while retrieving the call list: {ex.Message}");
+            }
         }
+        /// <summary>
+        /// Retrieves and displays detailed information about a specific call.
+        /// </summary>
         private static void GetCallDetails()
         {
-
+            Console.Write("Enter Call ID: ");
+            if (int.TryParse(Console.ReadLine(), out int callId))
+            {
+                try
+                {
+                    var call = s_bl.Call.GetCallDetails(callId);
+                    Console.WriteLine($"Call Details for ID {call.Id}:\nType: {call.CallType}\nAddress: {call.Address}\nDescription: {call.Description}\nStart Time: {call.StartTime}\nDeadline: {call.DeadLine}");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"An error occurred while retrieving call details: {ex.Message}");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Invalid Call ID.");
+            }
         }
+        /// <summary>
+        /// Updates an existing call's details.
+        /// </summary>
         private static void UpdateCall()
         {
+            Console.Write("Enter Call ID to Update: ");
+            if (int.TryParse(Console.ReadLine(), out int callId))
+            {
+                try
+                {
+                    var call = s_bl.Call.GetCallDetails(callId);
+                    Console.Write("Enter New Address (leave blank to keep current): ");
+                    string address = Console.ReadLine();
+                    if (!string.IsNullOrWhiteSpace(address))
+                        call.Address = address;
 
+                    Console.Write("Enter New Latitude: ");
+                    if (double.TryParse(Console.ReadLine(), out double latitude))
+                        call.Latitude = latitude;
+
+                    Console.Write("Enter New Longitude: ");
+                    if (double.TryParse(Console.ReadLine(), out double longitude))
+                        call.Longitude = longitude;
+
+                    Console.Write("Enter New Description (leave blank to keep current): ");
+                    string description = Console.ReadLine();
+                    if (!string.IsNullOrWhiteSpace(description))
+                        call.Description = description;
+
+                    Console.Write("Enter New Start Time (yyyy-MM-dd HH:mm): ");
+                    if (DateTime.TryParse(Console.ReadLine(), out DateTime startTime))
+                        call.StartTime = startTime;
+
+                    Console.Write("Enter New Deadline (yyyy-MM-dd HH:mm): ");
+                    if (DateTime.TryParse(Console.ReadLine(), out DateTime deadline))
+                        call.DeadLine = deadline;
+
+                    s_bl.Call.UpdateCall(call);
+                    Console.WriteLine("Call updated successfully.");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"An error occurred while updating the call: {ex.Message}");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Invalid Call ID.");
+            }
         }
+        /// <summary>
+        /// Deletes a specific call from the system.
+        /// </summary>
         private static void DeleteCall()
         {
-
+            Console.Write("Enter Call ID to Delete: ");
+            if (int.TryParse(Console.ReadLine(), out int callId))
+            {
+                try
+                {
+                    s_bl.Call.DeleteCall(callId);
+                    Console.WriteLine("Call deleted successfully.");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"An error occurred while deleting the call: {ex.Message}");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Invalid Call ID.");
+            }
         }
+        /// <summary>
+        /// Adds a new call to the system.
+        /// </summary>
         private static void AddCall()
         {
-            Call call = new Call();
-
-
-            call.CallType = CallType.Open;
-
+            Call call = new()
+            {
+                CallType = CallType.Open
+            };
 
             // Prompt for Address
             while (true)
@@ -755,55 +873,256 @@ Option Options:
 
             s_bl.Call.AddCall(call);
         }
+        /// <summary>
+        /// Retrieves and displays a list of closed calls.
+        /// </summary>
         private static void GetClosedCalls()
         {
-
+            try
+            {
+                var closedCalls = s_bl.Call.GetClosedCalls(0, null, null); // Adjust parameters as needed
+                Console.WriteLine("Closed Calls:");
+                foreach (var call in closedCalls)
+                {
+                    Console.WriteLine($"ID: {call.Id}, Address: {call.Address}, Open Time: {call.OpenTime}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred while retrieving closed calls: {ex.Message}");
+            }
         }
+        /// <summary>
+        /// Retrieves and displays a list of open calls.
+        /// </summary>
         private static void GetOpenCalls()
         {
-
+            try
+            {
+                var openCalls = s_bl.Call.GetOpenCalls(0, null, null); // Adjust parameters as needed
+                Console.WriteLine("Open Calls:");
+                foreach (var call in openCalls)
+                {
+                    Console.WriteLine($"ID: {call.Id}, Description: {call.Description}, Address: {call.Address}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred while retrieving open calls: {ex.Message}");
+            }
         }
+        /// <summary>
+        /// Completes a specific call.
+        /// </summary>
         private static void CompleteCall()
         {
-
+            Console.Write("Enter Volunteer ID: ");
+            if (int.TryParse(Console.ReadLine(), out int volunteerId))
+            {
+                Console.Write("Enter Assignment ID: ");
+                if (int.TryParse(Console.ReadLine(), out int assignmentId))
+                {
+                    try
+                    {
+                        s_bl.Call.CompleteCall(volunteerId, assignmentId);
+                        Console.WriteLine("Call completed successfully.");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"An error occurred while completing the call: {ex.Message}");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Invalid Assignment ID.");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Invalid Volunteer ID.");
+            }
         }
+        /// <summary>
+        /// Cancels a specific call.
+        /// </summary>
         private static void CancelCall()
         {
-
+            Console.Write("Enter Requester ID: ");
+            if (int.TryParse(Console.ReadLine(), out int requesterId))
+            {
+                Console.Write("Enter Assignment ID: ");
+                if (int.TryParse(Console.ReadLine(), out int assignmentId))
+                {
+                    try
+                    {
+                        s_bl.Call.CancelCall(requesterId, assignmentId);
+                        Console.WriteLine("Call canceled successfully.");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"An error occurred while canceling the call: {ex.Message}");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Invalid Assignment ID.");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Invalid Requester ID.");
+            }
         }
+        /// <summary>
+        /// Assigns a volunteer to a specific call.
+        /// </summary>
         private static void SelectionCall()
         {
-
+            Console.Write("Enter Volunteer ID: ");
+            if (int.TryParse(Console.ReadLine(), out int volunteerId))
+            {
+                Console.Write("Enter Call ID: ");
+                if (int.TryParse(Console.ReadLine(), out int callId))
+                {
+                    try
+                    {
+                        s_bl.Call.selectionCall(volunteerId, callId);
+                        Console.WriteLine("Volunteer successfully assigned to call.");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"An error occurred while assigning the call: {ex.Message}");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Invalid Call ID.");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Invalid Volunteer ID.");
+            }
         }
+
 
 
         /// <summary>
         /// admin fonctions
         /// </summary>
+        /// 
+        
+        /// <summary>
+        /// Admin function to get the current time.
+        /// </summary>
         private static void GetCurrentTime()
         {
-
+            try
+            {
+                DateTime currentTime = s_bl.Admin.GetCurrentTime();
+                Console.WriteLine($"Current Time: {currentTime}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred while getting the current time: {ex.Message}");
+            }
         }
+        /// <summary>
+        /// Admin function to update the clock.
+        /// </summary>
         private static void UpdateClock()
         {
+            Console.WriteLine("Enter Time Unit to Update (MINUTE, HOUR, DAY, MONTH, YEAR): ");
+            string input = Console.ReadLine();
 
+            if (Enum.TryParse(input, true, out TimeUnit timeUnit))
+            {
+                try
+                {
+                    s_bl.Admin.UpdateClock(timeUnit);
+                    Console.WriteLine($"Clock updated successfully by one {timeUnit}.");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"An error occurred while updating the clock: {ex.Message}");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Invalid Time Unit. Please enter a valid option (MINUTE, HOUR, DAY, MONTH, YEAR).");
+            }
         }
+        /// <summary>
+        /// Admin function to get the risk time range.
+        /// </summary>
         private static void GetRiskTime()
         {
-
+            try
+            {
+                TimeSpan riskTime = s_bl.Admin.GetRiskTime();
+                Console.WriteLine($"Risk Time Range: {riskTime}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred while getting the risk time: {ex.Message}");
+            }
         }
+        /// <summary>
+        /// Admin function to set the risk time range.
+        /// </summary>
         private static void SetRiskTime()
         {
+            Console.WriteLine("Enter Risk Time Range in format HH:MM:SS: ");
+            string input = Console.ReadLine();
 
+            if (TimeSpan.TryParse(input, out TimeSpan riskTime))
+            {
+                try
+                {
+                    s_bl.Admin.SetRiskTime(riskTime);
+                    Console.WriteLine($"Risk Time successfully updated to {riskTime}.");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"An error occurred while setting the risk time: {ex.Message}");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Invalid TimeSpan format. Please use HH:MM:SS.");
+            }
         }
+        /// <summary>
+        /// Admin function to reset the database.
+        /// </summary>
         private static void ResetDatabase()
         {
-
+            try
+            {
+                s_bl.Admin.ResetDatabase();
+                Console.WriteLine("Database reset successfully.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred while resetting the database: {ex.Message}");
+            }
         }
+        /// <summary>
+        /// Admin function to initialize the database.
+        /// </summary>
         private static void InitializeDatabase()
         {
-
+            try
+            {
+                s_bl.Admin.InitializeDatabase();
+                Console.WriteLine("Database initialized successfully.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred while initializing the database: {ex.Message}");
+            }
         }
+
 
     }
 }
