@@ -124,12 +124,12 @@ namespace Helpers
         /// <summary>
         /// Retrieves coordinates from an address using LocationIQ API.
         /// </summary>
-        public static (double latitude, double longitude)? GetCoordinatesFromAddress(string address)
+        public static List<(double latitude, double longitude)> GetCoordinatesFromAddress(string address)
         {
             if (string.IsNullOrWhiteSpace(address))
                 return null;
 
-            string apiKey = "67520387b42a2384305556nqrdb57df";
+            string apiKey = "pk.24d7295db243a75d8b3c688089250321";
             string url = $"https://api.locationiq.com/v1/search.php?key={apiKey}&q={WebUtility.UrlEncode(address)}&format=json";
 
             try
@@ -148,10 +148,15 @@ namespace Helpers
 
                     if (root.GetArrayLength() > 0)
                     {
-                        var firstResult = root[0];
-                        var latitude = double.Parse(firstResult.GetProperty("lat").GetString());
-                        var longitude = double.Parse(firstResult.GetProperty("lon").GetString());
-                        return (latitude, longitude);
+                        // Extract all coordinates
+                        var coordinatesList = new List<(double latitude, double longitude)>();
+                        foreach (var item in root.EnumerateArray())
+                        {
+                            var latitude = double.Parse(item.GetProperty("lat").GetString());
+                            var longitude = double.Parse(item.GetProperty("lon").GetString());
+                            coordinatesList.Add((latitude, longitude));
+                        }
+                        return coordinatesList;
                     }
                     return null; // No results
                 }
@@ -164,18 +169,28 @@ namespace Helpers
         }
         public static bool ValidAddress(string address)
         {
-            var coordinates = GetCoordinatesFromAddress(address);
-            return coordinates.HasValue; // If coordinates are returned, the address is real.
+            var coordinatesList = GetCoordinatesFromAddress(address);
+            return coordinatesList != null && coordinatesList.Count > 0; // If at least one result is returned, the address is valid.
         }
         public static bool AreCoordinatesMatching(string address, double latitude, double longitude)
         {
             var resolvedCoordinates = GetCoordinatesFromAddress(address);
-            if (!resolvedCoordinates.HasValue)
+            if (resolvedCoordinates == null || resolvedCoordinates.Count == 0)
                 return false;
 
-            const double tolerance = 0.0001; // Adjust as necessary.
-            return Math.Abs(resolvedCoordinates.Value.latitude - latitude) <= tolerance &&
-                   Math.Abs(resolvedCoordinates.Value.longitude - longitude) <= tolerance;
+            const double tolerance = 0.001; // Ajustez si nécessaire.
+
+            // Check if any of the returned coordinates match
+            foreach (var (resolvedLatitude, resolvedLongitude) in resolvedCoordinates)
+            {
+                if (Math.Abs(resolvedLatitude - latitude) <= tolerance &&
+                    Math.Abs(resolvedLongitude - longitude) <= tolerance)
+                {
+                    return true; // Found a match
+                }
+            }
+
+            return false; // No match found
         }
 
         public static bool IsRequesterAuthorizedToCancel(int requesterId, int volunteerId)
