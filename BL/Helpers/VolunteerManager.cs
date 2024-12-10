@@ -123,6 +123,13 @@ namespace Helpers
 
         /// <summary>
         /// Retrieves coordinates from an address using LocationIQ API.
+        /// 
+        /// exemple of correct adress
+        /// "display_name": "Tiltan, Ramla, Ramla Subdistrict, District centre, 7135275, Israël"
+        /// "lat": "31.9290114"
+        /// "lon": "34.8737578"
+        /// 
+        /// 
         /// </summary>
         public static List<(double latitude, double longitude)> GetCoordinatesFromAddress(string address)
         {
