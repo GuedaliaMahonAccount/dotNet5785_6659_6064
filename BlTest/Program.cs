@@ -377,11 +377,10 @@ Option Options:
         }
         private static void AddCall()
         {
-            Call call = new Call();
-
-
-            call.CallType = CallType.Open;
-
+            Call call = new()
+            {
+                CallType = CallType.Open
+            };
 
             // Prompt for Address
             while (true)
@@ -488,30 +487,119 @@ Option Options:
         /// <summary>
         /// admin fonctions
         /// </summary>
+        /// 
+        //
+        /// <summary>
+        /// Admin function to get the current time.
+        /// </summary>
         private static void GetCurrentTime()
         {
-
+            try
+            {
+                DateTime currentTime = s_bl.Admin.GetCurrentTime();
+                Console.WriteLine($"Current Time: {currentTime}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred while getting the current time: {ex.Message}");
+            }
         }
+        /// <summary>
+        /// Admin function to update the clock.
+        /// </summary>
         private static void UpdateClock()
         {
+            Console.WriteLine("Enter Time Unit to Update (MINUTE, HOUR, DAY, MONTH, YEAR): ");
+            string input = Console.ReadLine();
 
+            if (Enum.TryParse(input, true, out TimeUnit timeUnit))
+            {
+                try
+                {
+                    s_bl.Admin.UpdateClock(timeUnit);
+                    Console.WriteLine($"Clock updated successfully by one {timeUnit}.");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"An error occurred while updating the clock: {ex.Message}");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Invalid Time Unit. Please enter a valid option (MINUTE, HOUR, DAY, MONTH, YEAR).");
+            }
         }
+        /// <summary>
+        /// Admin function to get the risk time range.
+        /// </summary>
         private static void GetRiskTime()
         {
-
+            try
+            {
+                TimeSpan riskTime = s_bl.Admin.GetRiskTime();
+                Console.WriteLine($"Risk Time Range: {riskTime}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred while getting the risk time: {ex.Message}");
+            }
         }
+        /// <summary>
+        /// Admin function to set the risk time range.
+        /// </summary>
         private static void SetRiskTime()
         {
+            Console.WriteLine("Enter Risk Time Range in format HH:MM:SS: ");
+            string input = Console.ReadLine();
 
+            if (TimeSpan.TryParse(input, out TimeSpan riskTime))
+            {
+                try
+                {
+                    s_bl.Admin.SetRiskTime(riskTime);
+                    Console.WriteLine($"Risk Time successfully updated to {riskTime}.");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"An error occurred while setting the risk time: {ex.Message}");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Invalid TimeSpan format. Please use HH:MM:SS.");
+            }
         }
+        /// <summary>
+        /// Admin function to reset the database.
+        /// </summary>
         private static void ResetDatabase()
         {
-
+            try
+            {
+                s_bl.Admin.ResetDatabase();
+                Console.WriteLine("Database reset successfully.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred while resetting the database: {ex.Message}");
+            }
         }
+        /// <summary>
+        /// Admin function to initialize the database.
+        /// </summary>
         private static void InitializeDatabase()
         {
-
+            try
+            {
+                s_bl.Admin.InitializeDatabase();
+                Console.WriteLine("Database initialized successfully.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred while initializing the database: {ex.Message}");
+            }
         }
+
 
     }
 }
