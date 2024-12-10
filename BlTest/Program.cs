@@ -226,27 +226,319 @@ Option Options:
         /// </summary>
         private static void Login()
         {
+            Console.Write("Enter username: ");
+            string username = Console.ReadLine();
 
+            Console.Write("Enter password: ");
+            string password = Console.ReadLine();
+
+            try
+            {
+                string role = s_bl.Volunteer.Login(username, password);
+                Console.WriteLine($"Login successful. Role: {role}");
+            }
+            catch (BO.BlDoesNotExistException ex)
+            {
+                Console.WriteLine($"Login failed: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Unexpected error: {ex.Message}");
+            }
         }
+
+
         private static void GetVolunteersList()
         {
+            try
+            {
+                int choice;
+                bool? isActive = null;
+                BO.VolunteerInListSortFields? sortField = null;
 
+                while (true)
+                {
+                    Console.WriteLine("\nVolunteers List Menu:");
+                    Console.WriteLine("1. Get All Volunteers");
+                    Console.WriteLine("2. Get Active Volunteers");
+                    Console.WriteLine("3. Get Inactive Volunteers");
+                    Console.WriteLine("4. Sort by ID");
+                    Console.WriteLine("5. Sort by Name");
+                    Console.WriteLine("6. Sort by Phone");
+                    Console.WriteLine("7. Sort by Activity Status");
+                    Console.WriteLine("8. Sort by Role");
+                    Console.WriteLine("9. Sort by Latitude");
+                    Console.WriteLine("10. Sort by Longitude");
+                    Console.WriteLine("0. Return to Main Menu");
+
+                    // Use TryParse for input validation
+                    if (!int.TryParse(Console.ReadLine(), out choice))
+                    {
+                        Console.WriteLine("Invalid input. Please enter a number.");
+                        continue;
+                    }
+
+                    // Reset sorting and filtering for each iteration
+                    isActive = null;
+                    sortField = null;
+
+                    switch (choice)
+                    {
+                        case 0:
+                            return;
+                        case 1: // All Volunteers
+                            break;
+                        case 2: // Active Volunteers
+                            isActive = true;
+                            break;
+                        case 3: // Inactive Volunteers
+                            isActive = false;
+                            break;
+                        case 4:
+                            sortField = BO.VolunteerInListSortFields.Id;
+                            break;
+                        case 5:
+                            sortField = BO.VolunteerInListSortFields.Name;
+                            break;
+                        case 6:
+                            sortField = BO.VolunteerInListSortFields.Phone;
+                            break;
+                        case 7:
+                            sortField = BO.VolunteerInListSortFields.IsActive;
+                            break;
+                        case 8:
+                            sortField = BO.VolunteerInListSortFields.Role;
+                            break;
+                        case 9:
+                            sortField = BO.VolunteerInListSortFields.Latitude;
+                            break;
+                        case 10:
+                            sortField = BO.VolunteerInListSortFields.Longitude;
+                            break;
+                        default:
+                            Console.WriteLine("Invalid choice. Please try again.");
+                            continue;
+                    }
+
+                    // Retrieve and display volunteers
+                    try
+                    {
+                        var volunteersList = s_bl.Volunteer.GetVolunteersList(isActive, sortField);
+
+                        Console.WriteLine("\nVolunteers List:");
+                        foreach (var volunteer in volunteersList)
+                        {
+                            Console.WriteLine(volunteer);
+                        }
+                    }
+                    catch (BO.BlDoesNotExistException ex)
+                    {
+                        Console.WriteLine($"Volunteers do not exist: {ex.Message}");
+                    }
+                    catch (BO.BlNullPropertyException ex)
+                    {
+                        Console.WriteLine($"Null Property Error: {ex.Message}");
+                    }
+                    catch (BO.BlInvalidValueException ex)
+                    {
+                        Console.WriteLine($"Invalid Value: {ex.Message}");
+                    }
+                    catch (BO.BlArgumentNullException ex)
+                    {
+                        Console.WriteLine($"Argument Null Error: {ex.Message}");
+                    }
+                    catch (BO.LogicException ex)
+                    {
+                        Console.WriteLine($"Logic Error: {ex.Message}");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Unexpected Error: {ex.Message}");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Unexpected Error in Volunteers List Menu: {ex.Message}");
+            }
         }
         private static void GetVolunteerDetails()
         {
-
+            Console.Write("Enter volunteer ID: ");
+            if (int.TryParse(Console.ReadLine(), out int volunteerId))
+            {
+                try
+                {
+                    BO.Volunteer volunteer = s_bl.Volunteer.GetVolunteerDetails(volunteerId);
+                    Console.WriteLine(volunteer);
+                }
+                catch (BO.BlDoesNotExistException ex)
+                {
+                    Console.WriteLine($"Error retrieving volunteer details: {ex.Message}");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Unexpected error: {ex.Message}");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Invalid ID. Please enter a valid number.");
+            }
         }
         private static void UpdateVolunteer()
         {
+            Console.Write("Enter requester ID: ");
+            if (!int.TryParse(Console.ReadLine(), out int requesterId))
+            {
+                Console.WriteLine("Invalid requester ID.");
+                return;
+            }
 
+            Console.Write("Enter volunteer ID to update: ");
+            if (!int.TryParse(Console.ReadLine(), out int volunteerId))
+            {
+                Console.WriteLine("Invalid volunteer ID.");
+                return;
+            }
+
+            try
+            {
+                BO.Volunteer volunteer = s_bl.Volunteer.GetVolunteerDetails(volunteerId);
+
+                Console.Write("Enter new name (leave empty to keep current): ");
+                string name = Console.ReadLine();
+                if (!string.IsNullOrEmpty(name)) volunteer.Name = name;
+
+                Console.Write("Enter new phone (leave empty to keep current): ");
+                string phone = Console.ReadLine();
+                if (!string.IsNullOrEmpty(phone)) volunteer.Phone = phone;
+
+                Console.Write("Enter new email (leave empty to keep current): ");
+                string email = Console.ReadLine();
+                if (!string.IsNullOrEmpty(email)) volunteer.Email = email;
+
+                Console.Write("Enter new address (leave empty to keep current): ");
+                string address = Console.ReadLine();
+                if (!string.IsNullOrEmpty(address)) volunteer.Address = address;
+
+                Console.Write("Enter new latitude (leave empty to keep current): ");
+                string latitudeInput = Console.ReadLine();
+                if (!string.IsNullOrEmpty(latitudeInput) && double.TryParse(latitudeInput, out double latitude))
+                {
+                    volunteer.Latitude = latitude;
+                }
+
+                Console.Write("Enter new longitude (leave empty to keep current): ");
+                string longitudeInput = Console.ReadLine();
+                if (!string.IsNullOrEmpty(longitudeInput) && double.TryParse(longitudeInput, out double longitude))
+                {
+                    volunteer.Longitude = longitude;
+                }
+
+                s_bl.Volunteer.UpdateVolunteer(requesterId, volunteer);
+                Console.WriteLine("Volunteer updated successfully.");
+            }
+            catch (BO.BlInvalidValueException ex)
+            {
+                Console.WriteLine($"Update failed: {ex.Message}");
+            }
+            catch (BO.BlDoesNotExistException ex)
+            {
+                Console.WriteLine($"Update failed: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Unexpected error: {ex.Message}");
+            }
         }
         private static void DeleteVolunteer()
         {
-
+            Console.Write("Enter volunteer ID to delete: ");
+            if (int.TryParse(Console.ReadLine(), out int volunteerId))
+            {
+                try
+                {
+                    s_bl.Volunteer.DeleteVolunteer(volunteerId);
+                    Console.WriteLine("Volunteer deleted successfully.");
+                }
+                catch (BO.BlDeletionImpossibleException ex)
+                {
+                    Console.WriteLine($"Delete failed: {ex.Message}");
+                }
+                catch (BO.BlDoesNotExistException ex)
+                {
+                    Console.WriteLine($"Delete failed: {ex.Message}");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Unexpected error: {ex.Message}");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Invalid ID. Please enter a valid number.");
+            }
         }
         private static void AddVolunteer()
         {
+            BO.Volunteer volunteer = new BO.Volunteer();
 
+            Console.Write("Enter volunteer ID: ");
+            if (!int.TryParse(Console.ReadLine(), out int id))
+            {
+                Console.WriteLine("Invalid ID.");
+                return;
+            }
+            volunteer.Id = id;
+
+            Console.Write("Enter name: ");
+            volunteer.Name = Console.ReadLine();
+
+            Console.Write("Enter phone: ");
+            volunteer.Phone = Console.ReadLine();
+
+            Console.Write("Enter email: ");
+            volunteer.Email = Console.ReadLine();
+
+            Console.Write("Enter address: ");
+            volunteer.Address = Console.ReadLine();
+
+            Console.Write("Enter latitude: ");
+            if (double.TryParse(Console.ReadLine(), out double latitude))
+            {
+                volunteer.Latitude = latitude;
+            }
+            else
+            {
+                Console.WriteLine("Invalid latitude.");
+                return;
+            }
+
+            Console.Write("Enter longitude: ");
+            if (double.TryParse(Console.ReadLine(), out double longitude))
+            {
+                volunteer.Longitude = longitude;
+            }
+            else
+            {
+                Console.WriteLine("Invalid longitude.");
+                return;
+            }
+
+            try
+            {
+                s_bl.Volunteer.AddVolunteer(volunteer);
+                Console.WriteLine("Volunteer added successfully.");
+            }
+            catch (BO.BlInvalidValueException ex)
+            {
+                Console.WriteLine($"Add failed: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Unexpected error: {ex.Message}");
+            }
         }
 
         //private static void CreateVolunteer(out Volunteer volunteer)
