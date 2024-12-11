@@ -254,6 +254,8 @@ Option Options:
         /// <summary>
         /// function to get the list of volunteers
         /// </summary>
+        /// 
+
         private static void GetVolunteersList()
         {
 
@@ -373,6 +375,8 @@ Option Options:
         /// <summary>
         /// function to get the details of a volunteer
         /// </summary>
+        /// 
+
         private static void GetVolunteerDetails()
         {
             Console.Write("Enter volunteer ID: ");
@@ -397,74 +401,129 @@ Option Options:
                 Console.WriteLine("Invalid ID. Please enter a valid number.");
             }
         }
+
+
         /// <summary>
         /// function to update a volunteer
         /// </summary>
         private static void UpdateVolunteer()
         {
-            Console.Write("Enter requester ID: ");
-            if (!int.TryParse(Console.ReadLine(), out int requesterId))
+            Console.Write("Please enter the ID of the requester: ");
+            int requesterId = int.Parse(Console.ReadLine());
+
+            Console.Write("Please enter the ID of the volunteer you want to update: ");
+            int volunteerId = int.Parse(Console.ReadLine());
+
+            // Get the volunteer details from the BL
+            BO.Volunteer volunteer = s_bl.Volunteer.GetVolunteerDetails(volunteerId);
+
+            if (volunteer == null)
             {
-                Console.WriteLine("Invalid requester ID.");
+                Console.WriteLine("Volunteer with ID {0} not found.", volunteerId);
                 return;
             }
 
-            Console.Write("Enter volunteer ID to update: ");
-            if (!int.TryParse(Console.ReadLine(), out int volunteerId))
+            // Get the requester details to check if they are an admin
+            BO.Volunteer requester = s_bl.Volunteer.GetVolunteerDetails(requesterId);
+            if (requester == null)
             {
-                Console.WriteLine("Invalid volunteer ID.");
+                Console.WriteLine("Requester with ID {0} not found.", requesterId);
                 return;
             }
 
+            bool isAdmin = requester.Role == BO.Role.Admin;
+
+            // Prompt the user to update the volunteer details
+            Console.WriteLine("Enter new details for the volunteer (leave empty to keep current values):");
+
+            Console.Write("Enter new name: ");
+            string newName = Console.ReadLine();
+            if (!string.IsNullOrEmpty(newName))
+                volunteer.Name = newName;
+
+            Console.Write("Enter new phone number: ");
+            string newPhone = Console.ReadLine();
+            if (!string.IsNullOrEmpty(newPhone))
+                volunteer.Phone = newPhone;
+
+            Console.Write("Enter new email: ");
+            string newEmail = Console.ReadLine();
+            if (!string.IsNullOrEmpty(newEmail))
+                volunteer.Email = newEmail;
+
+            Console.Write("Enter new address: ");
+            string newAddress = Console.ReadLine();
+            if (!string.IsNullOrEmpty(newAddress))
+                volunteer.Address = newAddress;
+
+            Console.Write("Enter new latitude (leave empty to keep current): ");
+            string newLatitude = Console.ReadLine();
+            if (!string.IsNullOrEmpty(newLatitude))
+            {
+                if (double.TryParse(newLatitude, out double latitude))
+                    volunteer.Latitude = latitude;
+                else
+                    Console.WriteLine("Invalid latitude value. Keeping current value.");
+            }
+
+            Console.Write("Enter new longitude (leave empty to keep current): ");
+            string newLongitude = Console.ReadLine();
+            if (!string.IsNullOrEmpty(newLongitude))
+            {
+                if (double.TryParse(newLongitude, out double longitude))
+                    volunteer.Longitude = longitude;
+                else
+                    Console.WriteLine("Invalid longitude value. Keeping current value.");
+            }
+
+            // Only admin can change the Role
+            Console.Write("Enter new role (Admin/Volunteer) - only admin can change this: ");
+            string newRole = Console.ReadLine();
+            if (!string.IsNullOrEmpty(newRole))
+            {
+                if (!isAdmin)
+                {
+                    Console.WriteLine("Only an admin can change the role. Keeping current role.");
+                }
+                else
+                {
+                    if (Enum.TryParse(newRole, out BO.Role role))
+                        volunteer.Role = role;
+                    else
+                        Console.WriteLine("Invalid role value. Keeping current role.");
+                }
+            }
+
+            Console.Write("Enter new IsActive status (true/false): ");
+            string newIsActive = Console.ReadLine();
+            if (!string.IsNullOrEmpty(newIsActive))
+            {
+                if (bool.TryParse(newIsActive, out bool isActive))
+                    volunteer.IsActive = isActive;
+                else
+                    Console.WriteLine("Invalid IsActive value. Keeping current value.");
+            }
+
+            // Update the volunteer using the BL
             try
             {
-                BO.Volunteer volunteer = s_bl.Volunteer.GetVolunteerDetails(volunteerId);
-
-                Console.Write("Enter new name (leave empty to keep current): ");
-                string name = Console.ReadLine();
-                if (!string.IsNullOrEmpty(name)) volunteer.Name = name;
-
-                Console.Write("Enter new phone (leave empty to keep current): ");
-                string phone = Console.ReadLine();
-                if (!string.IsNullOrEmpty(phone)) volunteer.Phone = phone;
-
-                Console.Write("Enter new email (leave empty to keep current): ");
-                string email = Console.ReadLine();
-                if (!string.IsNullOrEmpty(email)) volunteer.Email = email;
-
-                Console.Write("Enter new address (leave empty to keep current): ");
-                string address = Console.ReadLine();
-                if (!string.IsNullOrEmpty(address)) volunteer.Address = address;
-
-                Console.Write("Enter new latitude (leave empty to keep current): ");
-                string latitudeInput = Console.ReadLine();
-                if (!string.IsNullOrEmpty(latitudeInput) && double.TryParse(latitudeInput, out double latitude))
-                {
-                    volunteer.Latitude = latitude;
-                }
-
-                Console.Write("Enter new longitude (leave empty to keep current): ");
-                string longitudeInput = Console.ReadLine();
-                if (!string.IsNullOrEmpty(longitudeInput) && double.TryParse(longitudeInput, out double longitude))
-                {
-                    volunteer.Longitude = longitude;
-                }
-
                 s_bl.Volunteer.UpdateVolunteer(requesterId, volunteer);
-                Console.WriteLine("Volunteer updated successfully.");
-            }
-            catch (BO.BlInvalidValueException ex)
-            {
-                Console.WriteLine($"Update failed: {ex.Message}");
-            }
-            catch (BO.BlDoesNotExistException ex)
-            {
-                Console.WriteLine($"Update failed: {ex.Message}");
+                Console.WriteLine("Volunteer with ID {0} has been updated successfully.", volunteerId);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Unexpected error: {ex.Message}");
+                Console.WriteLine("Error updating volunteer: " + ex.Message);
             }
+        }
+
+
+        // Helper method to retrieve a volunteer by ID (you need to implement this)
+        private static BO.Volunteer GetVolunteerById(int volunteerId)
+        {
+            // Implement this method to retrieve the volunteer from your list or database
+            // For example:
+            // return volunteers.FirstOrDefault(v => v.Id == volunteerId);
+            throw new NotImplementedException("Implement this method to retrieve a volunteer by ID.");
         }
         /// <summary>
         /// function to delete a volunteer
