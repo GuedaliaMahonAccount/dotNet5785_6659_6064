@@ -224,6 +224,11 @@ Option Options:
         /// <summary>
         /// vounteer fonctions
         /// </summary>
+        ///
+        //
+        /// <summary>
+        /// function to login
+        /// </summary>
         private static void Login()
         {
             Console.Write("Enter username: ");
@@ -246,8 +251,9 @@ Option Options:
                 Console.WriteLine($"Unexpected error: {ex.Message}");
             }
         }
-
-
+        /// <summary>
+        /// function to get the list of volunteers
+        /// </summary>
         private static void GetVolunteersList()
         {
 
@@ -364,6 +370,9 @@ Option Options:
                 Console.WriteLine($"Unexpected Error in Volunteers List Menu: {ex.Message}");
             }
         }
+        /// <summary>
+        /// function to get the details of a volunteer
+        /// </summary>
         private static void GetVolunteerDetails()
         {
             Console.Write("Enter volunteer ID: ");
@@ -388,10 +397,9 @@ Option Options:
                 Console.WriteLine("Invalid ID. Please enter a valid number.");
             }
         }
-
-
-
-
+        /// <summary>
+        /// function to update a volunteer
+        /// </summary>
         private static void UpdateVolunteer()
         {
             Console.Write("Enter requester ID: ");
@@ -458,6 +466,9 @@ Option Options:
                 Console.WriteLine($"Unexpected error: {ex.Message}");
             }
         }
+        /// <summary>
+        /// function to delete a volunteer
+        /// </summary>
         private static void DeleteVolunteer()
         {
             Console.Write("Enter volunteer ID to delete: ");
@@ -486,6 +497,9 @@ Option Options:
                 Console.WriteLine("Invalid ID. Please enter a valid number.");
             }
         }
+        /// <summary>
+        /// function to add a volunteer
+        /// </summary>
         private static void AddVolunteer()
         {
             BO.Volunteer volunteer = new BO.Volunteer();
@@ -547,107 +561,7 @@ Option Options:
             }
         }
 
-        //private static void CreateVolunteer(out Volunteer volunteer)
-        //{
-        //    Console.Write("Enter Name: ");
-        //    string name = Console.ReadLine() ?? throw new FormatException("Wrong input");
 
-        //    Console.Write("Enter Phone: ");
-        //    string phone = Console.ReadLine() ?? throw new FormatException("Wrong input");
-
-        //    Console.Write("Enter Email: ");
-        //    string email = Console.ReadLine() ?? throw new FormatException("Wrong input");
-
-        //    Console.Write("Enter IsActive (true/false): ");
-        //    if (!bool.TryParse(Console.ReadLine(), out bool isActive))
-        //        throw new FormatException("Wrong input");
-
-        //    Console.Write("Enter Role: ");
-        //    string roleInput = Console.ReadLine() ?? throw new FormatException("Wrong input");
-        //    if (!Enum.TryParse(roleInput, out Role role))
-        //        throw new FormatException("Invalid Role");
-
-        //    Console.Write("Enter DistanceType: ");
-        //    string distanceTypeInput = Console.ReadLine() ?? throw new FormatException("Wrong input");
-        //    if (!Enum.TryParse(distanceTypeInput, out DistanceType distanceType))
-        //        throw new FormatException("Invalid DistanceType");
-
-        //    Console.Write("Enter Password: ");
-        //    string password = Console.ReadLine() ?? throw new FormatException("Wrong input");
-
-        //    Console.Write("Enter Address: ");
-        //    string address = Console.ReadLine() ?? throw new FormatException("Wrong input");
-
-        //    Console.Write("Enter Latitude: ");
-        //    if (!double.TryParse(Console.ReadLine(), out double latitude))
-        //        throw new FormatException("Wrong input");
-
-        //    Console.Write("Enter Longitude: ");
-        //    if (!double.TryParse(Console.ReadLine(), out double longitude))
-        //        throw new FormatException("Wrong input");
-
-        //    Console.Write("Enter MaxDistance: ");
-        //    if (!double.TryParse(Console.ReadLine(), out double maxDistance))
-        //        throw new FormatException("Wrong input");
-
-        //    volunteer = new Volunteer
-        //    {
-        //        Name = name,
-        //        Phone = phone,
-        //        Email = email,
-        //        IsActive = isActive,
-        //        Role = role,
-        //        DistanceType = distanceType,
-        //        Password = password,
-        //        Address = address,
-        //        Latitude = latitude,
-        //        Longitude = longitude,
-        //        MaxDistance = maxDistance
-        //    };
-        //}
-        //private static void UpdateVolunteer(Volunteer volunteer)
-        //{
-        //    Console.Write("Enter New Name: ");
-        //    volunteer.Name = Console.ReadLine() ?? volunteer.Name;
-
-        //    Console.Write("Enter New Phone: ");
-        //    volunteer.Phone = Console.ReadLine() ?? volunteer.Phone;
-
-        //    Console.Write("Enter New Email: ");
-        //    volunteer.Email = Console.ReadLine() ?? volunteer.Email;
-
-        //    Console.Write("Enter New IsActive (true/false): ");
-        //    if (bool.TryParse(Console.ReadLine(), out bool isActive))
-        //        volunteer.IsActive = isActive;
-
-        //    Console.Write("Enter New Role: ");
-        //    string roleInput = Console.ReadLine() ?? volunteer.Role.ToString();
-        //    if (Enum.TryParse(roleInput, out Role role))
-        //        volunteer.Role = role;
-
-        //    Console.Write("Enter New DistanceType: ");
-        //    string distanceTypeInput = Console.ReadLine() ?? volunteer.DistanceType.ToString();
-        //    if (Enum.TryParse(distanceTypeInput, out DistanceType distanceType))
-        //        volunteer.DistanceType = distanceType;
-
-        //    Console.Write("Enter New Password: ");
-        //    volunteer.Password = Console.ReadLine() ?? volunteer.Password;
-
-        //    Console.Write("Enter New Address: ");
-        //    volunteer.Address = Console.ReadLine() ?? volunteer.Address;
-
-        //    Console.Write("Enter New Latitude: ");
-        //    if (double.TryParse(Console.ReadLine(), out double latitude))
-        //        volunteer.Latitude = latitude;
-
-        //    Console.Write("Enter New Longitude: ");
-        //    if (double.TryParse(Console.ReadLine(), out double longitude))
-        //        volunteer.Longitude = longitude;
-
-        //    Console.Write("Enter New MaxDistance: ");
-        //    if (double.TryParse(Console.ReadLine(), out double maxDistance))
-        //        volunteer.MaxDistance = maxDistance;
-        //}
 
 
         /// <summary>
@@ -886,11 +800,17 @@ Option Options:
         {
             try
             {
-                var closedCalls = s_bl.Call.GetClosedCalls(0, null, null); // Adjust parameters as needed
-                Console.WriteLine("Closed Calls:");
+                var closedCalls = s_bl.Call.GetClosedCalls(0, null, null).ToList();
+
+                if (!closedCalls.Any())
+                {
+                    Console.WriteLine("No closed calls found.");
+                    return;
+                }
+
                 foreach (var call in closedCalls)
                 {
-                    Console.WriteLine($"ID: {call.Id}, Address: {call.Address}, Open Time: {call.OpenTime}");
+                    Console.WriteLine($"ID: {call.Id}, Address: {call.Address}, Open Time: {call.OpenTime}, End Time: {call.EndTime}");
                 }
             }
             catch (Exception ex)
@@ -905,8 +825,14 @@ Option Options:
         {
             try
             {
-                var openCalls = s_bl.Call.GetOpenCalls(0, null, null); // Adjust parameters as needed
-                Console.WriteLine("Open Calls:");
+                var openCalls = s_bl.Call.GetOpenCalls(0, null, null);
+
+                if (!openCalls.Any())
+                {
+                    Console.WriteLine("No open calls found.");
+                    return;
+                }
+
                 foreach (var call in openCalls)
                 {
                     Console.WriteLine($"ID: {call.Id}, Description: {call.Description}, Address: {call.Address}");
@@ -1017,7 +943,7 @@ Option Options:
         /// admin fonctions
         /// </summary>
         /// 
-        
+        //
         /// <summary>
         /// Admin function to get the current time.
         /// </summary>

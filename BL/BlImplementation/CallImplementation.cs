@@ -285,7 +285,8 @@ namespace BlImplementation
             var callsDO = _dal.Call.ReadAll();
 
             var closedAssignments = assignmentsDO
-                .Where(a => a.VolunteerId == volunteerId && a.EndTime != null);
+                .Where(a => (volunteerId == 0 || a.VolunteerId == volunteerId) && a.EndTime != null)
+                .ToList();
 
             var closedCalls = closedAssignments
                 .Join(
@@ -301,24 +302,24 @@ namespace BlImplementation
                         StartAssignementTime = assignment.StartTime,
                         EndTime = assignment.EndTime,
                         EndType = (BO.EndType)assignment.EndType!
-                    });
+                    })
+                .ToList();
 
             if (callType != null)
             {
-                closedCalls = closedCalls.Where(c => c.CallType.Equals(callType));
+                closedCalls = closedCalls.Where(c => c.CallType.Equals(callType)).ToList();
             }
 
             closedCalls = sortField switch
             {
-                BO.ClosedCallSortField.StartTime => closedCalls.OrderBy(c => c.OpenTime),
-                BO.ClosedCallSortField.EndTime => closedCalls.OrderBy(c => c.EndTime),
-                BO.ClosedCallSortField.ResolutionTime => closedCalls.OrderBy(c => c.StartAssignementTime),
-                _ => closedCalls.OrderBy(c => c.Id)
+                BO.ClosedCallSortField.StartTime => closedCalls.OrderBy(c => c.OpenTime).ToList(),
+                BO.ClosedCallSortField.EndTime => closedCalls.OrderBy(c => c.EndTime).ToList(),
+                BO.ClosedCallSortField.ResolutionTime => closedCalls.OrderBy(c => c.StartAssignementTime).ToList(),
+                _ => closedCalls.OrderBy(c => c.Id).ToList()
             };
 
             return closedCalls;
         }
-
         /// <summary>
         /// Retrieves a list of open calls that are either "Open" or "OpenAtRisk" for a specific volunteer.
         /// Includes filtering by call type and sorting options. Uses `let` to compute distances between locations.
@@ -329,42 +330,56 @@ namespace BlImplementation
         /// <returns>A collection of open calls with details.</returns>
         public IEnumerable<BO.OpenCallInList> GetOpenCalls(int volunteerId, Enum? callType, Enum? sortField)
         {
+            var assignmentsDO = _dal.Assignment.ReadAll();
             var callsDO = _dal.Call.ReadAll();
-            var volunteerDO = _dal.Volunteer.Read(volunteerId)
-                ?? throw new BlDoesNotExistException($"Volunteer with ID {volunteerId} not found.");
 
-            var openCallsWithDetails = from call in callsDO
-                                       where call.CallType == DO.CallType.Open || call.CallType == DO.CallType.OpenAtRisk
-                                       let distance = CallManager.CalculateDistance(
-                                           volunteerDO.Latitude ?? 0, volunteerDO.Longitude ?? 0,
-                                           call.Latitude, call.Longitude
-                                       )
-                                       select new BO.OpenCallInList
-                                       {
-                                           Id = call.Id,
-                                           CallType = (BO.CallType)call.CallType,
-                                           Description = call.Description ?? "No description provided",
-                                           Address = call.Address ?? "Unknown",
-                                           StartTime = call.StartTime,
-                                           MaxEndTime = call.DeadLine ?? DateTime.MaxValue,
-                                           Distance = distance
-                                       };
+            var openedAssignments = assignmentsDO
+                .Where(a => (volunteerId == 0 || a.VolunteerId == volunteerId) && a.EndTime != null)
+                .ToList();
+
+            var openCalls = openedAssignments
+                .Join(
+                    callsDO,
+                    assignment => assignment.CallId,
+                    call => call.Id,
+                    (assignment, call) =>
+                    {
+                        var volunteer = _dal.Volunteer.Read(assignment.VolunteerId)
+                                        ?? throw new Exception($"Volunteer with ID {assignment.VolunteerId} not found.");
+
+                        return new BO.OpenCallInList
+                        {
+                            Id = call.Id,
+                            CallType = (BO.CallType)call.CallType,
+                            Address = call.Address ?? "No address provided",
+                            Description = call.Description ?? "No description provided",
+                            StartTime = call.StartTime,
+                            MaxEndTime = call.DeadLine,
+                            Distance = CallManager.CalculateDistance(
+                                call.Latitude,
+                                call.Longitude,
+                                volunteer.Latitude ?? 0,
+                                volunteer.Longitude ?? 0)
+                        };
+                    })
+                .ToList();
+
 
             if (callType != null)
             {
-                openCallsWithDetails = openCallsWithDetails.Where(c => c.CallType.Equals(callType));
+                openCalls = openCalls.Where(c => c.CallType.Equals(callType)).ToList();
             }
 
-            openCallsWithDetails = sortField switch
+            openCalls = sortField switch
             {
-                BO.OpenCallSortField.StartTime => openCallsWithDetails.OrderBy(c => c.StartTime),
-                BO.OpenCallSortField.Distance => openCallsWithDetails.OrderBy(c => c.Distance),
-                _ => openCallsWithDetails.OrderBy(c => c.Id)
+                BO.ClosedCallSortField.StartTime => openCalls.OrderBy(c => c.StartTime).ToList(),
+                BO.ClosedCallSortField.EndTime => openCalls.OrderBy(c => c.MaxEndTime).ToList(),
+                BO.ClosedCallSortField.ResolutionTime => openCalls.OrderBy(c => c.Distance).ToList(),
+                _ => openCalls.OrderBy(c => c.Id).ToList()
             };
 
-            return openCallsWithDetails;
+            return openCalls;
         }
-
         /// <summary>
         /// Assigns a volunteer to a specific call. 
         /// Ensures that the call is open, unassigned, and not expired before creating the assignment.
