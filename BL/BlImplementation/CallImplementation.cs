@@ -1,11 +1,12 @@
 ﻿using BlApi;
 using BO;
+using DalApi;
 using DO;
 using Helpers;
 
 namespace BlImplementation
 {
-    internal class CallImplementation : ICall
+    internal class CallImplementation : BlApi.ICall
     {
         private readonly DalApi.IDal _dal = DalApi.Factory.Get;
 
@@ -194,57 +195,65 @@ namespace BlImplementation
         /// <param name="filterValue">Value to filter calls by.</param>
         /// <param name="sortField">Optional sorting field.</param>
         /// <returns>A collection of calls with summarized details.</returns>
-        public IEnumerable<BO.CallInList> GetCallList(Enum? filterField, object? filterValue, Enum? sortField)
+        public IEnumerable<BO.CallInList> GetCallList(BO.CallType? callType = null, BO.CallSortField? sortByField = null)
         {
-            var callsDO = _dal.Call.ReadAll();
-            var assignmentsDO = _dal.Assignment.ReadAll();
+            // Retrieve all calls from the DAL
+            var callsFromDal = _dal.Call.ReadAll();
 
-            var callsInList = from call in callsDO
-                              let relatedAssignments = assignmentsDO.Where(a => a.CallId == call.Id)
-                              let latestAssignment = relatedAssignments
-                                  .OrderByDescending(a => a.StartTime)
-                                  .FirstOrDefault()
-                              select new BO.CallInList
-                              {
-                                  CallId = call.Id,
-                                  CallType = (BO.CallType)call.CallType,
-                                  StartTime = call.StartTime,
-                                  LeftTimeToExpire = latestAssignment?.EndTime.HasValue == true
-                                      ? latestAssignment.EndTime.Value - call.StartTime
-                                      : TimeSpan.Zero,
-                                  LastVolunteerName = latestAssignment != null
-                                      ? _dal.Volunteer.Read(latestAssignment.VolunteerId)?.Name ?? "Unknown"
-                                      : "None",
-                                  LeftTimeTocomplete = latestAssignment?.EndTime.HasValue == true
-                                      ? DateTime.Now - latestAssignment.EndTime.Value
-                                      : TimeSpan.Zero,
-                                  Status = latestAssignment == null
-                                      ? BO.CallType.Open
-                                      : latestAssignment.EndTime == null
-                                          ? BO.CallType.InTreatment
-                                          : BO.CallType.Completed,
-                                  AssignmentCount = relatedAssignments.Count()
-                              };
-
-            if (filterField != null && filterValue != null)
+            // Filter by CallType if specified
+            if (callType.HasValue)
             {
-                callsInList = filterField switch
+                callsFromDal = callsFromDal.Where(c =>
                 {
-                    BO.CallFilterField.CallType => callsInList.Where(call => call.CallType.Equals(filterValue)),
-                    BO.CallFilterField.Status => callsInList.Where(call => call.Status.Equals(filterValue)),
-                    _ => callsInList
-                };
+                    if (Enum.IsDefined(typeof(BO.CallType), (BO.CallType)c.CallType))
+                    {
+                        return (BO.CallType)c.CallType == callType.Value;
+                    }
+                    return false;
+                });
             }
 
-            callsInList = sortField switch
+            // Apply sorting based on the specified field
+            if (sortByField.HasValue)
             {
-                BO.CallSortField.CallType => callsInList.OrderBy(call => call.CallType),
-                BO.CallSortField.StartTime => callsInList.OrderBy(call => call.StartTime),
-                BO.CallSortField.Duration => callsInList.OrderBy(call => call.LeftTimeToExpire),
-                _ => callsInList.OrderBy(call => call.CallId)
-            };
+                switch (sortByField.Value)
+                {
+                    case BO.CallSortField.CallType:
+                        callsFromDal = callsFromDal.OrderBy(c => c.CallType);
+                        break;
+                    case BO.CallSortField.StartTime:
+                        callsFromDal = callsFromDal.OrderBy(c => c.StartTime);
+                        break;
+                    case BO.CallSortField.Duration:
+                        callsFromDal = callsFromDal.OrderBy(c => c.DeadLine.HasValue
+                            ? c.DeadLine.Value - c.StartTime
+                            : TimeSpan.MaxValue);
+                        break;
+                    default:
+                        throw new LogicException("Invalid sort field provided.");
+                }
+            }
+            else
+            {
+                // Default sorting by ID
+                callsFromDal = callsFromDal.OrderBy(c => c.Id);
+            }
 
-            return callsInList;
+            // Convert the sorted list to a list of BO.CallInList
+            IEnumerable<DO.Call> calls = callsFromDal.ToList(); // Convert to List to preserve sorting
+            IEnumerable<DO.Assignment> assignments = _dal.Assignment.ReadAll();
+
+            return calls.Select(c => new BO.CallInList
+            {
+                CallId = c.Id,
+                CallType = (BO.CallType)c.CallType,
+                StartTime = c.StartTime,
+                LeftTimeToExpire = c.DeadLine.HasValue ? c.DeadLine.Value - DateTime.Now : null,
+                LastVolunteerName = assignments.Where(a => a.CallId == c.Id).OrderByDescending(a => a.EndTime).Select(a => _dal.Volunteer.Read(a.VolunteerId).Name).FirstOrDefault(),
+                LeftTimeTocomplete = c.DeadLine.HasValue ? c.DeadLine.Value - DateTime.Now : null,
+                Status = (BO.CallType)c.CallType,
+                AssignmentCount = assignments.Count(a => a.CallId == c.Id)
+            });
         }
 
         /// <summary>
@@ -321,6 +330,7 @@ namespace BlImplementation
 
             return closedCalls;
         }
+
         /// <summary>
         /// Retrieves a list of open calls that are either "Open" or "OpenAtRisk" for a specific volunteer.
         /// Includes filtering by call type and sorting options. Uses `let` to compute distances between locations.
@@ -381,6 +391,8 @@ namespace BlImplementation
 
             return openCalls;
         }
+
+
         /// <summary>
         /// Assigns a volunteer to a specific call. 
         /// Ensures that the call is open, unassigned, and not expired before creating the assignment.

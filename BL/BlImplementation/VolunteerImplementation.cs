@@ -47,9 +47,6 @@ internal class VolunteerImplementation : IVolunteer
         return vol.Role.ToString();
 
     }
-
-
-
     /// <summary>
     /// Retrieves the details of a specific volunteer, including general information and any current call in progress.
     /// </summary>
@@ -118,9 +115,6 @@ internal class VolunteerImplementation : IVolunteer
 
         return volunteer;
     }
-
-
-
     /// <summary>
     /// Retrieves a list of volunteers with optional filtering by activity status and sorting by specified fields.
     /// </summary>
@@ -138,8 +132,6 @@ internal class VolunteerImplementation : IVolunteer
     /// - Other unexpected errors occur during the retrieval or processing of the volunteer list.
     /// </exception>
     /// 
-
-
     public IEnumerable<BO.VolunteerInList> GetVolunteersList(bool? isActive = null, BO.VolunteerInListSortFields? sortByField = null)
     {
         // Retrieve all volunteers from the DAL
@@ -294,7 +286,6 @@ internal class VolunteerImplementation : IVolunteer
         _dal.Volunteer.Update(updatedVolunteerDO);
 
     }
-
     /// <summary>
     /// Deletes a volunteer from the system. 
     /// Ensures the volunteer exists and has no associated or previously handled calls before deletion.
@@ -327,7 +318,6 @@ internal class VolunteerImplementation : IVolunteer
         _dal.Volunteer.Delete(volunteerId);
 
     }
-
     /// <summary>
     /// Adds a new volunteer to the system. 
     /// Validates all fields, ensures the data is consistent, and creates a new volunteer record in the database.

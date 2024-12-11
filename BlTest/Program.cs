@@ -258,8 +258,6 @@ Option Options:
 
         private static void GetVolunteersList()
         {
-
-
             try
             {
                 int choice;
@@ -376,7 +374,6 @@ Option Options:
         /// function to get the details of a volunteer
         /// </summary>
         /// 
-
         private static void GetVolunteerDetails()
         {
             Console.Write("Enter volunteer ID: ");
@@ -401,8 +398,6 @@ Option Options:
                 Console.WriteLine("Invalid ID. Please enter a valid number.");
             }
         }
-
-
         /// <summary>
         /// function to update a volunteer
         /// </summary>
@@ -515,8 +510,6 @@ Option Options:
                 Console.WriteLine("Error updating volunteer: " + ex.Message);
             }
         }
-
-
         // Helper method to retrieve a volunteer by ID (you need to implement this)
         private static BO.Volunteer GetVolunteerById(int volunteerId)
         {
@@ -654,16 +647,98 @@ Option Options:
         {
             try
             {
-                var calls = s_bl.Call.GetCallList(null, null, null);
-                Console.WriteLine("Call List:");
-                foreach (var call in calls)
+                CallType? callType = null;
+                BO.CallSortField? sortField = null;
+
+                while (true)
                 {
-                    Console.WriteLine($"ID: {call.CallId}, Type: {call.CallType}, Status: {call.Status}");
+                    Console.WriteLine("\nCall List Menu:");
+                    Console.WriteLine("1. Get All Calls");
+                    Console.WriteLine("2. Get Open Calls");
+                    Console.WriteLine("3. Get Completed Calls");
+                    Console.WriteLine("4. Sort by Call Type");
+                    Console.WriteLine("5. Sort by Start Time");
+                    Console.WriteLine("6. Sort by Duration");
+                    Console.WriteLine("0. Return to Main Menu");
+
+                    Console.Write("Choose an option: ");
+                    if (!int.TryParse(Console.ReadLine(), out int choice))
+                    {
+                        Console.WriteLine("Invalid input. Please enter a number.");
+                        continue;
+                    }
+
+                    // Reset filters and sorting for each iteration
+                    callType = null;
+                    sortField = null;
+
+                    switch (choice)
+                    {
+                        case 0:
+                            return;
+                        case 1: // Get All Calls
+                            break;
+                        case 2: // Open Calls
+                            callType = CallType.Open;
+                            break;
+                        case 3: // Closed Calls
+                            callType = CallType.Completed;
+                            break;
+                        case 4: // Sort by Call Type
+                            sortField = BO.CallSortField.CallType;
+                            break;
+                        case 5: // Sort by Start Time
+                            sortField = BO.CallSortField.StartTime;
+                            break;
+                        case 6: // Sort by Duration
+                            sortField = BO.CallSortField.Duration;
+                            break;
+                        default:
+                            Console.WriteLine("Invalid choice. Please try again.");
+                            continue;
+                    }
+
+                    try
+                    {
+                        // Retrieve the filtered and sorted list
+                        var callsList = s_bl.Call.GetCallList(callType, sortField);
+
+                        // Display the calls
+                        Console.WriteLine("\nCalls List:");
+                        foreach (var call in callsList)
+                        {
+                            Console.WriteLine(call);
+                        }
+                    }
+                    catch (BO.BlDoesNotExistException ex)
+                    {
+                        Console.WriteLine($"Calls do not exist: {ex.Message}");
+                    }
+                    catch (BO.BlNullPropertyException ex)
+                    {
+                        Console.WriteLine($"Null Property Error: {ex.Message}");
+                    }
+                    catch (BO.BlInvalidValueException ex)
+                    {
+                        Console.WriteLine($"Invalid Value: {ex.Message}");
+                    }
+                    catch (BO.BlArgumentNullException ex)
+                    {
+                        Console.WriteLine($"Argument Null Error: {ex.Message}");
+                    }
+                    catch (BO.LogicException ex)
+                    {
+                        Console.WriteLine($"Logic Error: {ex.Message}");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Unexpected Error: {ex.Message}");
+                    }
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"An error occurred while retrieving the call list: {ex.Message}");
+                Console.WriteLine($"Unexpected Error in Calls List Menu: {ex.Message}");
             }
         }
         /// <summary>
