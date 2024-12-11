@@ -19,11 +19,12 @@ namespace BO
         public string Name { get; init; }
         public bool IsActive { get; init; }
         public int CompletedAssignmentsCount { get; init; }
-        public int InProgressAssignmentsCount { get; init; }
         public int? CurrentCallId { get; init; }
         public CallType CurrentCallType { get; init; }
+        public int CancelledCallsCount { get; init; } // Total calls cancelled by the volunteer
+        public int ExpiredCallsCount { get; init; } // Total calls expired by the volunteer
 
-        public override string ToString()
+    public override string ToString()
         {
             return this.ToStringProperty();
         }
