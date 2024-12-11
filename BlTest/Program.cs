@@ -798,11 +798,17 @@ Option Options:
         {
             try
             {
-                var closedCalls = s_bl.Call.GetClosedCalls(0, null, null); // Adjust parameters as needed
-                Console.WriteLine("Closed Calls:");
+                var closedCalls = s_bl.Call.GetClosedCalls(0, null, null).ToList();
+
+                if (!closedCalls.Any())
+                {
+                    Console.WriteLine("No closed calls found.");
+                    return;
+                }
+
                 foreach (var call in closedCalls)
                 {
-                    Console.WriteLine($"ID: {call.Id}, Address: {call.Address}, Open Time: {call.OpenTime}");
+                    Console.WriteLine($"ID: {call.Id}, Address: {call.Address}, Open Time: {call.OpenTime}, End Time: {call.EndTime}");
                 }
             }
             catch (Exception ex)
@@ -817,8 +823,14 @@ Option Options:
         {
             try
             {
-                var openCalls = s_bl.Call.GetOpenCalls(0, null, null); // Adjust parameters as needed
-                Console.WriteLine("Open Calls:");
+                var openCalls = s_bl.Call.GetOpenCalls(0, null, null);
+
+                if (!openCalls.Any())
+                {
+                    Console.WriteLine("No open calls found.");
+                    return;
+                }
+
                 foreach (var call in openCalls)
                 {
                     Console.WriteLine($"ID: {call.Id}, Description: {call.Description}, Address: {call.Address}");
