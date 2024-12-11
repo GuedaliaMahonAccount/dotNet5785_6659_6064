@@ -125,7 +125,7 @@ Option Options:
             Console.WriteLine("8 - Get Open Calls");
             Console.WriteLine("9 - Complete Call");
             Console.WriteLine("10 - Cancel Call");
-            Console.WriteLine("11 - Selection Call");
+            Console.WriteLine("11 - Assign Call");
             Console.WriteLine("0 - Return to Main Menu");
 
             Console.Write("Choose an option: ");

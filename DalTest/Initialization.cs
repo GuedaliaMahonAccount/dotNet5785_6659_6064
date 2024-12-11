@@ -328,10 +328,13 @@
                     {
                         endType = EndType.Expired;
                     }
-
+                    int Id = s_dal.Config.NextAssignmentId;
+                    Console.WriteLine("id assigneent: " + Id );
+                    Console.WriteLine("CallId = " + call.Id);
+                    Console.WriteLine("VolunteerId = " + volunteer.Id);
                     var assignment = new Assignment
                     {
-                        Id = s_dal.Config.NextAssignmentId,
+                        Id = Id,
                         CallId = call.Id,
                         VolunteerId = volunteer.Id,
                         StartTime = startTime,
