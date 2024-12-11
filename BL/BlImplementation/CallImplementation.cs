@@ -96,7 +96,7 @@ namespace BlImplementation
             if (volunteerId != assignmentDO.VolunteerId)
                 throw new BlInvalidRoleException("Only the assigned volunteer can complete this assignment.");
 
-            if (assignmentDO.EndTime != null)
+            if (assignmentDO.EndType != null && (EndType)assignmentDO.EndType == BO.EndType.Completed)
                 throw new BlInvalidValueException("Cannot complete an assignment that is already completed or canceled.");
 
             var updatedAssignment = assignmentDO with
