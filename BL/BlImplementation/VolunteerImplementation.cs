@@ -4,6 +4,7 @@ using Helpers;
 using System.Collections.Generic;
 using System.Linq;
 using BO;
+using DO;
 
 internal class VolunteerImplementation : IVolunteer
 {
@@ -46,6 +47,8 @@ internal class VolunteerImplementation : IVolunteer
         return vol.Role.ToString();
 
     }
+
+
 
     /// <summary>
     /// Retrieves the details of a specific volunteer, including general information and any current call in progress.
@@ -117,6 +120,8 @@ internal class VolunteerImplementation : IVolunteer
 
     }
 
+
+
     /// <summary>
     /// Retrieves a list of volunteers with optional filtering by activity status and sorting by specified fields.
     /// </summary>
@@ -135,7 +140,6 @@ internal class VolunteerImplementation : IVolunteer
     /// </exception>
     public IEnumerable<BO.VolunteerInList> GetVolunteersList(bool? isActive = null, BO.VolunteerInListSortFields? sortByField = null)
     {
-
         // Retrieve all volunteers from the DAL
         var volunteersFromDal = _dal.Volunteer.ReadAll();
 
@@ -180,28 +184,58 @@ internal class VolunteerImplementation : IVolunteer
             // Default sorting by ID
             volunteersFromDal = volunteersFromDal.OrderBy(v => v.Id);
         }
-
-        // Convert the data to the expected BO.VolunteerInList format
-        return (IEnumerable<BO.VolunteerInList>)volunteersFromDal;
-
+        IEnumerable<DO.Volunteer> volunteers = _dal.Volunteer.ReadAll();
+        IEnumerable<DO.Assignment> assignment = _dal.Assignment.ReadAll();
+        return volunteers.Select(v => new BO.VolunteerInList
+        {
+            Id = v.Id,
+            Name = v.Name,
+            IsActive = v.IsActive,
+            CompletedAssignmentsCount = assignment.Count(call => call.VolunteerId == v.Id),
+            CancelledCallsCount = assignment.Count(call => call.VolunteerId == v.Id),
+            ExpiredCallsCount = assignment.Count(call => call.VolunteerId == v.Id),
+            CurrentCallId = assignment.Where(call => call.VolunteerId == v.Id).Select(call => call.CallId).FirstOrDefault(),
+            CurrentCallType = assignment
+    .Where(call => call.VolunteerId == v.Id)
+    .Select(call =>
+    {
+        switch ((BO.EndType)call.EndType)
+        {
+            case BO.EndType.Completed:
+                return BO.CallType.Completed;
+            case BO.EndType.SelfCanceled:
+                return BO.CallType.SelfCanceled;
+            case BO.EndType.Expired:
+                return BO.CallType.Expired;
+            case BO.EndType.AdminCanceled:
+                return BO.CallType.AdminCanceled; 
+            default:
+                throw new InvalidOperationException("Unknown EndType");
+        }
+    })
+    .FirstOrDefault()
+        });
     }
 
-    /// <summary>
-    /// Updates the details of an existing volunteer in the system. 
-    /// Ensures that the requester is authorized to make changes and validates the updated fields before saving.
-    /// </summary>
-    /// <param name="requesterId">The ID of the user (admin or the volunteer themselves) making the update request.</param>
-    /// <param name="updatedVolunteer">A <see cref="BO.Volunteer"/> object containing the updated volunteer details.</param>
-    /// <exception cref="BlInvalidValueException">
-    /// Thrown when:
-    /// - The requester is not authorized to update the volunteer.
-    /// - Validation for any field (ID, name, phone, email, address, coordinates) fails.
-    /// - The coordinates do not match the provided address.
-    /// - An attempt is made to change the volunteer's role without admin privileges.
-    /// - The volunteer does not exist in the database.
-    /// - Other unexpected errors occur during the update process.
-    /// </exception>
-    public void UpdateVolunteer(int requesterId, BO.Volunteer updatedVolunteer)
+
+
+
+        /// <summary>
+        /// Updates the details of an existing volunteer in the system. 
+        /// Ensures that the requester is authorized to make changes and validates the updated fields before saving.
+        /// </summary>
+        /// <param name="requesterId">The ID of the user (admin or the volunteer themselves) making the update request.</param>
+        /// <param name="updatedVolunteer">A <see cref="BO.Volunteer"/> object containing the updated volunteer details.</param>
+        /// <exception cref="BlInvalidValueException">
+        /// Thrown when:
+        /// - The requester is not authorized to update the volunteer.
+        /// - Validation for any field (ID, name, phone, email, address, coordinates) fails.
+        /// - The coordinates do not match the provided address.
+        /// - An attempt is made to change the volunteer's role without admin privileges.
+        /// - The volunteer does not exist in the database.
+        /// - Other unexpected errors occur during the update process.
+        /// </exception>
+        public void UpdateVolunteer(int requesterId, BO.Volunteer updatedVolunteer)
     {
         var currentVolunteer = _dal.Volunteer.Read(updatedVolunteer.Id);
 

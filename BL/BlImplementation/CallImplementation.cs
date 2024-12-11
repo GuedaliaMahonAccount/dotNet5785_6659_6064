@@ -221,7 +221,7 @@ namespace BlImplementation
                                       ? BO.CallType.Open
                                       : latestAssignment.EndTime == null
                                           ? BO.CallType.InTreatment
-                                          : BO.CallType.Closed,
+                                          : BO.CallType.Completed,
                                   AssignmentCount = relatedAssignments.Count()
                               };
 

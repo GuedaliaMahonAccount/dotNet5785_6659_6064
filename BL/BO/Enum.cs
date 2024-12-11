@@ -66,8 +66,10 @@ public enum CallType
 {
     Open,              // The call is open and not currently assigned to any volunteer. It may have been previously assigned but was canceled by the volunteer or administrator.
     InTreatment,       // The call is currently being handled by a volunteer.
-    Closed,            // A volunteer has completed the call.
-    Expired,           // The call was not handled or was assigned but not completed within the allowed time.
+    Completed,         // A volunteer has completed the call.
+    Expired,            // The call was canceled as it was not handled before the maximum allowed time.
+    SelfCanceled,      // The volunteer chose to cancel their assignment before the maximum allowed time.
+    AdminCanceled,     // The administrator canceled the volunteer's assignment before the maximum allowed time.
     OpenAtRisk,        // The call is open and nearing its required completion time, within a risk time range defined by the administrator.
     InTreatmentAtRisk  // The call is currently in treatment but nearing its required completion time, within a risk time range defined by the administrator.
 }
