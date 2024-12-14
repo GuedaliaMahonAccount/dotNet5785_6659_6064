@@ -44,6 +44,9 @@ namespace BlImplementation
             );
 
             _dal.Call.Create(callDO);
+
+            // Notify relevant volunteers
+            CallManager.NotifyRelevantVolunteers(newCall);
         }
 
         /// <summary>

@@ -1,6 +1,8 @@
 ﻿using DalApi;
 using System.Net;
 using System.Text.Json;
+using System.Net;
+using System.Net.Mail;
 using BO;
 
 namespace Helpers
@@ -300,5 +302,122 @@ namespace Helpers
             };
         }
 
+
+        /// <summary>
+        /// Finds relevant volunteers based on the call details and sends emails to them.
+        /// </summary>
+        /// <param name="call">The call details.</param>
+        public static void NotifyRelevantVolunteers(Call call)
+        {
+            // Get all volunteers from the database
+            var allVolunteers = s_dal.Volunteer.ReadAll();
+
+            // Filter volunteers based on distance and availability
+            var relevantVolunteers = allVolunteers.Where(volunteer =>
+            {
+                // Check distance
+                double distance = CalculateDistance((double)call.Latitude, (double)call.Longitude, (double)volunteer.Latitude, (double)volunteer.Longitude, (DistanceType)volunteer.DistanceType);
+                if (distance > volunteer.MaxDistance)
+                    return false;
+
+                // Check availability (implement this logic based on your Volunteer object)
+                return volunteer.IsActive;
+            }).ToList();
+
+            // Send emails to relevant volunteers
+            foreach (var volunteer in relevantVolunteers)
+            {
+                string subject = "New Call Available Near You!";
+                string body = $@"
+                Dear {volunteer.Name},
+                
+                A new call has been created that matches your preferences:
+                Address: {call.Address}
+                Description: {call.Description}
+                Start Time: {call.StartTime}
+                Deadline: {call.DeadLine}
+                Distance: {CalculateDistance((double)call.Latitude, (double)call.Longitude, (double)volunteer.Latitude, (double)volunteer.Longitude, (DistanceType)volunteer.DistanceType):F2} km
+
+                Please log in to the system to accept the call.
+
+                Best regards,
+                The Volunteer System
+            ";
+
+                EmailService.SendEmail(volunteer.Email, subject, body);
+            }
+        }
+
+        /// <summary>
+        /// Sends an email to the assigned volunteer when an assignment is canceled.
+        /// </summary>
+        /// <param name="call">The canceled call.</param>
+        /// <param name="volunteer">The assigned volunteer.</param>
+        public static void NotifyVolunteerOnCancellation(Call call, Volunteer volunteer)
+        {
+            string subject = "Call Assignment Canceled";
+            string body = $@"
+            Dear {volunteer.Name},
+            
+            Your assignment for the following call has been canceled:
+            Address: {call.Address}
+            Description: {call.Description}
+            Start Time: {call.StartTime}
+            Deadline: {call.DeadLine}
+
+            Thank you for your understanding.
+
+            Best regards,
+            The Volunteer System
+        ";
+
+            EmailService.SendEmail(volunteer.Email, subject, body);
+        }
+
+        /// <summary>
+        /// class to send email
+        /// </summary>
+        internal static class EmailService
+        {
+            private const string SmtpHost = "smtp.gmail.com"; 
+            private const int SmtpPort = 587; 
+            private const string SenderEmail = "guedalia.sebbah@gmail.com";
+            private const string SenderPassword = "ujij qtrg kyrs cguv";
+            public static void SendEmail(string recipientEmail, string subject, string body)
+            {
+                try
+                {
+                    using (var smtpClient = new SmtpClient(SmtpHost, SmtpPort))
+                    {
+                        smtpClient.Credentials = new NetworkCredential(SenderEmail, SenderPassword);
+                        smtpClient.EnableSsl = true;
+
+                        var mailMessage = new MailMessage
+                        {
+                            From = new MailAddress(SenderEmail),
+                            Subject = subject,
+                            Body = body,
+                            IsBodyHtml = true // Set to true if sending HTML emails
+                        };
+
+                        mailMessage.To.Add(recipientEmail);
+
+                        smtpClient.Send(mailMessage);
+                        Console.WriteLine($"Email sent to {recipientEmail} successfully.");
+                    }
+                }
+                catch (SmtpException smtpEx)
+                {
+                    Console.WriteLine($"SMTP error while sending email to {recipientEmail}: {smtpEx.Message}");
+                    Console.WriteLine($"Details: {smtpEx.StackTrace}");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"General error while sending email to {recipientEmail}: {ex.Message}");
+                    Console.WriteLine($"Details: {ex.StackTrace}");
+                }
+            }
+
+        }
     }
 }
