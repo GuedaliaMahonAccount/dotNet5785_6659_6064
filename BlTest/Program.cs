@@ -936,7 +936,26 @@ Option Options:
         {
             try
             {
-                var closedCalls = s_bl.Call.GetClosedCalls(0, null, null).ToList();
+                Console.WriteLine("Enter Volunteer ID: ");
+                if (!int.TryParse(Console.ReadLine(), out int id))
+                {
+                    Console.WriteLine("Invalid input. Please enter a number.");
+                }
+                int volunteerId = id;
+
+                Console.WriteLine("Enter Call Type (or press Enter to skip):");
+                string callTypeInput = Console.ReadLine();
+                Enum? callType = (Enum?)(string.IsNullOrEmpty(callTypeInput)
+                    ? null
+                    : Enum.Parse(typeof(BO.CallType), callTypeInput, true));
+
+                Console.WriteLine("Enter Sort Field (or press Enter to skip):");
+                string sortFieldInput = Console.ReadLine();
+                Enum? sortField = (Enum?)(string.IsNullOrEmpty(sortFieldInput)
+                    ? null
+                    : Enum.Parse(typeof(BO.ClosedCallSortField), sortFieldInput, true));
+
+                var closedCalls = s_bl.Call.GetClosedCalls(volunteerId, callType, sortField).ToList();
 
                 if (!closedCalls.Any())
                 {
@@ -962,7 +981,22 @@ Option Options:
         {
             try
             {
-                var openCalls = s_bl.Call.GetOpenCalls(0, null, null);
+                Console.WriteLine("Enter Volunteer ID: ");
+                if (!int.TryParse(Console.ReadLine(), out int id))
+                {
+                    Console.WriteLine("Invalid input. Please enter a number.");
+                }
+                int volunteerId = id;
+
+                Console.WriteLine("Enter Call Type (or press Enter to skip):");
+                string callTypeInput = Console.ReadLine();
+                Enum? callType = (Enum?)(string.IsNullOrEmpty(callTypeInput) ? null : Enum.Parse(typeof(BO.CallType), callTypeInput, true));
+
+                Console.WriteLine("Enter Sort Field (or press Enter to skip):");
+                string sortFieldInput = Console.ReadLine();
+                Enum? sortField = (Enum?)(string.IsNullOrEmpty(sortFieldInput) ? null : Enum.Parse(typeof(BO.ClosedCallSortField), sortFieldInput, true));
+
+                var openCalls = s_bl.Call.GetOpenCalls(volunteerId, callType, sortField);
 
                 if (!openCalls.Any())
                 {

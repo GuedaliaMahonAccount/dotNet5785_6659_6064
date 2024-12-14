@@ -113,7 +113,8 @@ public enum ClosedCallSortField
 {
     StartTime,
     EndTime,
-    ResolutionTime
+    ResolutionTime,
+    Distance
 }
 public enum OpenCallSortField
 {

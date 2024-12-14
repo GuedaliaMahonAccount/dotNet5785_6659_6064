@@ -1,4 +1,5 @@
 ﻿using BO;
+using DO;
 using Helpers;
 
 namespace BlImplementation
@@ -288,13 +289,16 @@ namespace BlImplementation
         /// </returns>
         public IEnumerable<BO.ClosedCallInList> GetClosedCalls(int volunteerId, Enum? callType, Enum? sortField)
         {
+            // Retrieve all assignments and calls from the DAL
             var assignmentsDO = _dal.Assignment.ReadAll();
             var callsDO = _dal.Call.ReadAll();
 
+            // Filter assignments based on volunteerId and closed status
             var closedAssignments = assignmentsDO
                 .Where(a => (volunteerId == 0 || a.VolunteerId == volunteerId) && a.EndTime != null)
                 .ToList();
 
+            // Join assignments with calls to get closed call details
             var closedCalls = closedAssignments
                 .Join(
                     callsDO,
@@ -304,7 +308,7 @@ namespace BlImplementation
                     {
                         Id = call.Id,
                         CallType = (BO.CallType)call.CallType,
-                        Address = call.Address ?? "No description provided",
+                        Address = call.Address ?? "No address provided",
                         OpenTime = call.StartTime,
                         StartAssignementTime = assignment.StartTime,
                         EndTime = assignment.EndTime,
@@ -312,11 +316,13 @@ namespace BlImplementation
                     })
                 .ToList();
 
+            // Apply optional call type filtering
             if (callType != null)
             {
                 closedCalls = closedCalls.Where(c => c.CallType.Equals(callType)).ToList();
             }
 
+            // Apply optional sorting
             closedCalls = sortField switch
             {
                 BO.ClosedCallSortField.StartTime => closedCalls.OrderBy(c => c.OpenTime).ToList(),
@@ -336,54 +342,52 @@ namespace BlImplementation
         /// <param name="callType">Optional filter for the call type.</param>
         /// <param name="sortField">Optional sorting field.</param>
         /// <returns>A collection of open calls with details.</returns>
-        public IEnumerable<BO.OpenCallInList> GetOpenCalls(int volunteerId, Enum? callType, Enum? sortField)
+        /// <summary>
+        /// Retrieves a list of open calls that are either "Open" or "OpenAtRisk".
+        /// Includes filtering by call type and sorting options. Uses `let` to compute distances between locations.
+        /// </summary>
+        /// <param name="callType">Optional filter for the call type.</param>
+        /// <param name="sortField">Optional sorting field.</param>
+        /// <returns>A collection of open calls with details.</returns>
+        public IEnumerable<OpenCallInList> GetOpenCalls(int volunteerId, Enum? callType, Enum? sortField)
         {
-            var assignmentsDO = _dal.Assignment.ReadAll();
+            // Retrieve all calls from the DAL
             var callsDO = _dal.Call.ReadAll();
+            //retrieve volunteer info
+            var volunteer = _dal.Volunteer.Read(volunteerId);
 
-            var openedAssignments = assignmentsDO
-                .Where(a => (volunteerId == 0 || a.VolunteerId == volunteerId) && a.EndTime != null)
-                .ToList();
-
-            var openCalls = openedAssignments
-                .Join(
-                    callsDO,
-                    assignment => assignment.CallId,
-                    call => call.Id,
-                    (assignment, call) =>
-                    {
-                        var volunteer = _dal.Volunteer.Read(assignment.VolunteerId)
-                                        ?? throw new Exception($"Volunteer with ID {assignment.VolunteerId} not found.");
-
-                        return new BO.OpenCallInList
-                        {
-                            Id = call.Id,
-                            CallType = (BO.CallType)call.CallType,
-                            Address = call.Address ?? "No address provided",
-                            Description = call.Description ?? "No description provided",
-                            StartTime = call.StartTime,
-                            MaxEndTime = call.DeadLine,
-                            Distance = CallManager.CalculateDistance(
+            // Filter calls to include only open ones (or "open in risk")
+            var openCalls = callsDO
+                .Where(call => call.CallType is ((int)DO.CallType.Open) or (DO.CallType)(int)DO.CallType.OpenAtRisk)
+                .Select(call => new BO.OpenCallInList
+                {
+                    Id = call.Id,
+                    CallType = (BO.CallType)call.CallType,
+                    Address = call.Address ?? "No address provided",
+                    Description = call.Description ?? "No description provided",
+                    StartTime = call.StartTime,
+                    MaxEndTime = call.DeadLine,
+                    Distance = CallManager.CalculateDistance(
                                 call.Latitude,
                                 call.Longitude,
                                 volunteer.Latitude ?? 0,
                                 volunteer.Longitude ?? 0,
                                 (BO.DistanceType)volunteer.DistanceType)
-                        };
-                    })
+        })
                 .ToList();
 
-
+            // Apply optional call type filtering
             if (callType != null)
             {
                 openCalls = openCalls.Where(c => c.CallType.Equals(callType)).ToList();
             }
 
+            // Apply optional sorting
             openCalls = sortField switch
             {
                 BO.ClosedCallSortField.StartTime => openCalls.OrderBy(c => c.StartTime).ToList(),
                 BO.ClosedCallSortField.EndTime => openCalls.OrderBy(c => c.MaxEndTime).ToList(),
-                BO.ClosedCallSortField.ResolutionTime => openCalls.OrderBy(c => c.Distance).ToList(),
+                BO.ClosedCallSortField.Distance => openCalls.OrderBy(c => c.Distance).ToList(),
                 _ => openCalls.OrderBy(c => c.Id).ToList()
             };
 
