@@ -550,7 +550,7 @@ Option Options:
         /// </summary>
         private static void AddVolunteer()
         {
-            BO.Volunteer volunteer = new BO.Volunteer();
+            BO.Volunteer volunteer = new();
 
             Console.Write("Enter volunteer ID: ");
             if (!int.TryParse(Console.ReadLine(), out int id))

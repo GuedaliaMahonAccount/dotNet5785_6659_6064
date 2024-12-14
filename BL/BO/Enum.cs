@@ -3,8 +3,8 @@
 
 public enum Role
 {
-    Admin,                // System administrator with full platform access
     GeneralVolunteer,     // A general role for volunteers without a specific specialty
+    Admin,                // System administrator with full platform access
     Cook,                 // Prepares meals or food supplies for soldiers
     Driver,               // Transports supplies or personnel
     TeamLeader,           // Coordinates a group of volunteers for specific missions
