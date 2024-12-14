@@ -1,7 +1,4 @@
-﻿using BlApi;
-using BO;
-using DalApi;
-using DO;
+﻿using BO;
 using Helpers;
 
 namespace BlImplementation
@@ -370,7 +367,8 @@ namespace BlImplementation
                                 call.Latitude,
                                 call.Longitude,
                                 volunteer.Latitude ?? 0,
-                                volunteer.Longitude ?? 0)
+                                volunteer.Longitude ?? 0,
+                                (BO.DistanceType)volunteer.DistanceType)
                         };
                     })
                 .ToList();
@@ -391,7 +389,6 @@ namespace BlImplementation
 
             return openCalls;
         }
-
 
         /// <summary>
         /// Assigns a volunteer to a specific call. 

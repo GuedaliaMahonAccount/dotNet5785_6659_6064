@@ -972,7 +972,7 @@ Option Options:
 
                 foreach (var call in openCalls)
                 {
-                    Console.WriteLine($"ID: {call.Id}, Description: {call.Description}, Address: {call.Address}");
+                    Console.WriteLine($"ID: {call.Id}, Description: {call.Description}, Address: {call.Address}, Distance: {call.Distance} kilometers");
                 }
             }
             catch (Exception ex)

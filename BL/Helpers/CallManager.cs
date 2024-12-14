@@ -10,9 +10,68 @@ namespace Helpers
         private static IDal s_dal = Factory.Get;
 
         /// <summary>
-        /// Calculates the distance between two geographic points.
+        /// Calculates the distance between two geographic points. he calculate by the choice of the volunteer wich type of ditance he want
         /// </summary>
-        public static double CalculateDistance(double lat1, double lon1, double lat2, double lon2)
+        /// <param name="lat1"></param>
+        /// <param name="lon1"></param>
+        /// <param name="lat2"></param>
+        /// <param name="lon2"></param>
+        /// <param name="distanceType"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
+        public static double CalculateDistance(double lat1, double lon1, double lat2, double lon2, DistanceType distanceType)
+        {
+            const double R = 6371; // Earth's radius in kilometers
+
+            switch (distanceType)
+            {
+                case DistanceType.Plane:
+                case DistanceType.Helicopter:
+                case DistanceType.Drone:
+                    // Straight-line distance (Haversine formula)
+                    return CalculateHaversineDistance(lat1, lon1, lat2, lon2);
+
+                case DistanceType.Foot:
+                case DistanceType.HikingTrail:
+                case DistanceType.UrbanShortcuts:
+                    // Walking distance approximation (increase Haversine distance by 30% for paths)
+                    return CalculateHaversineDistance(lat1, lon1, lat2, lon2) * 1.3;
+
+                case DistanceType.Car:
+                case DistanceType.Bus:
+                case DistanceType.OffRoadVehicle:
+                    // Driving distance approximation (increase Haversine by 50%)
+                    return CalculateHaversineDistance(lat1, lon1, lat2, lon2) * 1.5;
+
+                case DistanceType.Bike:
+                case DistanceType.BicycleShare:
+                case DistanceType.Scooter:
+                    // Biking distance approximation (increase Haversine by 40%)
+                    return CalculateHaversineDistance(lat1, lon1, lat2, lon2) * 1.4;
+
+                case DistanceType.PublicTransport:
+                case DistanceType.Train:
+                case DistanceType.Waterway:
+                    // Assume a detour factor of 1.7 for routes with public transport or waterways
+                    return CalculateHaversineDistance(lat1, lon1, lat2, lon2) * 1.7;
+
+                case DistanceType.Horse:
+                case DistanceType.Ski:
+                case DistanceType.Snowmobile:
+                case DistanceType.Rollerblade:
+                case DistanceType.Skateboard:
+                    // Increase Haversine by 20% for terrain-based travel
+                    return CalculateHaversineDistance(lat1, lon1, lat2, lon2) * 1.2;
+
+                case DistanceType.Boat:
+                    // Assume minimal detour for water travel
+                    return CalculateHaversineDistance(lat1, lon1, lat2, lon2) * 1.1;
+
+                default:
+                    throw new ArgumentException($"Unsupported DistanceType: {distanceType}");
+            }
+        }
+        private static double CalculateHaversineDistance(double lat1, double lon1, double lat2, double lon2)
         {
             const double R = 6371; // Earth's radius in kilometers
             var dLat = DegreesToRadians(lat2 - lat1);
@@ -25,11 +84,11 @@ namespace Helpers
             var c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
             return R * c; // Distance in kilometers
         }
-
         private static double DegreesToRadians(double degrees)
         {
             return degrees * Math.PI / 180;
         }
+
 
         /// <summary>
         /// Retrieves coordinates from an address using LocationIQ API.
@@ -38,9 +97,9 @@ namespace Helpers
         /// "display_name": "Tiltan, Ramla, Ramla Subdistrict, District centre, 7135275, Israël"
         /// "lat": "31.9290114"
         /// "lon": "34.8737578"
-        /// 
-        /// 
         /// </summary>
+        /// <param name="address"></param>
+        /// <returns></returns>
         public static List<(double latitude, double longitude)> GetCoordinatesFromAddress(string address)
         {
             if (string.IsNullOrWhiteSpace(address))
@@ -110,6 +169,12 @@ namespace Helpers
             return false; // No match found
         }
 
+        /// <summary>
+        /// function to check if he is autorized
+        /// </summary>
+        /// <param name="requesterId"></param>
+        /// <param name="volunteerId"></param>
+        /// <returns></returns>
         public static bool IsRequesterAuthorizedToCancel(int requesterId, int volunteerId)
         {
             if (requesterId == volunteerId)
