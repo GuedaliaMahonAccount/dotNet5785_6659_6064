@@ -251,11 +251,11 @@ Option Options:
                 Console.WriteLine($"Unexpected error: {ex.Message}");
             }
         }
+
         /// <summary>
         /// function to get the list of volunteers
         /// </summary>
         /// 
-
         private static void GetVolunteersList()
         {
             try
@@ -370,6 +370,7 @@ Option Options:
                 Console.WriteLine($"Unexpected Error in Volunteers List Menu: {ex.Message}");
             }
         }
+
         /// <summary>
         /// function to get the details of a volunteer
         /// </summary>
@@ -398,6 +399,7 @@ Option Options:
                 Console.WriteLine("Invalid ID. Please enter a valid number.");
             }
         }
+
         /// <summary>
         /// function to update a volunteer
         /// </summary>
@@ -510,14 +512,7 @@ Option Options:
                 Console.WriteLine("Error updating volunteer: " + ex.Message);
             }
         }
-        // Helper method to retrieve a volunteer by ID (you need to implement this)
-        private static BO.Volunteer GetVolunteerById(int volunteerId)
-        {
-            // Implement this method to retrieve the volunteer from your list or database
-            // For example:
-            // return volunteers.FirstOrDefault(v => v.Id == volunteerId);
-            throw new NotImplementedException("Implement this method to retrieve a volunteer by ID.");
-        }
+
         /// <summary>
         /// function to delete a volunteer
         /// </summary>
@@ -549,6 +544,7 @@ Option Options:
                 Console.WriteLine("Invalid ID. Please enter a valid number.");
             }
         }
+
         /// <summary>
         /// function to add a volunteer
         /// </summary>
@@ -640,6 +636,7 @@ Option Options:
                 Console.WriteLine($"An error occurred while retrieving call quantities: {ex.Message}");
             }
         }
+
         /// <summary>
         /// Retrieves and displays the list of calls.
         /// </summary>
@@ -741,6 +738,7 @@ Option Options:
                 Console.WriteLine($"Unexpected Error in Calls List Menu: {ex.Message}");
             }
         }
+
         /// <summary>
         /// Retrieves and displays detailed information about a specific call.
         /// </summary>
@@ -764,6 +762,7 @@ Option Options:
                 Console.WriteLine("Invalid Call ID.");
             }
         }
+
         /// <summary>
         /// Updates an existing call's details.
         /// </summary>
@@ -814,6 +813,7 @@ Option Options:
                 Console.WriteLine("Invalid Call ID.");
             }
         }
+
         /// <summary>
         /// Deletes a specific call from the system.
         /// </summary>
@@ -837,6 +837,7 @@ Option Options:
                 Console.WriteLine("Invalid Call ID.");
             }
         }
+
         /// <summary>
         /// Adds a new call to the system.
         /// </summary>
@@ -927,6 +928,7 @@ Option Options:
 
             s_bl.Call.AddCall(call);
         }
+
         /// <summary>
         /// Retrieves and displays a list of closed calls.
         /// </summary>
@@ -952,6 +954,7 @@ Option Options:
                 Console.WriteLine($"An error occurred while retrieving closed calls: {ex.Message}");
             }
         }
+
         /// <summary>
         /// Retrieves and displays a list of open calls.
         /// </summary>
@@ -977,6 +980,7 @@ Option Options:
                 Console.WriteLine($"An error occurred while retrieving open calls: {ex.Message}");
             }
         }
+
         /// <summary>
         /// Completes a specific call.
         /// </summary>
@@ -1008,6 +1012,7 @@ Option Options:
                 Console.WriteLine("Invalid Volunteer ID.");
             }
         }
+
         /// <summary>
         /// Cancels a specific call.
         /// </summary>
@@ -1039,6 +1044,7 @@ Option Options:
                 Console.WriteLine("Invalid Requester ID.");
             }
         }
+
         /// <summary>
         /// Assigns a volunteer to a specific call.
         /// </summary>
@@ -1093,6 +1099,7 @@ Option Options:
                 Console.WriteLine($"An error occurred while getting the current time: {ex.Message}");
             }
         }
+
         /// <summary>
         /// Admin function to update the clock.
         /// </summary>
@@ -1118,6 +1125,7 @@ Option Options:
                 Console.WriteLine("Invalid Time Unit. Please enter a valid option (MINUTE, HOUR, DAY, MONTH, YEAR).");
             }
         }
+
         /// <summary>
         /// Admin function to get the risk time range.
         /// </summary>
@@ -1133,6 +1141,7 @@ Option Options:
                 Console.WriteLine($"An error occurred while getting the risk time: {ex.Message}");
             }
         }
+
         /// <summary>
         /// Admin function to set the risk time range.
         /// </summary>
@@ -1158,6 +1167,7 @@ Option Options:
                 Console.WriteLine("Invalid TimeSpan format. Please use HH:MM:SS.");
             }
         }
+
         /// <summary>
         /// Admin function to reset the database.
         /// </summary>
@@ -1173,6 +1183,7 @@ Option Options:
                 Console.WriteLine($"An error occurred while resetting the database: {ex.Message}");
             }
         }
+
         /// <summary>
         /// Admin function to initialize the database.
         /// </summary>
