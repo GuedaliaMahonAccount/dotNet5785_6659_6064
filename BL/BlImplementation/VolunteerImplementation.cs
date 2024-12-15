@@ -345,6 +345,9 @@ internal class VolunteerImplementation : IVolunteer
         if (!VolunteerManager.ValidName(volunteer.Name))
             throw new BlInvalidValueException("Invalid name.");
 
+          if (!VolunteerManager.ValidPassword(volunteer.Password))
+            throw new BlInvalidValueException("Invalid Password.");
+
         if (!VolunteerManager.ValidPhone(volunteer.Phone))
             throw new BlInvalidValueException("Invalid phone number.");
 
@@ -367,6 +370,7 @@ internal class VolunteerImplementation : IVolunteer
         {
             Id = volunteer.Id,
             Name = volunteer.Name,
+            Password = volunteer.Password,
             Phone = volunteer.Phone,
             Email = volunteer.Email,
             Address = volunteer.Address,

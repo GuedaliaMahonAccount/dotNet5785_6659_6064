@@ -10,8 +10,13 @@ internal static class Tools
         string str = "";
         foreach (PropertyInfo item in typeof(T).GetProperties())
         {
+            if (item.Name.Equals("Password", StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
             var value = item.GetValue(t, null);
             str += item.Name + ": ";
+
             if (value is not string && value is IEnumerable)
             {
                 str += "\n";

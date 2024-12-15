@@ -4,6 +4,9 @@ using System.Net.Mail;
 using System.Net;
 using System.Text.Json;
 using BO;
+using System.Security.Cryptography;
+using System.Text;
+using System.IO;
 
 namespace Helpers
 {
@@ -176,7 +179,6 @@ namespace Helpers
                     return true; // Found a match
                 }
             }
-
             return false; // No match found
         }
 
@@ -192,5 +194,75 @@ namespace Helpers
             return false;
         }
 
+    }
+
+    public static class AesEncryptionHelper
+    {
+        private static readonly string Key = "YourSecureKey123";
+
+        private static readonly string IV = "YourSecureIV1234";
+
+        public static string Encrypt(string plainText)
+        {
+            using Aes aes = Aes.Create();
+            aes.Key = Encoding.UTF8.GetBytes(Key);
+            aes.IV = Encoding.UTF8.GetBytes(IV);
+
+            using MemoryStream ms = new();
+            using CryptoStream cs = new(ms, aes.CreateEncryptor(), CryptoStreamMode.Write);
+            using (StreamWriter writer = new(cs))
+            {
+                writer.Write(plainText);
+            }
+
+            return Convert.ToBase64String(ms.ToArray());
+        }
+
+        public static string Decrypt(string encryptedText)
+        {
+            using Aes aes = Aes.Create();
+            aes.Key = Encoding.UTF8.GetBytes(Key);
+            aes.IV = Encoding.UTF8.GetBytes(IV);
+
+            using MemoryStream ms = new(Convert.FromBase64String(encryptedText));
+            using CryptoStream cs = new(ms, aes.CreateDecryptor(), CryptoStreamMode.Read);
+            using StreamReader reader = new(cs);
+            {
+                return reader.ReadToEnd();
+            }
+        }
+    }
+
+    public static class PasswordUtils
+    {
+        public static string ReadAndEncryptPassword()
+        {
+            StringBuilder plainPassword = new StringBuilder();
+            Console.Write("Enter password: ");
+
+            while (true)
+            {
+                var keyInfo = Console.ReadKey(intercept: true);
+
+                if (keyInfo.Key == ConsoleKey.Enter)
+                {
+                    Console.WriteLine(); 
+                    break;
+                }
+
+                if (keyInfo.Key == ConsoleKey.Backspace && plainPassword.Length > 0)
+                {
+                    plainPassword.Remove(plainPassword.Length - 1, 1);
+                    Console.Write("\b \b"); 
+                }
+                else if (keyInfo.Key != ConsoleKey.Backspace)
+                {
+                    plainPassword.Append(keyInfo.KeyChar);
+                    Console.Write("*"); 
+                }
+            }
+
+            return AesEncryptionHelper.Encrypt(plainPassword.ToString());
+        }
     }
 }

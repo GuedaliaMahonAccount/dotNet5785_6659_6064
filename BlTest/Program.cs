@@ -1,6 +1,7 @@
 ﻿
 using BlApi;
 using BO;
+using Helpers;
 
 namespace BlTest
 {
@@ -234,12 +235,11 @@ Option Options:
             Console.Write("Enter username: ");
             string username = Console.ReadLine();
 
-            Console.Write("Enter password: ");
-            string password = Console.ReadLine();
+            string encryptedPassword = Helpers.PasswordUtils.ReadAndEncryptPassword(); ;
 
             try
             {
-                string role = s_bl.Volunteer.Login(username, password);
+                string role = s_bl.Volunteer.Login(username, encryptedPassword);
                 Console.WriteLine($"Login successful. Role: {role}");
             }
             catch (BO.BlDoesNotExistException ex)
@@ -251,6 +251,7 @@ Option Options:
                 Console.WriteLine($"Unexpected error: {ex.Message}");
             }
         }
+
 
         /// <summary>
         /// function to get the list of volunteers
@@ -563,6 +564,8 @@ Option Options:
             Console.Write("Enter name: ");
             volunteer.Name = Console.ReadLine();
 
+            volunteer.Password = Helpers.PasswordUtils.ReadAndEncryptPassword(); ;
+
             Console.Write("Enter phone: ");
             volunteer.Phone = Console.ReadLine();
 
@@ -608,6 +611,7 @@ Option Options:
                 Console.WriteLine($"Unexpected error: {ex.Message}");
             }
         }
+
 
 
 
