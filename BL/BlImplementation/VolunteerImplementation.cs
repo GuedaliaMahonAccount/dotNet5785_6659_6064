@@ -26,26 +26,31 @@ internal class VolunteerImplementation : IVolunteer
     /// </exception>
     public string Login(string username, string password)
     {
-
         // Retrieve all volunteers from the DAL
         var volunteersFromDal = _dal.Volunteer.ReadAll();
 
-        // Convert the provided password to string (if necessary)
-        string passwordAsString = password.ToString();
+        string decryptedPassword;
+        try
+        {
+            decryptedPassword = AesEncryptionHelper.Decrypt(password);
+        }
+        catch
+        {
+            decryptedPassword = password;
+        }
 
-        // Find the volunteer with matching username and password
-        var vol = volunteersFromDal.FirstOrDefault(v => v.Name == username && v.Password == passwordAsString);
+        // Find the volunteer with matching username and decrypted password
+        var vol = volunteersFromDal.FirstOrDefault(v => v.Name == username && v.Password == decryptedPassword);
 
         if (vol == null)
         {
             // Volunteer not found or incorrect password
             throw new BlDoesNotExistException("Volunteer not found or incorrect password.");
         }
-
         // Return the role of the authenticated volunteer
         return vol.Role.ToString();
-
     }
+
 
     /// <summary>
     /// Retrieves the details of a specific volunteer, including general information and any current call in progress.

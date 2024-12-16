@@ -4,6 +4,8 @@ using DalApi;
 using DO;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
 
 internal class VolunteerImplementation : IVolunteer
 {
@@ -44,7 +46,7 @@ internal class VolunteerImplementation : IVolunteer
         // Apply the filter if provided, otherwise return all volunteers
         return filter != null ? volunteerCopy.Where(filter) : volunteerCopy;
     }
-
+    // Eli Amar  pas- Z8mQ7xW4rB
     public void Update(Volunteer item)
     {
         // Check if the volunteer exists
@@ -77,4 +79,5 @@ internal class VolunteerImplementation : IVolunteer
         // Clear the list of volunteers
         DataSource.Volunteers.Clear();
     }
+
 }

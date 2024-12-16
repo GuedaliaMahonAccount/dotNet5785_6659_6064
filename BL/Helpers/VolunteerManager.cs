@@ -93,9 +93,8 @@ namespace Helpers
             // - At least one uppercase letter
             // - At least one lowercase letter
             // - At least one number
-            // - At least one special character
             return Regex.IsMatch(password,
-                @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{8,}$");
+                @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$");
         }
         public static bool ValidIsActive(bool isActive)
         {

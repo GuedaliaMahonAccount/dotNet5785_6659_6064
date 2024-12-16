@@ -693,56 +693,53 @@ static readonly IDal s_dal = Factory.Get;
         // create new volunteer
         public static Volunteer CreatenewVolunteer()
         {
-            Console.WriteLine("Enter ID:");
+            Console.Write("Enter ID: ");
             if (!int.TryParse(Console.ReadLine(), out int id) || id < 200000000 || id > 400000000)
                 throw new InvalidIdException("ID must be a number between 200000000 and 400000000.");
 
-            Console.WriteLine("Enter Full Name (First and Last):");
+            Console.Write("Enter Full Name (First and Last): ");
             string fullName = Console.ReadLine();
             if (string.IsNullOrWhiteSpace(fullName) || !fullName.Contains(" "))
                 throw new InvalidNameException("Full name must include first and last names.");
 
-            Console.WriteLine("Enter Phone Number:");
+            Console.Write("Enter Phone Number: ");
             string phone = Console.ReadLine();
             if (!System.Text.RegularExpressions.Regex.IsMatch(phone, @"^05\d{8}$"))
                 throw new InvalidPhoneNumberException("Phone number must start with '05' and be 10 digits long.");
 
-            Console.WriteLine("Enter Email:");
+            Console.Write("Enter Email: ");
             string email = Console.ReadLine();
             if (!System.Text.RegularExpressions.Regex.IsMatch(email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
                 throw new InvalidEmailException("Invalid email format. Please enter a valid email.");
 
-            Console.WriteLine("Enter Password:");
-            string password = Console.ReadLine();
-            if (password.Length < 8 || !password.Any(char.IsDigit) || !password.Any(char.IsLetter))
-                throw new InvalidPasswordException("Password must be at least 8 characters long, containing at least one letter and one digit.");
-
-            Console.WriteLine("Enter Full Address:");
+            string password = DalTest.PasswordUtils.ReadAndEncryptPassword();
+            
+            Console.Write("Enter Full Address: ");
             string address = Console.ReadLine();
             if (string.IsNullOrWhiteSpace(address))
                 throw new InvalidAddressException("Address cannot be empty.");
 
-            Console.WriteLine("Enter Latitude:");
+            Console.Write("Enter Latitude: ");
             if (!double.TryParse(Console.ReadLine(), out double latitude))
                 throw new InvalidCoordinateException("Invalid latitude. Please enter a numeric latitude.");
 
-            Console.WriteLine("Enter Longitude:");
+            Console.Write("Enter Longitude: ");
             if (!double.TryParse(Console.ReadLine(), out double longitude))
                 throw new InvalidCoordinateException("Invalid longitude. Please enter a numeric longitude.");
 
-            Console.WriteLine("Enter 0 for Manager and 1 for Volunteer:");
+            Console.Write("Enter 0 for Manager and 1 for Volunteer: ");
             string input = Console.ReadLine();
             if (!int.TryParse(input, out int roleInput) || roleInput < 0 || roleInput > 1)
                 throw new InvalidRoleException("Role must be either '0' for Volunteer or '1' for Manager.");
 
-            Console.WriteLine("Is Active? (Yes/No):");
+            Console.Write("Is Active? (Yes/No): ");
             bool isActive = Console.ReadLine().ToLower() == "yes";
 
-            Console.WriteLine("Enter Maximum Distance to Accept a Call:");
+            Console.Write("Enter Maximum Distance to Accept a Call: ");
             if (!int.TryParse(Console.ReadLine(), out int maxDistance) || maxDistance <= 0)
                 throw new InvalidDistanceException("Maximum distance must be a positive integer.");
 
-            Console.WriteLine("Enter Distance Type (0: plane, 1: foot, 2: Car, 3: Bike, 4: Public Transport):");
+            Console.Write("Enter Distance Type (0: plane, 1: foot, 2: Car, 3: Bike, 4: Public Transport): ");
             string distanceType = Console.ReadLine();
             if (!int.TryParse(distanceType, out int distanceTypeValue) || distanceTypeValue < 0 || distanceTypeValue > 4)
                 throw new InvalidDistanceException("Distance type must be a number between 0 and 4.");
@@ -753,7 +750,7 @@ static readonly IDal s_dal = Factory.Get;
                 Name = fullName,
                 Phone = phone,
                 Email = email,
-                Password = password,
+                Password = password, 
                 Address = address,
                 Latitude = latitude,
                 Longitude = longitude,
@@ -763,6 +760,7 @@ static readonly IDal s_dal = Factory.Get;
                 DistanceType = (DistanceType)distanceTypeValue
             };
         }
+
 
         // Create new assignment
         public static Assignment CreatenewAssignment()
