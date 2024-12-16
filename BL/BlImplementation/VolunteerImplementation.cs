@@ -69,7 +69,6 @@ internal class VolunteerImplementation : IVolunteer
     /// </exception>
     public BO.Volunteer GetVolunteerDetails(int volunteerId)
     {
-
         // Retrieve all volunteers from the DAL
         var volunteersFromDal = _dal.Volunteer.ReadAll();
 
@@ -92,11 +91,11 @@ internal class VolunteerImplementation : IVolunteer
             IsActive = volunteerData.IsActive,
             Role = (BO.Role)volunteerData.Role,
             DistanceType = (BO.DistanceType)volunteerData.DistanceType,
-            Password = volunteerData.Password,
             Address = volunteerData.Address,
             Latitude = volunteerData.Latitude,
             Longitude = volunteerData.Longitude,
-            MaxDistance = volunteerData.MaxDistance
+            MaxDistance = volunteerData.MaxDistance,
+            Password = IsEncrypted(volunteerData.Password) ? volunteerData.Password : AesEncryptionHelper.Encrypt(volunteerData.Password)
         };
 
         // Map the current call in progress if applicable
@@ -394,6 +393,18 @@ internal class VolunteerImplementation : IVolunteer
         {
             // Catch and rethrow exceptions to the presentation layer
             throw new LogicException("Failed to add volunteer.", ex);
+        }
+    }
+    private static bool IsEncrypted(string password)
+    {
+        try
+        {
+            Convert.FromBase64String(password);
+            return true;
+        }
+        catch
+        {
+            return false;
         }
     }
 

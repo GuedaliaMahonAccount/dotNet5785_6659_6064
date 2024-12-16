@@ -88,14 +88,25 @@ namespace Helpers
         }
         public static bool ValidPassword(string password)
         {
+            string decryptedPassword;
+            try
+            {
+                decryptedPassword = AesEncryptionHelper.Decrypt(password);
+            }
+            catch
+            {
+                decryptedPassword = password;
+            }
+
             // Password requirements:
             // - Minimum 8 characters
             // - At least one uppercase letter
             // - At least one lowercase letter
             // - At least one number
-            return Regex.IsMatch(password,
+            return Regex.IsMatch(decryptedPassword,
                 @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$");
         }
+
         public static bool ValidIsActive(bool isActive)
         {
             // Just ensures it's a boolean
