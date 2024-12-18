@@ -40,7 +40,7 @@ internal static class ClockManager //stage 4
             // Add calls to any logic method that should be called periodically, after each clock update.
             // For example: Periodic student updates:
             CallManager.UpdateExpiredCalls(); // This could throw an exception too, and it will be thrown up to the caller.
-
+            VolunteerManager.PeriodicVolunteersUpdates();
             // Calling all the observers of the clock update.
             ClockUpdatedObservers?.Invoke(); // This is also susceptible to throwing exceptions.
         }

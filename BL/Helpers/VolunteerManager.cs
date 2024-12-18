@@ -3,10 +3,8 @@ using System.Text.RegularExpressions;
 using System.Net.Mail;
 using System.Net;
 using System.Text.Json;
-using BO;
 using System.Security.Cryptography;
 using System.Text;
-using System.IO;
 
 namespace Helpers
 {
@@ -203,6 +201,45 @@ namespace Helpers
                 return true;
 
             return false;
+        }
+
+
+
+        public static void PeriodicVolunteersUpdates()
+        {
+            try
+            {
+                // Define the threshold in years for inactivity
+                int inactivityThresholdYears = 2;
+
+                // Get the current date
+                DateTime currentDate = DateTime.Now;
+
+                // Retrieve all volunteers from the database
+                var allVolunteers = s_dal.Volunteer.ReadAll();
+
+                // Iterate through the volunteers
+                foreach (var volunteer in allVolunteers)
+                {
+                    // If the volunteer is inactive
+                    if (!volunteer.IsActive)
+                    {
+                        // Check if they have been inactive for more than the threshold
+                        if (volunteer.CurrentCall == null ||
+                            volunteer.CurrentCall.LastUpdated.AddYears(inactivityThresholdYears) <= currentDate)
+                        {
+                            // Remove the inactive volunteer
+                            s_dal.Volunteer.Delete(volunteer.Id);
+                            Console.WriteLine($"Volunteer {volunteer.Id} ({volunteer.Name}) has been removed due to prolonged inactivity.");
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error during periodic volunteer updates: {ex.Message}");
+                throw;
+            }
         }
 
     }
