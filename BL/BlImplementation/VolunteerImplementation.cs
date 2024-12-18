@@ -349,7 +349,7 @@ internal class VolunteerImplementation : IVolunteer
         if (!VolunteerManager.ValidName(volunteer.Name))
             throw new BlInvalidValueException("Invalid name.");
 
-          if (!VolunteerManager.ValidPassword(volunteer.Password))
+        if (!VolunteerManager.ValidPassword(volunteer.Password))
             throw new BlInvalidValueException("Invalid Password.");
 
         if (!VolunteerManager.ValidPhone(volunteer.Phone))
@@ -407,6 +407,18 @@ internal class VolunteerImplementation : IVolunteer
             return false;
         }
     }
+
+    // ...
+    #region Stage 5
+    public void AddObserver(Action listObserver) =>
+    VolunteerManager.Observers.AddListObserver(listObserver); //stage 5
+    public void AddObserver(int id, Action observer) =>
+    VolunteerManager.Observers.AddObserver(id, observer); //stage 5
+    public void RemoveObserver(Action listObserver) =>
+    VolunteerManager.Observers.RemoveListObserver(listObserver); //stage 5
+    public void RemoveObserver(int id, Action observer) =>
+     VolunteerManager.Observers.RemoveObserver(id, observer); //stage 5
+    #endregion Stage 5
 
 }
 
