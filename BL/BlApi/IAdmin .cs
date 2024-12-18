@@ -1,7 +1,7 @@
 ﻿
 namespace BlApi
 {
-    public interface IAdmin
+    public interface IAdmin: IObservable
     {
         DateTime GetCurrentTime();
         void UpdateClock(BO.TimeUnit timeUnit);

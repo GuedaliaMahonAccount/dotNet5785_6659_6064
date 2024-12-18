@@ -4,7 +4,7 @@
 namespace BlApi
 {
 
-    public interface IVolunteer
+    public interface IVolunteer : IObservable
     {
         string Login(string username, string password);
         IEnumerable<VolunteerInList> GetVolunteersList(bool? isActive = null, VolunteerInListSortFields? sortByField = null);

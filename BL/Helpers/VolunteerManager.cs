@@ -12,6 +12,7 @@ namespace Helpers
 {
     internal static class VolunteerManager
     {
+        internal static ObserverManager Observers = new();
         private static IDal s_dal = Factory.Get;
 
         /// <summary>

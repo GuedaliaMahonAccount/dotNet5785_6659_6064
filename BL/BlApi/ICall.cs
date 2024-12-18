@@ -1,7 +1,7 @@
 ﻿
 namespace BlApi
 {
-    public interface ICall
+    public interface ICall : IObservable
     {
         int[] GetCallQuantities();
         IEnumerable<BO.CallInList> GetCallList(BO.CallType? callType = null, BO.CallSortField? sortByField = null);

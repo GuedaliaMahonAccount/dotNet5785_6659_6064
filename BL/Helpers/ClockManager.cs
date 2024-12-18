@@ -6,6 +6,7 @@ namespace Helpers;
 /// </summary>
 internal static class ClockManager //stage 4
 {
+
     #region Stage 4
     private static readonly DalApi.IDal _dal = DalApi.Factory.Get; //stage 4
 
