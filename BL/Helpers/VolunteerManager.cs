@@ -204,7 +204,6 @@ namespace Helpers
         }
 
 
-
         public static void PeriodicVolunteersUpdates()
         {
             try
@@ -215,18 +214,23 @@ namespace Helpers
                 // Get the current date
                 DateTime currentDate = DateTime.Now;
 
-                // Retrieve all volunteers from the database
-                var allVolunteers = s_dal.Volunteer.ReadAll();
+                // Retrieve all volunteers from the database (DO layer)
+                var allVolunteersDO = s_dal.Volunteer.ReadAll();
 
-                // Iterate through the volunteers
-                foreach (var volunteer in allVolunteers)
+                // Convert DO volunteers to BO volunteers, including fetching CurrentCall data
+                var allVolunteersBO = allVolunteersDO
+                    .Select(volunteerDO => ConvertToBO(volunteerDO))
+                    .ToList();
+
+                // Iterate through the BO volunteers
+                foreach (var volunteer in allVolunteersBO)
                 {
                     // If the volunteer is inactive
                     if (!volunteer.IsActive)
                     {
                         // Check if they have been inactive for more than the threshold
                         if (volunteer.CurrentCall == null ||
-                            volunteer.CurrentCall.LastUpdated.AddYears(inactivityThresholdYears) <= currentDate)
+                            volunteer.CurrentCall.AssignmentStartTime.AddYears(inactivityThresholdYears) <= currentDate)
                         {
                             // Remove the inactive volunteer
                             s_dal.Volunteer.Delete(volunteer.Id);
@@ -242,7 +246,51 @@ namespace Helpers
             }
         }
 
+        /// <summary>
+        /// Converts a DO.Volunteer to BO.Volunteer, including fetching the CurrentCall.
+        /// </summary>
+        /// <param name="volunteerDO">The DO.Volunteer object.</param>
+        /// <returns>The converted BO.Volunteer object.</returns>
+        private static BO.Volunteer ConvertToBO(DO.Volunteer volunteerDO)
+        {
+            // Fetch the current call for the volunteer, if it exists
+            var currentCallDO = s_dal.CallInProgress.ReadByVolunteerId(volunteerDO.Id);
+
+            // Convert to BO.Volunteer, mapping fields appropriately
+            return new BO.Volunteer
+            {
+                Id = volunteerDO.Id,
+                Name = volunteerDO.Name,
+                Phone = volunteerDO.Phone,
+                Email = volunteerDO.Email,
+                IsActive = volunteerDO.IsActive,
+                Role = (BO.Role)volunteerDO.Role, // Assuming Role enums map directly
+                DistanceType = (BO.DistanceType)volunteerDO.DistanceType, // Assuming DistanceType enums map directly
+                Password = volunteerDO.Password,
+                Address = volunteerDO.Address,
+                Latitude = volunteerDO.Latitude,
+                Longitude = volunteerDO.Longitude,
+                MaxDistance = volunteerDO.MaxDistance,
+                CurrentCall = currentCallDO != null
+                    ? new BO.CallInProgress
+                    {
+                        Id = currentCallDO.Id,
+                        CallId = currentCallDO.CallId,
+                        CallType = (BO.CallType)currentCallDO.CallType, // Map CallType enums
+                        GeneralDescription = currentCallDO.GeneralDescription,
+                        Address = currentCallDO.Address,
+                        StartTime = currentCallDO.StartTime,
+                        EstimatedCompletionTime = currentCallDO.EstimatedCompletionTime,
+                        AssignmentStartTime = currentCallDO.AssignmentStartTime,
+                        Distance = currentCallDO.Distance,
+                        Status = (BO.CallType)currentCallDO.Status // Map Status enums
+                    }
+                    : null
+            };
+        }
+
     }
+
 
     public static class AesEncryptionHelper
     {
