@@ -15,55 +15,71 @@ namespace BlImplementation
             switch (timeUnit)
             {
                 case TimeUnit.MINUTE:
-                    newClock = ClockManager.Now.AddMinutes(1);
+                    newClock = AdminManager.Now.AddMinutes(1);
                     break;
                 case TimeUnit.HOUR:
-                    newClock = ClockManager.Now.AddHours(1);
+                    newClock = AdminManager.Now.AddHours(1);
                     break;
                 case TimeUnit.DAY:
-                    newClock = ClockManager.Now.AddDays(1);
+                    newClock = AdminManager.Now.AddDays(1);
                     break;
                 case TimeUnit.MONTH:
-                    newClock = ClockManager.Now.AddMonths(1);
+                    newClock = AdminManager.Now.AddMonths(1);
                     break;
                 case TimeUnit.YEAR:
-                    newClock = ClockManager.Now.AddYears(1);
+                    newClock = AdminManager.Now.AddYears(1);
                     break;
                 default:
                     // No try-catch, throw the exception directly
                     throw new BlInvalidValueException($"Invalid TimeUnit provided: {timeUnit}");
             }
 
-            ClockManager.UpdateClock(newClock);
+            AdminManager.UpdateClock(newClock);
         }
 
         public DateTime GetCurrentTime()
         {
             // No try-catch, throw the exception directly
-            return ClockManager.Now;
+            return AdminManager.Now;
         }
 
         public TimeSpan GetRiskTime()
         {
             // No try-catch, throw the exception directly
-            return _dal.Config.RiskRange;
+            return AdminManager.MaxRange;
         }
 
         public void InitializeDatabase()
         {
             ResetDatabase();
             DalTest.Initialization.Do();
-            ClockManager.UpdateClock(ClockManager.Now);
+            AdminManager.UpdateClock(AdminManager.Now);
+            AdminManager.MaxRange = AdminManager.MaxRange;
         }
 
         public void ResetDatabase()
         {
             _dal.ResetDB();
+            AdminManager.MaxRange = AdminManager.MaxRange;
         }
 
         public void SetRiskTime(TimeSpan riskTimeSpan)
         {
-            _dal.Config.RiskRange = riskTimeSpan;
+            AdminManager.MaxRange = riskTimeSpan;
         }
+
+
+        ///<summary>
+        /// observer
+        /// </summary>
+        public void AddClockObserver(Action clockObserver) =>
+                    AdminManager.ClockUpdatedObservers += clockObserver;
+        public void RemoveClockObserver(Action clockObserver) =>
+                    AdminManager.ClockUpdatedObservers -= clockObserver;
+        public void AddConfigObserver(Action configObserver) =>
+                    AdminManager.ConfigUpdatedObservers += configObserver;
+        public void RemoveConfigObserver(Action configObserver) =>
+                    AdminManager.ConfigUpdatedObservers -= configObserver;
+
     }
 }
