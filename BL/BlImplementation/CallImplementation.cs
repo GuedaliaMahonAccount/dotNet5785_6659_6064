@@ -47,7 +47,7 @@ namespace BlImplementation
             _dal.Call.Create(callDO);
 
             // Notify relevant volunteers
-            CallManager.NotifyRelevantVolunteers(newCall);
+            CallManager.Observers.NotifyListUpdated();
         }
 
         /// <summary>
@@ -135,6 +135,7 @@ namespace BlImplementation
                 throw new BlDeletionImpossibleException("Cannot delete a call that has been assigned to a volunteer.");
 
             _dal.Call.Delete(callId);
+            CallManager.Observers.NotifyListUpdated();
         }
 
         /// <summary>
@@ -492,6 +493,8 @@ namespace BlImplementation
 
             // Update the call using the DAL
             _dal.Call.Update(callDO);
+            CallManager.Observers.NotifyItemUpdated(callDO.Id);
+            CallManager.Observers.NotifyListUpdated();
 
         }
 
