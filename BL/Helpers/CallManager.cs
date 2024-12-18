@@ -1,7 +1,6 @@
 ﻿using DalApi;
 using System.Net;
 using System.Text.Json;
-using System.Net;
 using System.Net.Mail;
 using BO;
 
@@ -252,6 +251,7 @@ namespace Helpers
 
                     // Update the call in the DAL
                     s_dal.Call.Update(updatedDOCall);
+                    Observers.NotifyListUpdated();
                 }
             }
         }

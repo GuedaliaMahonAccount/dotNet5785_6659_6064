@@ -5,6 +5,7 @@ using System.Net;
 using System.Text.Json;
 using System.Security.Cryptography;
 using System.Text;
+using BO;
 
 namespace Helpers
 {
@@ -208,85 +209,77 @@ namespace Helpers
         {
             try
             {
-                // Define the threshold in years for inactivity
-                int inactivityThresholdYears = 2;
+                var volunteersFromDal = s_dal.Volunteer.ReadAll();
+                var assignmentsFromDal = s_dal.Assignment.ReadAll();
 
-                // Get the current date
-                DateTime currentDate = DateTime.Now;
-
-                // Retrieve all volunteers from the database (DO layer)
-                var allVolunteersDO = s_dal.Volunteer.ReadAll();
-
-                // Convert DO volunteers to BO volunteers, including fetching CurrentCall data
-                var allVolunteersBO = allVolunteersDO
-                    .Select(volunteerDO => ConvertToBO(volunteerDO))
-                    .ToList();
-
-                // Iterate through the BO volunteers
-                foreach (var volunteer in allVolunteersBO)
+                var volunteersInBO = volunteersFromDal.Select(v => new BO.VolunteerInList
                 {
-                    // If the volunteer is inactive
-                    if (!volunteer.IsActive)
+                    Id = v.Id,
+                    Name = v.Name,
+                    IsActive = v.IsActive,
+                    CompletedAssignmentsCount = assignmentsFromDal.Count(call => call.VolunteerId == v.Id),
+                    CancelledCallsCount = assignmentsFromDal.Count(call => call.VolunteerId == v.Id),
+                    ExpiredCallsCount = assignmentsFromDal.Count(call => call.VolunteerId == v.Id),
+                    CurrentCallId = assignmentsFromDal.Where(call => call.VolunteerId == v.Id).Select(call => call.CallId).FirstOrDefault(),
+                    CurrentCallType = assignmentsFromDal.Where(call => call.VolunteerId == v.Id).Select(call =>
                     {
-                        // Check if they have been inactive for more than the threshold
-                        if (volunteer.CurrentCall == null ||
-                            volunteer.CurrentCall.AssignmentStartTime.AddYears(inactivityThresholdYears) <= currentDate)
+                        switch ((BO.EndType)call.EndType)
                         {
-                            // Remove the inactive volunteer
-                            s_dal.Volunteer.Delete(volunteer.Id);
-                            Console.WriteLine($"Volunteer {volunteer.Id} ({volunteer.Name}) has been removed due to prolonged inactivity.");
+                            case BO.EndType.Completed:
+                                return BO.CallType.Completed;
+                            case BO.EndType.SelfCanceled:
+                                return BO.CallType.SelfCanceled;
+                            case BO.EndType.Expired:
+                                return BO.CallType.Expired;
+                            case BO.EndType.AdminCanceled:
+                                return BO.CallType.AdminCanceled;
+                            default:
+                                throw new InvalidOperationException("Unknown EndType");
                         }
+                    }).FirstOrDefault()
+                }).ToList();
+
+                var volunteersWithNullCallType = volunteersInBO.Where(v => v.CurrentCallType == null).ToList();
+
+                foreach (var volunteer in volunteersWithNullCallType)
+                {
+                    try
+                    {
+                        var volunteerAssignments = assignmentsFromDal
+                            .Where(a => a.VolunteerId == volunteer.Id)
+                            .OrderByDescending(a => a.StartTime)
+                            .ToList();
+
+                        if (volunteerAssignments.Any())
+                        {
+                            var latestAssignment = volunteerAssignments.First();
+
+                            if (latestAssignment.StartTime < DateTime.Now.AddYears(-5))
+                            {
+                                s_dal.Volunteer.Delete(volunteer.Id);
+
+                                // Remove the observer
+                                VolunteerManager.Observers.NotifyItemUpdated(volunteer.Id);
+                            }
+                        }
+                        else
+                        {
+                            s_dal.Volunteer.Delete(volunteer.Id);
+
+                            // Remove the observer
+                            VolunteerManager.Observers.NotifyItemUpdated(volunteer.Id);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new BlDoesNotExistException($"Error processing volunteer with ID {volunteer.Id}.", ex);
                     }
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error during periodic volunteer updates: {ex.Message}");
-                throw;
+                throw new Exception("An error occurred while removing volunteers with no active call for 5 years.", ex);
             }
-        }
-
-        /// <summary>
-        /// Converts a DO.Volunteer to BO.Volunteer, including fetching the CurrentCall.
-        /// </summary>
-        /// <param name="volunteerDO">The DO.Volunteer object.</param>
-        /// <returns>The converted BO.Volunteer object.</returns>
-        private static BO.Volunteer ConvertToBO(DO.Volunteer volunteerDO)
-        {
-            // Fetch the current call for the volunteer, if it exists
-            var currentCallDO = s_dal.CallInProgress.ReadByVolunteerId(volunteerDO.Id);
-
-            // Convert to BO.Volunteer, mapping fields appropriately
-            return new BO.Volunteer
-            {
-                Id = volunteerDO.Id,
-                Name = volunteerDO.Name,
-                Phone = volunteerDO.Phone,
-                Email = volunteerDO.Email,
-                IsActive = volunteerDO.IsActive,
-                Role = (BO.Role)volunteerDO.Role, // Assuming Role enums map directly
-                DistanceType = (BO.DistanceType)volunteerDO.DistanceType, // Assuming DistanceType enums map directly
-                Password = volunteerDO.Password,
-                Address = volunteerDO.Address,
-                Latitude = volunteerDO.Latitude,
-                Longitude = volunteerDO.Longitude,
-                MaxDistance = volunteerDO.MaxDistance,
-                CurrentCall = currentCallDO != null
-                    ? new BO.CallInProgress
-                    {
-                        Id = currentCallDO.Id,
-                        CallId = currentCallDO.CallId,
-                        CallType = (BO.CallType)currentCallDO.CallType, // Map CallType enums
-                        GeneralDescription = currentCallDO.GeneralDescription,
-                        Address = currentCallDO.Address,
-                        StartTime = currentCallDO.StartTime,
-                        EstimatedCompletionTime = currentCallDO.EstimatedCompletionTime,
-                        AssignmentStartTime = currentCallDO.AssignmentStartTime,
-                        Distance = currentCallDO.Distance,
-                        Status = (BO.CallType)currentCallDO.Status // Map Status enums
-                    }
-                    : null
-            };
         }
 
     }
