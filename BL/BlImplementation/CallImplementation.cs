@@ -1,6 +1,7 @@
 ﻿using BO;
 using DO;
 using Helpers;
+using System;
 
 namespace BlImplementation
 {
@@ -376,7 +377,7 @@ namespace BlImplementation
                                 volunteer.Latitude ?? 0,
                                 volunteer.Longitude ?? 0,
                                 (BO.DistanceType)volunteer.DistanceType)
-        })
+                })
                 .ToList();
 
             // Apply optional call type filtering
@@ -493,6 +494,19 @@ namespace BlImplementation
             _dal.Call.Update(callDO);
 
         }
+
+
+        ///<sumary>
+        ///observable
+        /// </sumary>
+        public void AddObserver(Action listObserver) =>
+                CallManager.Observers.AddListObserver(listObserver);
+        public void AddObserver(int id, Action observer) =>
+                CallManager.Observers.AddObserver(id, observer);
+        public void RemoveObserver(Action listObserver) =>
+                CallManager.Observers.AddListObserver(listObserver);
+        public void RemoveObserver(int id, Action observer) =>
+                CallManager.Observers.AddObserver(id, observer);
 
     }
 }
