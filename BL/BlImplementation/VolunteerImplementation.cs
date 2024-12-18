@@ -4,6 +4,8 @@ using Helpers;
 using System.Collections.Generic;
 using System.Linq;
 using BO;
+using DalApi;
+using DO;
 
 internal class VolunteerImplementation : IVolunteer
 {
@@ -290,7 +292,8 @@ internal class VolunteerImplementation : IVolunteer
 
         // Update the volunteer in the database
         _dal.Volunteer.Update(updatedVolunteerDO);
-
+        VolunteerManager.Observers.NotifyItemUpdated(updatedVolunteerDO.Id); 
+        VolunteerManager.Observers.NotifyListUpdated(); 
     }
 
     /// <summary>
@@ -322,8 +325,8 @@ internal class VolunteerImplementation : IVolunteer
         }
 
         // Attempt to delete the volunteer
-        _dal.Volunteer.Delete(volunteerId);
-
+        _dal.Volunteer.Delete(volunteerId); 
+        VolunteerManager.Observers.NotifyListUpdated(); 
     }
 
     /// <summary>
@@ -388,6 +391,7 @@ internal class VolunteerImplementation : IVolunteer
         {
             // Attempt to add the volunteer to the database
             _dal.Volunteer.Create(newVolunteer);
+            VolunteerManager.Observers.NotifyListUpdated();                                                   
         }
         catch (Exception ex)
         {
@@ -419,6 +423,11 @@ internal class VolunteerImplementation : IVolunteer
     public void RemoveObserver(int id, Action observer) =>
      VolunteerManager.Observers.RemoveObserver(id, observer); //stage 5
     #endregion Stage 5
+
+
+
+  
+
 
 }
 
