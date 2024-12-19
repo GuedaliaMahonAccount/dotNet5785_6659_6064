@@ -31,5 +31,31 @@ namespace PL
             InitializeComponent();
            
         }
+        private void btnAddOneMinute_Click(object sender, RoutedEventArgs e)
+        {
+            s_bl.Admin.UpdateClock(BO.TimeUnit.MINUTE);
+        }
+
+
+        private void btnAddOneHour_Click(object sender, RoutedEventArgs e)
+        {
+            s_bl.Admin.UpdateClock(BO.TimeUnit.HOUR);
+        }
+
+        private void btnAddOneDay_Click(object sender, RoutedEventArgs e)
+        {
+            s_bl.Admin.UpdateClock(BO.TimeUnit.DAY);
+        }
+
+        private void btnAddOneMonth_Click(object sender, RoutedEventArgs e)
+        {
+            s_bl.Admin.UpdateClock(BO.TimeUnit.MONTH);
+        }
+
+        private void btnAddOneYear_Click(object sender, RoutedEventArgs e)
+        {
+            s_bl.Admin.UpdateClock(BO.TimeUnit.YEAR);
+        }
+
     }
 }

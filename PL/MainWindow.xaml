@@ -26,11 +26,11 @@
 
         <Label Grid.Column="1" Content="{Binding CurrentTime}" FontWeight="Bold" FontSize="20" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />
 
-        <Button Grid.Column="1" Grid.Row="1" Content="Add One Minute" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />
-        <Button Grid.Column="1" Grid.Row="2" Content="Add One Hour" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />
-        <Button Grid.Column="1" Grid.Row="3" Content="Add One Day" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />
-        <Button Grid.Column="1" Grid.Row="4" Content="Add One Month" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />
-        <Button Grid.Column="1" Grid.Row="5" Content="Add One Year" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />
+        <Button Grid.Column="1" Grid.Row="1" Content="Add One Minute" Click="btnAddOneMinute_Click" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />
+        <Button Grid.Column="1" Grid.Row="2" Content="Add One Hour" Click="btnAddOneHour_Click" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />
+        <Button Grid.Column="1" Grid.Row="3" Content="Add One Day" Click="btnAddOneDay_Click" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />
+        <Button Grid.Column="1" Grid.Row="4" Content="Add One Month" Click="btnAddOneMonth_Click" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />
+        <Button Grid.Column="1" Grid.Row="5" Content="Add One Year" Click="btnAddOneYear_Click" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />
         <Button Content="Reset DB" HorizontalAlignment="Left" Margin="51,50,0,0" Grid.Row="6" VerticalAlignment="Top" Height="60" Width="160"/>
         <Button Content="Initi DB" HorizontalAlignment="Left" Margin="51,122,0,0" Grid.Row="6" VerticalAlignment="Top" Height="60" Width="160"/>
         <Button Grid.Column="1" Content="Handle Volunteer" HorizontalAlignment="Left" Margin="67,50,0,0" Grid.Row="6" VerticalAlignment="Top" Height="60" Width="160"/>
