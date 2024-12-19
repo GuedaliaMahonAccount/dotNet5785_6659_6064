@@ -5,7 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PL"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="450" Width="800"
+        DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}">
+
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="300*"/>
@@ -21,7 +23,9 @@
             <RowDefinition Height="1*" />
             <RowDefinition Height="6*" />
         </Grid.RowDefinitions>
-        <Label Grid.Column="1" Content="System clock" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />
+
+        <Label Grid.Column="1" Content="{Binding CurrentTime}" FontWeight="Bold" FontSize="20" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />
+
         <Button Grid.Column="1" Grid.Row="1" Content="Add One Minute" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />
         <Button Grid.Column="1" Grid.Row="2" Content="Add One Hour" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />
         <Button Grid.Column="1" Grid.Row="3" Content="Add One Day" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />
@@ -31,9 +35,9 @@
         <Button Content="Initi DB" HorizontalAlignment="Left" Margin="51,122,0,0" Grid.Row="6" VerticalAlignment="Top" Height="60" Width="160"/>
         <Button Grid.Column="1" Content="Handle Volunteer" HorizontalAlignment="Left" Margin="67,50,0,0" Grid.Row="6" VerticalAlignment="Top" Height="60" Width="160"/>
         <Button Grid.Column="1" Content="Handle Call" HorizontalAlignment="Left" Margin="67,122,0,0" Grid.Row="6" VerticalAlignment="Top" Height="60" Width="160"/>
+
         <TextBox HorizontalAlignment="Left" Grid.Row="2" TextWrapping="Wrap" Text="Max years without activity" VerticalAlignment="Center" Width="150" Height="36"/>
         <Button Content="update" HorizontalAlignment="Left" Margin="206,5,0,0" Grid.Row="2" VerticalAlignment="Top" Height="22" Width="84"/>
         <TextBox HorizontalAlignment="Left" Margin="150,7,0,0" Grid.Row="2" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="61" Height="20"/>
-
     </Grid>
 </Window>
