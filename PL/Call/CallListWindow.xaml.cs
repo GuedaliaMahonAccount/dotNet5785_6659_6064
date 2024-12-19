@@ -41,16 +41,24 @@ namespace PL.Call
         }
 
 
-        //private void QueryCourseList()
-        //{
-        //    CallList = (Type == BO.CallType.None) ?
-        //        s_bl?.Call.ReadAll()! : s_bl?.Call.ReadAll(item => item.InSemester == Type)!;
-        //}
 
-        //private void cbSemesterSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        //{
-        //    QueryCourseList();
-        //}
 
-            }
+        private void cbCallTypeSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            queryCallList();
+        }
+
+
+        private void queryCallList()
+    => CallList = (Type == BO.CallType.None) ?
+        s_bl?.Call.GetCallList()! : s_bl?.Call.GetCallList(Type, BO.CallSortField.CallType)!;
+
+        private void callListObserver()
+            => queryCallList();
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+            => s_bl.Call.AddObserver(callListObserver);
+        private void Window_Closed(object sender, EventArgs e)
+            => s_bl.Call.RemoveObserver(callListObserver);
+
+    }
 }
