@@ -71,7 +71,8 @@ public enum CallType
     SelfCanceled,      // The volunteer chose to cancel their assignment before the maximum allowed time.
     AdminCanceled,     // The administrator canceled the volunteer's assignment before the maximum allowed time.
     OpenAtRisk,        // The call is open and nearing its required completion time, within a risk time range defined by the administrator.
-    InTreatmentAtRisk  // The call is currently in treatment but nearing its required completion time, within a risk time range defined by the administrator.
+    InTreatmentAtRisk,  // The call is currently in treatment but nearing its required completion time, within a risk time range defined by the administrator.
+    None
 }
 public enum EndType
 {

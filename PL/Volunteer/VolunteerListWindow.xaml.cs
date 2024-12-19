@@ -32,10 +32,12 @@ namespace PL.Call
         public static readonly DependencyProperty VolunteerInListProperty =
             DependencyProperty.Register("VolunteerList", typeof(IEnumerable<BO.VolunteerInList>), typeof(VolunteerListWindow), new PropertyMetadata(null));
 
+        public BO.CallType Type { get; set; } = BO.CallType.None;
 
         public VolunteerListWindow()
         {
             InitializeComponent();
         }
+
     }
 }

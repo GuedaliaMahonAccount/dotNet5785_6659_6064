@@ -32,9 +32,24 @@ namespace PL.Call
         public static readonly DependencyProperty CallInListProperty =
             DependencyProperty.Register("CallList", typeof(IEnumerable<BO.CallInList>), typeof(CallListWindow), new PropertyMetadata(null));
 
+        public BO.CallType Type { get; set; } = BO.CallType.None;
+
+
         public CallListWindow()
         {
             InitializeComponent();
         }
+
+
+        //private void QueryCourseList()
+        //{
+        //    CallList = (Type == BO.CallType.None) ?
+        //        s_bl?.Call.ReadAll()! : s_bl?.Call.ReadAll(item => item.InSemester == Type)!;
+        //}
+
+        //private void cbSemesterSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        //{
+        //    QueryCourseList();
+        //}
     }
 }
