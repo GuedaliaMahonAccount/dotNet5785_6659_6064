@@ -56,14 +56,14 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
-                <!-- View Assignments Button -->
+                <!-- View Assignments Button
                 <DataGridTemplateColumn Width="Auto">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Button Content="View Assignments"  Margin="2"/>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
+                </DataGridTemplateColumn> -->
 
             </DataGrid.Columns>
         </DataGrid>
