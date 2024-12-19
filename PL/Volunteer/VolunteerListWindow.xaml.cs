@@ -19,6 +19,20 @@ namespace PL.Call
     /// </summary>
     public partial class VolunteerListWindow : Window
     {
+        static readonly BlApi.IBl s_bl = BlApi.Factory.Get();
+
+
+        //public IEnumerable<BO.VolunteerInList> VolunteerList;
+        public IEnumerable<BO.VolunteerInList> VolunteerList
+        {
+            get { return (IEnumerable<BO.VolunteerInList>)GetValue(VolunteerInListProperty); }
+            set { SetValue(VolunteerInListProperty, value); }
+        }
+        // Using DependencyProperty as the backing store for VolunteerList
+        public static readonly DependencyProperty VolunteerInListProperty =
+            DependencyProperty.Register("VolunteerList", typeof(IEnumerable<BO.VolunteerInList>), typeof(VolunteerListWindow), new PropertyMetadata(null));
+
+
         public VolunteerListWindow()
         {
             InitializeComponent();
