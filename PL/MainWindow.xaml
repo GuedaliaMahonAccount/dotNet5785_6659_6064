@@ -31,8 +31,8 @@
         <Button Grid.Column="1" Grid.Row="3" Content="Add One Day" Click="btnAddOneDay_Click" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />
         <Button Grid.Column="1" Grid.Row="4" Content="Add One Month" Click="btnAddOneMonth_Click" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />
         <Button Grid.Column="1" Grid.Row="5" Content="Add One Year" Click="btnAddOneYear_Click" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />
-        <Button Content="Reset DB" HorizontalAlignment="Left" Margin="51,50,0,0" Grid.Row="6" VerticalAlignment="Top" Height="60" Width="160" Click="btnResetDB_Click"/>
-        <Button Content="Initi DB" HorizontalAlignment="Left" Margin="51,122,0,0" Grid.Row="6" VerticalAlignment="Top" Height="60" Width="160" Click="btnInitiDB_Click"/>
+        <Button Content="Reset DB" HorizontalAlignment="Left" Margin="51,50,0,0" Grid.Row="6" VerticalAlignment="Top" Height="60" Width="160" />
+        <Button Content="Initi DB" HorizontalAlignment="Left" Margin="51,122,0,0" Grid.Row="6" VerticalAlignment="Top" Height="60" Width="160"/>
         <Button Grid.Column="1" Content="Handle Volunteer" HorizontalAlignment="Left" Margin="67,50,0,0" Grid.Row="6" VerticalAlignment="Top" Height="60" Width="160" Click="btnHandleVolunteer_Click"/>
         <Button Grid.Column="1" Content="Handle Call" HorizontalAlignment="Left" Margin="67,122,0,0" Grid.Row="6" VerticalAlignment="Top" Height="60" Width="160" Click="btnHandleCall_Click"/>
 

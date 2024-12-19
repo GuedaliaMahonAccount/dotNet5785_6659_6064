@@ -1,4 +1,6 @@
-﻿using System.Text;
+﻿using PL.Call;
+using PL.Volunteer;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -117,24 +119,24 @@ namespace PL
         {
 
         }
-        private void btnResetDB_Click(object sender, RoutedEventArgs e)
-        {
-            new ResetDBWindow().Show();
-        }
+        //private void btnResetDB_Click(object sender, RoutedEventArgs e)
+        //{
+        //    new ResetDBWindow().Show();
+        //}
 
-        private void btnInitiDB_Click(object sender, RoutedEventArgs e)
-        {
-            new InitiDBWindow().Show();
-        }
+        //private void btnInitiDB_Click(object sender, RoutedEventArgs e)
+        //{
+        //    new InitiDBWindow().Show();
+        //}
 
         private void btnHandleVolunteer_Click(object sender, RoutedEventArgs e)
         {
-            new VolunteerManagementWindow().Show();
+            new VolunteerWindow().Show();
         }
 
         private void btnHandleCall_Click(object sender, RoutedEventArgs e)
         {
-            new CallManagementWindow().Show();
+            new CallWindow().Show();
         }
     }
 }
