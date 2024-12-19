@@ -112,5 +112,10 @@ namespace PL
 
             s_bl.Admin.SetRiskTime(riskTimeSpan);
         }
+
+        private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+
+        }
     }
 }
