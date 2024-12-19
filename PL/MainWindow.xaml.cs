@@ -117,5 +117,24 @@ namespace PL
         {
 
         }
+        private void btnResetDB_Click(object sender, RoutedEventArgs e)
+        {
+            new ResetDBWindow().Show();
+        }
+
+        private void btnInitiDB_Click(object sender, RoutedEventArgs e)
+        {
+            new InitiDBWindow().Show();
+        }
+
+        private void btnHandleVolunteer_Click(object sender, RoutedEventArgs e)
+        {
+            new VolunteerManagementWindow().Show();
+        }
+
+        private void btnHandleCall_Click(object sender, RoutedEventArgs e)
+        {
+            new CallManagementWindow().Show();
+        }
     }
 }
