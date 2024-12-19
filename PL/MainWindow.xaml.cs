@@ -1,4 +1,6 @@
-﻿using System.Text;
+﻿using PL.Call;
+using PL.Volunteer;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -111,6 +113,21 @@ namespace PL
             TimeSpan riskTimeSpan = TimeSpan.FromDays(maxYearRange * 365);
 
             s_bl.Admin.SetRiskTime(riskTimeSpan);
+        }
+
+        private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+
+        }
+       
+        private void btnHandleVolunteer_Click(object sender, RoutedEventArgs e)
+        {
+            new VolunteerWindow().Show();
+        }
+
+        private void btnHandleCall_Click(object sender, RoutedEventArgs e)
+        {
+            new CallWindow().Show();
         }
     }
 }
