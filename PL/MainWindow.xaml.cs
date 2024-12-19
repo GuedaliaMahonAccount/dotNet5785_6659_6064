@@ -129,5 +129,60 @@ namespace PL
         {
             new CallListWindow().Show();
         }
+
+
+        private void btnResetDB_Click(object sender, RoutedEventArgs e)
+        {
+            var result = MessageBox.Show("Are you sure you want to reset the database?", "Reset Database", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+            if (result != MessageBoxResult.Yes) return;
+            try
+            {
+                Mouse.OverrideCursor = Cursors.Wait;
+                foreach (Window window in Application.Current.Windows)
+                {
+                    if (window != this)
+                        window.Close();
+                }
+
+                s_bl.Admin.ResetDatabase();
+                MessageBox.Show("Database reset successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Failed to reset the database: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
+                Mouse.OverrideCursor = null;
+            }
+        }
+
+        private void btnInitializeDB_Click(object sender, RoutedEventArgs e)
+        {
+            var result = MessageBox.Show("Are you sure you want to initialize the database?", "Initialize Database", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+            if (result != MessageBoxResult.Yes) return;
+            try
+            {
+                Mouse.OverrideCursor = Cursors.Wait;
+
+                foreach (Window window in Application.Current.Windows)
+                {
+                    if (window != this)
+                        window.Close();
+                }
+                s_bl.Admin.InitializeDatabase();
+
+                MessageBox.Show("Database initialized successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Failed to initialize the database: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
+                Mouse.OverrideCursor = null;
+            }
+        }
+
     }
 }
