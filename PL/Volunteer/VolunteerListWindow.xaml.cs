@@ -42,7 +42,7 @@ namespace PL.Call
 
 
 
-        private void cbVolunteerTypeSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void CbVolunteerTypeSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             queryVolunteerList();
         }
@@ -50,7 +50,7 @@ namespace PL.Call
 
         private void queryVolunteerList()
         => VolunteerList = (Type == BO.CallType.None) ?
-        s_bl?.Volunteer.GetVolunteersList()! : s_bl?.Volunteer.GetVolunteersList(null, BO.VolunteerInListSortFields.CallType)!;
+        s_bl?.Volunteer.GetVolunteersList()! : s_bl?.Volunteer.GetVolunteersList(Type, BO.VolunteerInListSortFields.CallType)!;
 
         private void volunteerListObserver()
             => queryVolunteerList();

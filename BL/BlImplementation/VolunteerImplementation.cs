@@ -122,12 +122,12 @@ internal class VolunteerImplementation : IVolunteer
     }
 
     /// <summary>
-    /// Retrieves a list of volunteers with optional filtering by activity status and sorting by specified fields.
+    /// Retrieves a list of volunteers filtered by call type and optionally sorted by specified fields.
     /// </summary>
-    /// <param name="isActive">Optional filter to include only active or inactive volunteers. If null, all volunteers are included.</param>
+    /// <param name="callType">Filter to include only volunteers with the specified current call type.</param>
     /// <param name="sortByField">
     /// Optional sorting field for the results. Defaults to sorting by volunteer ID if not specified.
-    /// Supported fields include ID, Name, Phone, IsActive, Role, Latitude, and Longitude.
+    /// Supported fields include ID, Name, IsActive, CompletedAssignmentsCount, CancelledCallsCount, ExpiredCallsCount, and CurrentCallType.
     /// </param>
     /// <returns>
     /// A collection of <see cref="BO.VolunteerInList"/> objects representing the filtered and sorted list of volunteers.
@@ -137,66 +137,23 @@ internal class VolunteerImplementation : IVolunteer
     /// - An invalid sorting field is provided.
     /// - Other unexpected errors occur during the retrieval or processing of the volunteer list.
     /// </exception>
-    /// 
-    public IEnumerable<BO.VolunteerInList> GetVolunteersList(bool? isActive = null, BO.VolunteerInListSortFields? sortByField = null)
+    public IEnumerable<BO.VolunteerInList> GetVolunteersList(BO.CallType? callType = null, BO.VolunteerInListSortFields? sortByField = null)
     {
         // Retrieve all volunteers from the DAL
         var volunteersFromDal = _dal.Volunteer.ReadAll();
 
-        // Filter by activity status if specified
-        if (isActive.HasValue)
-        {
-            volunteersFromDal = volunteersFromDal.Where(v => v.IsActive == isActive.Value);
-        }
+        // Retrieve assignments to compute related counts
+        var assignments = _dal.Assignment.ReadAll();
 
-        // Apply sorting based on the specified field
-        if (sortByField.HasValue)
-        {
-            switch (sortByField.Value)
-            {
-                case BO.VolunteerInListSortFields.Id:
-                    volunteersFromDal = volunteersFromDal.OrderBy(v => v.Id);
-                    break;
-                case BO.VolunteerInListSortFields.Name:
-                    volunteersFromDal = volunteersFromDal.OrderBy(v => v.Name);
-                    break;
-                case BO.VolunteerInListSortFields.Phone:
-                    volunteersFromDal = volunteersFromDal.OrderBy(v => v.Phone);
-                    break;
-                case BO.VolunteerInListSortFields.IsActive:
-                    volunteersFromDal = volunteersFromDal.OrderBy(v => v.IsActive);
-                    break;
-                case BO.VolunteerInListSortFields.Role:
-                    volunteersFromDal = volunteersFromDal.OrderBy(v => v.Role);
-                    break;
-                case BO.VolunteerInListSortFields.Latitude:
-                    volunteersFromDal = volunteersFromDal.OrderBy(v => v.Latitude);
-                    break;
-                case BO.VolunteerInListSortFields.Longitude:
-                    volunteersFromDal = volunteersFromDal.OrderBy(v => v.Longitude);
-                    break;
-                default:
-                    throw new LogicException("Invalid sort field provided.");
-            }
-        }
-        else
-        {
-            // Default sorting by ID
-            volunteersFromDal = volunteersFromDal.OrderBy(v => v.Id);
-        }
-
-        // Convert the sorted list to a list of BO.VolunteerInList
-        IEnumerable<DO.Volunteer> volunteers = volunteersFromDal.ToList(); // Convert to List to preserve sorting
-        IEnumerable<DO.Assignment> assignments = _dal.Assignment.ReadAll();
-
-        return volunteers.Select(v => new BO.VolunteerInList
+        // Map volunteers to BO.VolunteerInList objects
+        var volunteerList = volunteersFromDal.Select(v => new BO.VolunteerInList
         {
             Id = v.Id,
             Name = v.Name,
             IsActive = v.IsActive,
-            CompletedAssignmentsCount = assignments.Count(call => call.VolunteerId == v.Id),
-            CancelledCallsCount = assignments.Count(call => call.VolunteerId == v.Id),
-            ExpiredCallsCount = assignments.Count(call => call.VolunteerId == v.Id),
+            CompletedAssignmentsCount = assignments.Count(call => call.VolunteerId == v.Id &&(BO.EndType)call.EndType == BO.EndType.Completed),
+            CancelledCallsCount = assignments.Count(call => call.VolunteerId == v.Id &&(BO.EndType)call.EndType == BO.EndType.SelfCanceled),
+            ExpiredCallsCount = assignments.Count(call => call.VolunteerId == v.Id &(BO.EndType)call.EndType == BO.EndType.Expired),
             CurrentCallId = assignments.Where(call => call.VolunteerId == v.Id).Select(call => call.CallId).FirstOrDefault(),
             CurrentCallType = assignments.Where(call => call.VolunteerId == v.Id).Select(call =>
             {
@@ -211,10 +168,48 @@ internal class VolunteerImplementation : IVolunteer
                     case BO.EndType.AdminCanceled:
                         return BO.CallType.AdminCanceled;
                     default:
-                        throw new InvalidOperationException("Unknown EndType");
+                        return BO.CallType.None;
                 }
             }).FirstOrDefault()
-        });
+        }).Where(v => callType == null || callType == BO.CallType.None || v.CurrentCallType == callType);
+
+        // Apply sorting based on the specified field
+        if (sortByField.HasValue)
+        {
+            switch (sortByField.Value)
+            {
+                case BO.VolunteerInListSortFields.Id:
+                    volunteerList = volunteerList.OrderBy(v => v.Id);
+                    break;
+                case BO.VolunteerInListSortFields.Name:
+                    volunteerList = volunteerList.OrderBy(v => v.Name);
+                    break;
+                case BO.VolunteerInListSortFields.IsActive:
+                    volunteerList = volunteerList.OrderBy(v => v.IsActive);
+                    break;
+                case BO.VolunteerInListSortFields.CallType:
+                    volunteerList = volunteerList.OrderBy(v => v.CurrentCallType).ThenBy(v => v.Id);
+                    break;
+                case BO.VolunteerInListSortFields.CompletedAssignmentsCount:
+                    volunteerList = volunteerList.OrderBy(v => v.CompletedAssignmentsCount);
+                    break;
+                case BO.VolunteerInListSortFields.CancelledCallsCount:
+                    volunteerList = volunteerList.OrderBy(v => v.CancelledCallsCount);
+                    break;
+                case BO.VolunteerInListSortFields.ExpiredCallsCount:
+                    volunteerList = volunteerList.OrderBy(v => v.ExpiredCallsCount);
+                    break;
+                default:
+                    throw new LogicException("Invalid sort field provided.");
+            }
+        }
+        else
+        {
+            // Default sorting by ID
+            volunteerList = volunteerList.OrderBy(v => v.Id);
+        }
+
+        return volunteerList.ToList();
     }
 
     /// <summary>
@@ -291,8 +286,8 @@ internal class VolunteerImplementation : IVolunteer
 
         // Update the volunteer in the database
         _dal.Volunteer.Update(updatedVolunteerDO);
-        VolunteerManager.Observers.NotifyItemUpdated(updatedVolunteerDO.Id); 
-        VolunteerManager.Observers.NotifyListUpdated(); 
+        VolunteerManager.Observers.NotifyItemUpdated(updatedVolunteerDO.Id);
+        VolunteerManager.Observers.NotifyListUpdated();
     }
 
     /// <summary>
@@ -324,8 +319,8 @@ internal class VolunteerImplementation : IVolunteer
         }
 
         // Attempt to delete the volunteer
-        _dal.Volunteer.Delete(volunteerId); 
-        VolunteerManager.Observers.NotifyListUpdated(); 
+        _dal.Volunteer.Delete(volunteerId);
+        VolunteerManager.Observers.NotifyListUpdated();
     }
 
     /// <summary>
@@ -390,7 +385,7 @@ internal class VolunteerImplementation : IVolunteer
         {
             // Attempt to add the volunteer to the database
             _dal.Volunteer.Create(newVolunteer);
-            VolunteerManager.Observers.NotifyListUpdated();                                                   
+            VolunteerManager.Observers.NotifyListUpdated();
         }
         catch (Exception ex)
         {

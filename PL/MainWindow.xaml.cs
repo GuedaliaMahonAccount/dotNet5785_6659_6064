@@ -120,12 +120,12 @@ namespace PL
 
         }
        
-        private void btnHandleVolunteer_Click(object sender, RoutedEventArgs e)
+        private void BtnHandleVolunteer_Click(object sender, RoutedEventArgs e)
         {
             new VolunteerListWindow().Show();
         }
 
-        private void btnHandleCall_Click(object sender, RoutedEventArgs e)
+        private void BtnHandleCall_Click(object sender, RoutedEventArgs e)
         {
             new CallListWindow().Show();
         }

@@ -99,6 +99,9 @@ public enum VolunteerInListSortFields
     Latitude,
     Longitude,
     CallType,
+    CompletedAssignmentsCount,
+    CancelledCallsCount,
+    ExpiredCallsCount
 }
 public enum CallFilterField
 {

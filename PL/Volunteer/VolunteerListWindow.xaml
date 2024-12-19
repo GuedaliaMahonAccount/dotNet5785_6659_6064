@@ -22,7 +22,7 @@
             <Label Content="Label" Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
             <ComboBox ItemsSource="{Binding Source={StaticResource CallTypeCollectionKey}}"
                       SelectedValue="{Binding Type, Mode=TwoWay}"
-                      SelectionChanged="cbVolunteerTypeSelector_SelectionChanged"
+                      SelectionChanged="CbVolunteerTypeSelector_SelectionChanged"
                       Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
         </Grid>
 
@@ -34,14 +34,7 @@
             <DataGrid.Columns>
                 <DataGridTextColumn Binding="{Binding Id}" Header="Id" Width="Auto"/>
                 <DataGridTextColumn Binding="{Binding Name}" Header="Name" Width="Auto"/>
-
-                <DataGridTemplateColumn Header="Call Type" Width="Auto">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding CallType,Mode=TwoWay}" FontSize="16" Background="{Binding Path=CallType, Converter={StaticResource ConvertCallTypeToColorKey}}" />
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
+                <DataGridTextColumn Binding="{Binding CurrentCallType}" Header="CurrentCallType" Width="Auto"/>
 
                 <DataGridTemplateColumn Header="Is Active" Width="Auto">
                     <DataGridTemplateColumn.CellTemplate>

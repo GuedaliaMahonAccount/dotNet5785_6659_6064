@@ -43,7 +43,7 @@ namespace PL.Call
 
 
 
-        private void cbCallTypeSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void CbCallTypeSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             queryCallList();
         }
