@@ -38,6 +38,7 @@
 
         <TextBox HorizontalAlignment="Left" Grid.Row="2" TextWrapping="Wrap" Text="Max years without activity" VerticalAlignment="Center" Width="150" Height="36"/>
         <Button Content="update" HorizontalAlignment="Left" Margin="206,5,0,0" Grid.Row="2" VerticalAlignment="Top" Height="22" Width="84"/>
-        <TextBox HorizontalAlignment="Left" Margin="150,7,0,0" Grid.Row="2" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="61" Height="20"/>
+        <TextBox HorizontalAlignment="Left" Margin="150,7,0,0" Grid.Row="2" TextWrapping="Wrap" 
+                 Text="{Binding MaxYearRange, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top" Width="61" Height="20"/>
     </Grid>
 </Window>

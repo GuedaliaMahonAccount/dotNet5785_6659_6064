@@ -14,10 +14,11 @@ namespace PL
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    
+
     public partial class MainWindow : Window
     {
         static readonly BlApi.IBl s_bl = BlApi.Factory.Get();
+
         public DateTime CurrentTime
         {
             get { return (DateTime)GetValue(CurrentTimeProperty); }
@@ -26,16 +27,36 @@ namespace PL
         public static readonly DependencyProperty CurrentTimeProperty =
             DependencyProperty.Register("CurrentTime", typeof(DateTime), typeof(MainWindow));
 
+        public int MaxYearRange
+        {
+            get { return (int)GetValue(MaxYearRangeProperty); }
+            set { SetValue(MaxYearRangeProperty, value); }
+        }
+
+        public static readonly DependencyProperty MaxYearRangeProperty =
+            DependencyProperty.Register("MaxYearRange", typeof(int), typeof(MainWindow), new PropertyMetadata(0));
+
         public MainWindow()
         {
             InitializeComponent();
-           
         }
+
+        private void clockObserver()
+        {
+            CurrentTime = s_bl.Admin.GetCurrentTime();
+        }
+
+        private void configObserver()
+        {
+            TimeSpan riskTime = s_bl.Admin.GetRiskTime();
+            int years = (int)(riskTime.TotalDays / 365);
+            MaxYearRange = years;
+        }
+
         private void btnAddOneMinute_Click(object sender, RoutedEventArgs e)
         {
             s_bl.Admin.UpdateClock(BO.TimeUnit.MINUTE);
         }
-
 
         private void btnAddOneHour_Click(object sender, RoutedEventArgs e)
         {
@@ -57,5 +78,25 @@ namespace PL
             s_bl.Admin.UpdateClock(BO.TimeUnit.YEAR);
         }
 
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            CurrentTime = s_bl.Admin.GetCurrentTime();
+
+            TimeSpan riskTime = s_bl.Admin.GetRiskTime();
+            MaxYearRange = (int)(riskTime.TotalDays / 365);
+
+            s_bl.Admin.AddClockObserver(clockObserver);
+
+            s_bl.Admin.AddConfigObserver(configObserver);
+        }
+
+        private void btnUpdateMaxYearRange_Click(object sender, RoutedEventArgs e)
+        {
+            int maxYearRange = MaxYearRange;
+
+            TimeSpan riskTimeSpan = TimeSpan.FromDays(maxYearRange * 365);
+
+            s_bl.Admin.SetRiskTime(riskTimeSpan);
+        }
     }
 }
