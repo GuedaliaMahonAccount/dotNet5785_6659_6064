@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BO;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -38,6 +39,26 @@ namespace PL.Call
         {
             InitializeComponent();
         }
+
+
+
+        private void cbVolunteerTypeSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            queryVolunteerList();
+        }
+
+
+        private void queryVolunteerList()
+        => VolunteerList = (Type == BO.CallType.None) ?
+        s_bl?.Volunteer.GetVolunteersList()! : s_bl?.Volunteer.GetVolunteersList(null, BO.VolunteerInListSortFields.CallType)!;
+
+        private void volunteerListObserver()
+            => queryVolunteerList();
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+            => s_bl.Volunteer.AddObserver(volunteerListObserver);
+        private void Window_Closed(object sender, EventArgs e)
+            => s_bl.Volunteer.RemoveObserver(volunteerListObserver);
+
 
     }
 }
