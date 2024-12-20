@@ -1,16 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace PL.Volunteer
 {
@@ -30,64 +22,69 @@ namespace PL.Volunteer
         public static readonly DependencyProperty ButtonTextProperty =
             DependencyProperty.Register(nameof(ButtonText), typeof(string), typeof(VolunteerWindow));
 
-        // Dependency property for CurrentStudent
-        public BO.Student CurrentStudent
+        // Dependency property for CurrentVolunteer
+        public BO.Volunteer CurrentVolunteer
         {
-            get => (BO.Student)GetValue(CurrentStudentProperty);
-            set => SetValue(CurrentStudentProperty, value);
+            get => (BO.Volunteer)GetValue(CurrentVolunteerProperty);
+            set => SetValue(CurrentVolunteerProperty, value);
         }
-        public static readonly DependencyProperty CurrentStudentProperty =
-            DependencyProperty.Register(nameof(CurrentStudent), typeof(BO.Student), typeof(VolunteerWindow));
+        public static readonly DependencyProperty CurrentVolunteerProperty =
+            DependencyProperty.Register(nameof(CurrentVolunteer), typeof(BO.Volunteer), typeof(VolunteerWindow));
 
-        // Collections for ComboBoxes
-        public IEnumerable<string> RolesCollection { get; init; }
-        public IEnumerable<string> DistanceTypesCollection { get; init; }
-        public IEnumerable<BO.Call> CallsCollection { get; init; }
-
+      
         public VolunteerWindow(int id = 0)
         {
             ButtonText = id == 0 ? "Add" : "Update";
 
-            // Initialize collections for ComboBoxes
-            RolesCollection = s_bl.Student.GetRoles();
-            DistanceTypesCollection = s_bl.Student.GetDistanceTypes();
-            CallsCollection = s_bl.Call.GetAllCalls();
-
-            // Initialize CurrentStudent based on whether an id is provided
-            CurrentStudent = id == 0
-                ? new BO.Student() // New Student
-                : s_bl.Student.GetStudentDetails(id); // Fetch existing Student from BL
+            // Initialize CurrentVolunteer based on whether an id is provided
+            CurrentVolunteer = id == 0
+                ? new BO.Volunteer() // New Volunteer
+                : s_bl.Volunteer.GetVolunteerDetails(id); // Fetch existing Volunteer from BL
 
             InitializeComponent();
             DataContext = this;
         }
 
+        // Event handler for Add/Update button
         private void btnAddUpdate_Click(object sender, RoutedEventArgs e)
         {
             try
             {
                 // Get password from PasswordBox
-                var passwordBox = this.FindName("passwordBox") as PasswordBox;
+                var passwordBox = this.FindName("PasswordBox") as PasswordBox;
                 if (passwordBox != null)
                 {
-                    CurrentStudent.Password = passwordBox.Password;
+                    CurrentVolunteer.Password = passwordBox.Password;
+                }
+
+                // Validate required fields
+                if (string.IsNullOrWhiteSpace(CurrentVolunteer.Name) ||
+                    string.IsNullOrWhiteSpace(CurrentVolunteer.Phone) ||
+                    string.IsNullOrWhiteSpace(CurrentVolunteer.Email))
+                {
+                    MessageBox.Show("Please fill in all required fields.", "Validation Error",
+                        MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
                 }
 
                 if (ButtonText == "Add")
                 {
-                    s_bl.Student.AddStudent(CurrentStudent); // Add new Student
-                    MessageBox.Show("Volunteer added successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                    s_bl.Volunteer.AddVolunteer(CurrentVolunteer); // Add new Volunteer
+                    MessageBox.Show("Volunteer added successfully!", "Success",
+                        MessageBoxButton.OK, MessageBoxImage.Information);
                 }
                 else
                 {
-                    s_bl.Student.UpdateStudent(CurrentStudent); // Update existing Student
-                    MessageBox.Show("Volunteer updated successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                    s_bl.Volunteer.UpdateVolunteer(CurrentVolunteer.Id, CurrentVolunteer); // Update existing Volunteer
+                    MessageBox.Show("Volunteer updated successfully!", "Success",
+                        MessageBoxButton.OK, MessageBoxImage.Information);
                 }
                 Close();
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Error: {ex.Message}", "Error",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
     }
