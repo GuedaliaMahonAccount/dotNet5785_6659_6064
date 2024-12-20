@@ -5,8 +5,76 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PL.Call"
         mc:Ignorable="d"
-        Title="CallWindow" Height="450" Width="800">
+        Title="CallWindow" Height="450" Width="350"
+        DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}">
     <Grid>
-        
+        <Grid HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,20,0,0" Height="400">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <Label Grid.Row="0" Grid.Column="0" Content="Id:" HorizontalAlignment="Left" Margin="3" VerticalAlignment="Center"/>
+            <TextBox Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left" Height="NaN" Margin="3" 
+                     Text="{Binding Path=CurrentCall.Id, Mode=TwoWay, NotifyOnValidationError=true, ValidatesOnExceptions=true}"
+                     IsEnabled="False" VerticalAlignment="Center" Width="200"/>
+
+            <Label Grid.Row="1" Grid.Column="0" Content="CallType:" HorizontalAlignment="Left" Margin="3" VerticalAlignment="Center"/>
+            <ComboBox Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" Height="NaN" Margin="3"
+                      ItemsSource="{Binding Source={StaticResource CallTypeCollectionKey}}"
+                      SelectedValue="{Binding CurrentCall.CallType, Mode=TwoWay, NotifyOnValidationError=true, ValidatesOnExceptions=true}"
+                      VerticalAlignment="Center" Width="200"/>
+
+            <Label Grid.Row="2" Grid.Column="0" Content="Address:" HorizontalAlignment="Left" Margin="3" VerticalAlignment="Center"/>
+            <TextBox Grid.Row="2" Grid.Column="1" HorizontalAlignment="Left" Height="NaN" Margin="3"
+                     Text="{Binding CurrentCall.Address, Mode=TwoWay, NotifyOnValidationError=true, ValidatesOnExceptions=true}"
+                     VerticalAlignment="Center" Width="200"/>
+
+            <Label Grid.Row="3" Grid.Column="0" Content="Latitude:" HorizontalAlignment="Left" Margin="3" VerticalAlignment="Center"/>
+            <TextBox Grid.Row="3" Grid.Column="1" HorizontalAlignment="Left" Height="NaN" Margin="3"
+                     Text="{Binding CurrentCall.Latitude, Mode=TwoWay, NotifyOnValidationError=true, ValidatesOnExceptions=true}"
+                     VerticalAlignment="Center" Width="200"/>
+
+            <Label Grid.Row="4" Grid.Column="0" Content="Longitude:" HorizontalAlignment="Left" Margin="3" VerticalAlignment="Center"/>
+            <TextBox Grid.Row="4" Grid.Column="1" HorizontalAlignment="Left" Height="NaN" Margin="3"
+                     Text="{Binding CurrentCall.Longitude, Mode=TwoWay, NotifyOnValidationError=true, ValidatesOnExceptions=true}"
+                     VerticalAlignment="Center" Width="200"/>
+
+            <Label Grid.Row="5" Grid.Column="0" Content="Start Time:" HorizontalAlignment="Left" Margin="3" VerticalAlignment="Center"/>
+            <TextBox Grid.Row="5" Grid.Column="1" HorizontalAlignment="Left" Height="NaN" Margin="3"
+                     Text="{Binding CurrentCall.StartTime, Mode=TwoWay, NotifyOnValidationError=true, ValidatesOnExceptions=true}"
+                     VerticalAlignment="Center" Width="200"/>
+
+            <Label Grid.Row="6" Grid.Column="0" Content="Description:" HorizontalAlignment="Left" Margin="3" VerticalAlignment="Center"/>
+            <TextBox Grid.Row="6" Grid.Column="1" HorizontalAlignment="Left" Height="NaN" Margin="3"
+                     Text="{Binding CurrentCall.Description, Mode=TwoWay, NotifyOnValidationError=true, ValidatesOnExceptions=true}"
+                     VerticalAlignment="Center" Width="200"/>
+
+            <Label Grid.Row="7" Grid.Column="0" Content="Deadline:" HorizontalAlignment="Left" Margin="3" VerticalAlignment="Center"/>
+            <TextBox Grid.Row="7" Grid.Column="1" HorizontalAlignment="Left" Height="NaN" Margin="3"
+                     Text="{Binding CurrentCall.DeadLine, Mode=TwoWay, NotifyOnValidationError=true, ValidatesOnExceptions=true}"
+                     VerticalAlignment="Center" Width="200"/>
+
+            <Label Grid.Row="8" Grid.Column="0" Content="Assignments:" HorizontalAlignment="Left" Margin="3" VerticalAlignment="Center"/>
+            <ListBox Grid.Row="8" Grid.Column="1" HorizontalAlignment="Left" Height="100" Margin="3"
+                     ItemsSource="{Binding CurrentCall.Assignments}" DisplayMemberPath="AssignmentName"
+                     VerticalAlignment="Center" Width="200"/>
+
+            <Button Grid.Row="9" Grid.Column="0" Content="{Binding ButtonText}" HorizontalAlignment="Center" Margin="3,0,0,0"
+                    VerticalAlignment="Top" Padding="5" Click="BtnAddUpdate_Click"/>
+
+        </Grid>
     </Grid>
 </Window>
