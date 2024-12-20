@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 
 namespace PL.Volunteer
 {
@@ -14,7 +15,7 @@ namespace PL.Volunteer
         static readonly BlApi.IBl s_bl = BlApi.Factory.Get();
 
         // Dependency property for button text
-        string ButtonText
+        public string ButtonText
         {
             get => (string)GetValue(ButtonTextProperty);
             init => SetValue(ButtonTextProperty, value);
@@ -88,4 +89,35 @@ namespace PL.Volunteer
             }
         }
     }
+
+    // Converter for IsReadOnly based on Update state
+    public class UpdateToReadOnlyConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            return value == null || (int)value == 0 ? true : false; 
+        }
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            return value;
+        }
+    }
+
+
+    // Converter for Visibility based on Update state
+    public class UpdateToVisibilityConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            return value == null || (int)value == 0 ? Visibility.Visible : Visibility.Collapsed; // Show for Add, Hide for Update
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            return value;
+        }
+    }
+
+    
 }
+
