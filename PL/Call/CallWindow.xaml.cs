@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -41,6 +42,21 @@ namespace PL.Call
             DependencyProperty.Register(nameof(CurrentCall), typeof(BO.Call), typeof(CallWindow));
 
 
+        // IValueConverter to convert ButtonText to true for Update mode
+        public class ConvertUpdateToTrueKey : IValueConverter
+        {
+            public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+            {
+                // Return true for "Update" mode, making the field read-only
+                return value is string buttonText && buttonText == "Update";
+            }
+
+            public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+            {
+                throw new NotImplementedException("ConvertBack is not implemented for ConvertUpdateToTrue.");
+            }
+        }
+
 
         public CallWindow(int id = 0)
         {
@@ -54,6 +70,9 @@ namespace PL.Call
 
             InitializeComponent();
         }
+
+
+
         // Event handler for Add/Update button
         private void BtnAddUpdate_Click(object sender, RoutedEventArgs e)
         {
