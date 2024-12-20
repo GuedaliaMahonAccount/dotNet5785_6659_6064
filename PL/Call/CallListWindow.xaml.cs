@@ -34,20 +34,15 @@ namespace PL.Call
 
         public BO.CallType Type { get; set; } = BO.CallType.None;
 
-
         public CallListWindow()
         {
             InitializeComponent();
         }
 
-
-
-
         private void CbCallTypeSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             queryCallList();
         }
-
 
         private void queryCallList()
     => CallList = (Type == BO.CallType.None) ?
@@ -59,6 +54,10 @@ namespace PL.Call
             => s_bl.Call.AddObserver(callListObserver);
         private void Window_Closed(object sender, EventArgs e)
             => s_bl.Call.RemoveObserver(callListObserver);
+
+
+        public BO.CallInList? SelectedCourse { get; set; }
+
 
     }
 }

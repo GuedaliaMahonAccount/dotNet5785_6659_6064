@@ -46,46 +46,28 @@ namespace PL.Volunteer
             DataContext = this;
         }
 
+
         // Event handler for Add/Update button
         private void btnAddUpdate_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                // Get password from PasswordBox
-                var passwordBox = this.FindName("PasswordBox") as PasswordBox;
-                if (passwordBox != null)
-                {
-                    CurrentVolunteer.Password = passwordBox.Password;
-                }
-
-                // Validate required fields
-                if (string.IsNullOrWhiteSpace(CurrentVolunteer.Name) ||
-                    string.IsNullOrWhiteSpace(CurrentVolunteer.Phone) ||
-                    string.IsNullOrWhiteSpace(CurrentVolunteer.Email))
-                {
-                    MessageBox.Show("Please fill in all required fields.", "Validation Error",
-                        MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return;
-                }
-
                 if (ButtonText == "Add")
                 {
-                    s_bl.Volunteer.AddVolunteer(CurrentVolunteer); // Add new Volunteer
-                    MessageBox.Show("Volunteer added successfully!", "Success",
-                        MessageBoxButton.OK, MessageBoxImage.Information);
+                    s_bl.Volunteer.AddVolunteer(CurrentVolunteer); // Add new Call
+                    MessageBox.Show("Call added successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
                 else
                 {
-                    s_bl.Volunteer.UpdateVolunteer(CurrentVolunteer.Id, CurrentVolunteer); // Update existing Volunteer
-                    MessageBox.Show("Volunteer updated successfully!", "Success",
-                        MessageBoxButton.OK, MessageBoxImage.Information);
+                    s_bl.Volunteer.UpdateVolunteer(CurrentVolunteer.Id, CurrentVolunteer); // Update existing Call
+                    MessageBox.Show("Call updated successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
+
                 Close();
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error: {ex.Message}", "Error",
-                    MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
     }

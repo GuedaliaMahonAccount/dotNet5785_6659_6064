@@ -30,7 +30,7 @@
            IsReadOnly="True" AutoGenerateColumns="False"
            EnableRowVirtualization="True"
            RowDetailsVisibilityMode="VisibleWhenSelected"
-            SelectedItem="{Binding _selectedCall}">
+            SelectedItem="{Binding SelectedCall}">
             <DataGrid.Columns>
                 <!-- Id Column -->
                 <DataGridTextColumn Binding="{Binding CallId}" Header="Id" Width="Auto"/>
