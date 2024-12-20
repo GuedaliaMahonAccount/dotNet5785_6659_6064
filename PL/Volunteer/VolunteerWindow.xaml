@@ -51,9 +51,8 @@
                 <ComboBox Grid.Row="4" Grid.Column="1" HorizontalAlignment="Left" Margin="3"
           ItemsSource="{Binding AvailableRoles}" 
           SelectedValue="{Binding CurrentVolunteer.Role}"
-          IsEnabled="{Binding CurrentVolunteer.Id, Converter={StaticResource UpdateToReadOnlyConverter}}"
+          IsReadOnly="True" 
           VerticalAlignment="Center" Width="120"/>
-
 
 
                 <Label Grid.Row="5" Grid.Column="0" Content="Distance Type:" HorizontalAlignment="Left" Margin="3" VerticalAlignment="Center"/>
