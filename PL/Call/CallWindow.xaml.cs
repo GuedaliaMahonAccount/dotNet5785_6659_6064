@@ -42,22 +42,6 @@ namespace PL.Call
             DependencyProperty.Register(nameof(CurrentCall), typeof(BO.Call), typeof(CallWindow));
 
 
-        // IValueConverter to convert ButtonText to true for Update mode
-        public class ConvertUpdateToTrueKey : IValueConverter
-        {
-            public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-            {
-                // Return true for "Update" mode, making the field read-only
-                return value is string buttonText && buttonText == "Update";
-            }
-
-            public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-            {
-                throw new NotImplementedException("ConvertBack is not implemented for ConvertUpdateToTrue.");
-            }
-        }
-
-
         public CallWindow(int id = 0)
         {
             ButtonText = id == 0 ? "Add" : "Update";
@@ -70,7 +54,6 @@ namespace PL.Call
 
             InitializeComponent();
         }
-
 
 
         // Event handler for Add/Update button
@@ -96,5 +79,41 @@ namespace PL.Call
                 MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+
     }
+
+    public class UpdateToReadOnlyConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value == null || !int.TryParse(value.ToString(), out int intValue) || intValue == 0)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return value;
+        }
+    }
+
+    public class UpdateToVisibilityConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value == null || !int.TryParse(value.ToString(), out int intValue) || intValue == 0)
+            {
+                return Visibility.Visible;
+            }
+            return Visibility.Collapsed;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return value;
+        }
+    }
+
 }

@@ -43,7 +43,6 @@ namespace PL.Volunteer
                 : s_bl.Volunteer.GetVolunteerDetails(id); // Fetch existing Volunteer from BL
 
             InitializeComponent();
-            DataContext = this;
         }
 
 
@@ -72,6 +71,7 @@ namespace PL.Volunteer
         }
     }
 
+
     // Converter for IsReadOnly based on Update state
     public class UpdateToReadOnlyConverter : IValueConverter
     {
@@ -84,7 +84,6 @@ namespace PL.Volunteer
             return value;
         }
     }
-
 
     // Converter for Visibility based on Update state
     public class UpdateToVisibilityConverter : IValueConverter

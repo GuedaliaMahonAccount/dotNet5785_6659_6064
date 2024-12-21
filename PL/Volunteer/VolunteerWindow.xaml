@@ -5,7 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PL.Volunteer"
         mc:Ignorable="d"
-        Title="VolunteerWindow" Height="550" Width="350">
+        Title="VolunteerWindow" Height="550" Width="350"
+        DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}">
 
     <Window.Resources>
         <local:UpdateToReadOnlyConverter x:Key="UpdateToReadOnlyConverter"/>

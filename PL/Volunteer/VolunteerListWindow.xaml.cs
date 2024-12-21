@@ -1,4 +1,5 @@
 ﻿using BO;
+using PL.Call;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +14,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
-namespace PL.Call
+namespace PL.Volunteer
 {
     /// <summary>
     /// Interaction logic for VolunteerListWindow.xaml
@@ -60,5 +61,17 @@ namespace PL.Call
             => s_bl.Volunteer.RemoveObserver(volunteerListObserver);
 
 
+        public BO.VolunteerInList? SelectedVolunteer { get; set; }
+
+        private void lsvVolunteerList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (SelectedVolunteer != null)
+                new VolunteerWindow(SelectedVolunteer.Id).Show();
+        }
+
+        private void AddvolunteerButton_Click(object sender, RoutedEventArgs e)
+        {
+            new VolunteerWindow().Show();
+        }
     }
 }

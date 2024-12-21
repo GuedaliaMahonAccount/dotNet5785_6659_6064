@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PL.Volunteer;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -56,8 +57,26 @@ namespace PL.Call
             => s_bl.Call.RemoveObserver(callListObserver);
 
 
-        public BO.CallInList? SelectedCourse { get; set; }
+        public BO.CallInList? SelectedCall { get; set; }
 
+        private void lsvCallList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (SelectedCall != null)
+            {
+                if (SelectedCall.CallId.HasValue)
+                {
+                    new CallWindow(SelectedCall.CallId.Value).Show(); 
+                }
+                else
+                {
+                    MessageBox.Show("Selected call does not have a valid ID.");
+                }
+            }
+        }
 
+        private void AddCallButton_Click(object sender, RoutedEventArgs e)
+        {
+            new CallWindow().Show();
+        }
     }
 }

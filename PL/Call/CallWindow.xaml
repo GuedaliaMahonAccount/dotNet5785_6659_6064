@@ -7,6 +7,10 @@
         mc:Ignorable="d"
         Title="CallWindow" Height="450" Width="350"
         DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}">
+    <Window.Resources>
+        <local:UpdateToReadOnlyConverter x:Key="UpdateToReadOnlyConverter"/>
+        <local:UpdateToVisibilityConverter x:Key="UpdateToVisibilityConverter"/>
+    </Window.Resources>
     <Grid>
         <Grid HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,20,0,0" Height="400">
             <Grid.ColumnDefinitions>
@@ -29,7 +33,7 @@
             <Label Grid.Row="0" Grid.Column="0" Content="Id:" HorizontalAlignment="Left" Margin="3" VerticalAlignment="Center"/>
             <TextBox Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left" Height="NaN" Margin="3" 
                      Text="{Binding Path=CurrentCall.Id, Mode=TwoWay, NotifyOnValidationError=true, ValidatesOnExceptions=true}"
-                     IsReadOnly="{Binding ButtonText, Converter={StaticResource ConvertUpdateToTrueKey}}"
+                     IsReadOnly="{Binding ButtonText, Converter={StaticResource UpdateToReadOnlyConverter}}"
                      VerticalAlignment="Center" Width="200"/>
 
 
