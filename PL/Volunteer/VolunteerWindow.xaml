@@ -49,17 +49,10 @@
                 <TextBox Grid.Row="3" Grid.Column="1" HorizontalAlignment="Left" Margin="3" Text="{Binding CurrentVolunteer.Email, Mode=TwoWay}" VerticalAlignment="Center" Width="120"/>
 
                 <Label Grid.Row="4" Grid.Column="0" Content="Role:" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="3"/>
-                <ComboBox Grid.Row="4" Grid.Column="1" HorizontalAlignment="Left" Margin="3"
-                          ItemsSource="{Binding AvailableRoles}" 
-                          SelectedValue="{Binding CurrentVolunteer.Role}"
-                          IsReadOnly="True" 
-                          VerticalAlignment="Center" Width="120"/>
+                <ComboBox Grid.Row="4" Grid.Column="1" HorizontalAlignment="Left" Margin="3" ItemsSource="{Binding Source={StaticResource RoleCollectionKey}}" SelectedValue="{Binding CurrentVolunteer.Role}" IsReadOnly="True" VerticalAlignment="Center" Width="120"/>
 
                 <Label Grid.Row="5" Grid.Column="0" Content="Distance Type:" HorizontalAlignment="Left" Margin="3" VerticalAlignment="Center"/>
-                <ComboBox Grid.Row="5" Grid.Column="1" HorizontalAlignment="Left" Margin="3" 
-                          ItemsSource="{Binding CurrentVolunteer.DistanceType}" 
-                          SelectedValue="{Binding CurrentVolunteer.DistanceType, Mode=TwoWay}" 
-                          VerticalAlignment="Center" Width="120"/>
+                <ComboBox Grid.Row="5" Grid.Column="1" HorizontalAlignment="Left" Margin="3" ItemsSource="{Binding Source={StaticResource DistanceTypeCollectionKey}}" SelectedValue="{Binding CurrentVolunteer.DistanceType, Mode=TwoWay}" VerticalAlignment="Center" Width="120"/>
 
                 <Label Grid.Row="6" Grid.Column="0" Content="Password:" HorizontalAlignment="Left" Margin="3" VerticalAlignment="Center"/>
                 <PasswordBox Grid.Row="6" Grid.Column="1" HorizontalAlignment="Left" Margin="3" VerticalAlignment="Center" Width="120"/>

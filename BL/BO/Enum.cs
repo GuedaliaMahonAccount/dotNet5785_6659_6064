@@ -39,8 +39,8 @@ public enum Role
 }
 public enum DistanceType
 {
-    Plane,               // Straight-line (as-the-crow-flies) distance, often used in aviation
     Foot,                // Walking distance, accounting for paths and walkways
+    Plane,               // Straight-line (as-the-crow-flies) distance, often used in aviation
     Car,                 // Driving distance, following road networks
     Bike,                // Biking distance, considering bike paths and roads
     PublicTransport,     // Distance and route based on available public transit options
