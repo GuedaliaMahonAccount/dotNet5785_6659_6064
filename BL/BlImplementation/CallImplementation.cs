@@ -26,11 +26,17 @@ namespace BlImplementation
             if (string.IsNullOrWhiteSpace(newCall.Address))
                 throw new BlInvalidAddressException("Address cannot be empty.");
 
-            if (newCall.Latitude == null || newCall.Longitude == null)
-                throw new BlInvalidCoordinateException("Latitude and Longitude cannot be null.");
+            if (!VolunteerManager.ValidAddress(newCall.Address)) // Validate address
+                throw new BlInvalidValueException("Invalid address.");
 
-            CallManager.ValidAddress(newCall.Address);
-            CallManager.AreCoordinatesMatching(newCall.Address, newCall.Latitude.Value, newCall.Longitude.Value);
+            // Ensure coordinates are not null and valid
+            if (!newCall.Latitude.HasValue || !newCall.Longitude.HasValue)
+                throw new BlNullPropertyException("Coordinates cannot be null.");
+
+            // Validate coordinates with partial address
+            var closestCoordinates = VolunteerManager.GetClosestCoordinates(newCall.Address, newCall.Latitude.Value, newCall.Longitude.Value);
+            if (closestCoordinates == null)
+                throw new BlInvalidValueException("Coordinates do not match the address.");
 
             var callDO = new DO.Call
             (
@@ -469,14 +475,18 @@ namespace BlImplementation
             if (call.StartTime >= call.DeadLine)
                 throw new BlInvalidValueException("The deadline must be later than the start time.");
 
-            if (call.Latitude == null || call.Longitude == null)
-                throw new BlInvalidValueException("Latitude and Longitude cannot be null.");
+            if (!VolunteerManager.ValidAddress(call.Address)) // Validate address
+                throw new BlInvalidValueException("Invalid address.");
 
-            if (!CallManager.AreCoordinatesMatching(call.Address, call.Latitude.Value, call.Longitude.Value))
-                throw new BlInvalidValueException("Invalid address coordinates (latitude or longitude).");
+            // Ensure coordinates are not null and valid
+            if (!call.Latitude.HasValue || !call.Longitude.HasValue)
+                throw new BlNullPropertyException("Coordinates cannot be null.");
 
-            if (!CallManager.ValidAddress(call.Address))
-                throw new BlInvalidAddressException("Invalid address format.");
+            // Validate coordinates with partial address
+            var closestCoordinates = VolunteerManager.GetClosestCoordinates(call.Address, call.Latitude.Value, call.Longitude.Value);
+            if (closestCoordinates == null)
+                throw new BlInvalidValueException("Coordinates do not match the address.");
+
 
             // Convert BO.Call to DO.Call
             var callDO = new DO.Call

@@ -257,9 +257,11 @@ internal class VolunteerImplementation : IVolunteer
         if (!updatedVolunteer.Latitude.HasValue || !updatedVolunteer.Longitude.HasValue)
             throw new BlNullPropertyException("Coordinates cannot be null.");
 
-        // Ensure coordinates match the address
-        if (!VolunteerManager.AreCoordinatesMatching(updatedVolunteer.Address, updatedVolunteer.Latitude.Value, updatedVolunteer.Longitude.Value))
+        // Validate coordinates with partial address
+        var closestCoordinates = VolunteerManager.GetClosestCoordinates(updatedVolunteer.Address, updatedVolunteer.Latitude.Value, updatedVolunteer.Longitude.Value);
+        if (closestCoordinates == null)
             throw new BlInvalidValueException("Coordinates do not match the address.");
+
 
         if (currentVolunteer == null)
             throw new BlDoesNotExistException("Volunteer with the given ID does not exist.");
@@ -355,15 +357,16 @@ internal class VolunteerImplementation : IVolunteer
         if (!VolunteerManager.ValidEmail(volunteer.Email))
             throw new BlInvalidValueException("Invalid email.");
 
-        if (!VolunteerManager.ValidAddress(volunteer.Address))
+        if (!VolunteerManager.ValidAddress(volunteer.Address)) // Validate address
             throw new BlInvalidValueException("Invalid address.");
 
         // Ensure coordinates are not null and valid
         if (!volunteer.Latitude.HasValue || !volunteer.Longitude.HasValue)
-            throw new BlInvalidValueException("Coordinates cannot be null.");
+            throw new BlNullPropertyException("Coordinates cannot be null.");
 
-        // Ensure coordinates match the address
-        if (!VolunteerManager.AreCoordinatesMatching(volunteer.Address, volunteer.Latitude.Value, volunteer.Longitude.Value))
+        // Validate coordinates with partial address
+        var closestCoordinates = VolunteerManager.GetClosestCoordinates(volunteer.Address, volunteer.Latitude.Value, volunteer.Longitude.Value);
+        if (closestCoordinates == null)
             throw new BlInvalidValueException("Coordinates do not match the address.");
 
         // Create a new DO.Volunteer object

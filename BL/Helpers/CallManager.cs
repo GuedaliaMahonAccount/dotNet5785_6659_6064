@@ -99,9 +99,9 @@ namespace Helpers
         /// "display_name": "Tiltan, Ramla, Ramla Subdistrict, District centre, 7135275, Israël"
         /// "lat": "31.9290114"
         /// "lon": "34.8737578"
+        /// 
+        /// 
         /// </summary>
-        /// <param name="address"></param>
-        /// <returns></returns>
         public static List<(double latitude, double longitude)> GetCoordinatesFromAddress(string address)
         {
             if (string.IsNullOrWhiteSpace(address))
@@ -150,25 +150,77 @@ namespace Helpers
             var coordinatesList = GetCoordinatesFromAddress(address);
             return coordinatesList != null && coordinatesList.Count > 0; // If at least one result is returned, the address is valid.
         }
-        public static bool AreCoordinatesMatching(string address, double latitude, double longitude)
+        //public static bool AreCoordinatesMatching(string address, double latitude, double longitude)
+        //{
+        //    var resolvedCoordinates = GetCoordinatesFromAddress(address);
+        //    if (resolvedCoordinates == null || resolvedCoordinates.Count == 0)
+        //        return false;
+
+        //    const double tolerance = 0.001; // Ajustez si nécessaire.
+
+        //    // Check if any of the returned coordinates match
+        //    foreach (var (resolvedLatitude, resolvedLongitude) in resolvedCoordinates)
+        //    {
+        //        if (Math.Abs(resolvedLatitude - latitude) <= tolerance &&
+        //            Math.Abs(resolvedLongitude - longitude) <= tolerance)
+        //        {
+        //            return true; // Found a match
+        //        }
+        //    }
+        //    return false; // No match found
+        //}
+
+        /// <summary>
+        /// new fonction to check coordinations
+        /// </summary>
+        public static (double latitude, double longitude)? GetClosestCoordinates(string address, double targetLatitude, double targetLongitude)
         {
-            var resolvedCoordinates = GetCoordinatesFromAddress(address);
-            if (resolvedCoordinates == null || resolvedCoordinates.Count == 0)
-                return false;
+            if (string.IsNullOrWhiteSpace(address))
+                return null;
 
-            const double tolerance = 0.001; // Ajustez si nécessaire.
+            string apiKey = "pk.24d7295db243a75d8b3c688089250321";
+            string url = $"https://api.locationiq.com/v1/search.php?key={apiKey}&q={WebUtility.UrlEncode(address)}&format=json";
 
-            // Check if any of the returned coordinates match
-            foreach (var (resolvedLatitude, resolvedLongitude) in resolvedCoordinates)
+            try
             {
-                if (Math.Abs(resolvedLatitude - latitude) <= tolerance &&
-                    Math.Abs(resolvedLongitude - longitude) <= tolerance)
+                var request = WebRequest.Create(url);
+                request.Method = "GET";
+                using (var response = request.GetResponse())
+                using (var stream = response.GetResponseStream())
+                using (var reader = new StreamReader(stream))
                 {
-                    return true; // Found a match
+                    var result = reader.ReadToEnd();
+
+                    // Parse JSON using System.Text.Json
+                    var json = JsonDocument.Parse(result);
+                    var root = json.RootElement;
+
+                    if (root.GetArrayLength() > 0)
+                    {
+                        const double tolerance = 0.01; // Ajustez la tolérance en degrés (environ 1 km)
+
+                        // Parcourir les résultats pour trouver la correspondance la plus proche
+                        foreach (var item in root.EnumerateArray())
+                        {
+                            double latitude = double.Parse(item.GetProperty("lat").GetString());
+                            double longitude = double.Parse(item.GetProperty("lon").GetString());
+
+                            // Vérifiez si les coordonnées sont proches des cibles
+                            if (Math.Abs(latitude - targetLatitude) <= tolerance &&
+                                Math.Abs(longitude - targetLongitude) <= tolerance)
+                            {
+                                return (latitude, longitude);
+                            }
+                        }
+                    }
+                    return null; // Aucun résultat proche
                 }
             }
-
-            return false; // No match found
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error fetching coordinates: {ex.Message}");
+                return null;
+            }
         }
 
         /// <summary>
