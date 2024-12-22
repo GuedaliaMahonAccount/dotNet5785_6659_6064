@@ -40,7 +40,7 @@
             string[] addresses = {
                 "גרנדר קניון, David Tuviyahu Ave 125, Be'er Sheva",
                 "דרך אליהו נאוי 28, Beersheba",
-                "מתחם תחנת הדלק אלון, 31, Arad",
+                "יוסף בוסל,  5, Rehovot",
                 "Mivtsa Nakhshon Street 60, Be'er Sheva",
                 "Yitzhack I. Rager Boulevard 24, Be'er Sheva",
                 "Tsvi Bornstein Street 312, Yeruham",
@@ -48,23 +48,23 @@
                 "Herzl Street 43, Be'er Sheva",
                 "Derekh Hebron 21, Beersheba",
                 "Derekh Hebron 4, Beersheba",
-                "Kornmehl Farm M.E. Ramat Negev D.N. Halutza",
+                "לוין אפשטיין,  5, Rehovot",
                 "רסקו סנטר, HaTikva 8, Beersheba",
-                "40, Tlalim",
-                "קניון פרץ סנטר, דימונה",
+                "40, Tlalim, raanana",
+                "הרצל,  88, Rehovot",
                 "פרץ סנטר - אזור תעשיה דרומי, Dimona"
             };
 
             double[] latitudes = {
-                31.2506405f, 31.2467805f, 31.2497676f, 31.2605014f, 31.2473633f,
+                31.2506405f, 31.2467805f, 31.8899976f, 31.2605014f, 31.2473633f,
                 30.988506f, 31.062823f, 31.2396368f, 31.2391961f, 31.2377661f,
-                30.972753f, 31.2474244f, 30.9935689f, 31.0599323f, 31.0599323f
+                31.896093f, 31.2474244f, 32.185419f, 31.886343f, 31.0599323f
             };
 
             double[] longitudes = {
-                34.7716625f, 34.8156994f, 35.1914546f, 34.7873239f, 34.7978134f,
+                34.7716625f, 34.8156994f, 34.791436f, 34.7873239f, 34.7978134f,
                 34.927951f, 35.0192015f, 34.7877478f, 34.7967932f, 34.7944248f,
-                34.7755085f, 34.79862f, 34.7643578f, 35.0203137f, 35.0203137f
+                34.8099685f, 34.79862f, 34.856708f, 34.814607f, 35.0203137f
             };
 
             List<string> phonePrefixes = new List<string> { "050", "053", "058", "052", "054" };
