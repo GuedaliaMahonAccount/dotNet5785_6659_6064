@@ -25,7 +25,7 @@
             string[] volunteerNames = {
                 "Dani Levy", "Eli Amar", "Yair Cohen", "Ariela Levin", "Dina Klein",
                 "Shira Israelof", "Yael Mizrahi", "Oren Shmuel", "Maya Katz",
-                "Tomer Golan", "Lea Sharabi", "Moti Ben-David", "Yaakov Peretz",
+                "Tomer Golan", "Lea Sharabi", "Moti Ben David", "Yaakov Peretz",
                 "Ruth Azulay", "Itzik Shalev"
             };
 

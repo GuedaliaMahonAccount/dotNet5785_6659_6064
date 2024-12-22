@@ -78,7 +78,7 @@ namespace PL.Volunteer
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
-            return value == null || (int)value == 0 ? true : false; 
+            return value is string buttonText && buttonText == "Update";
         }
         public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
