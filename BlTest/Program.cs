@@ -329,6 +329,27 @@ Option Options:
                             continue;
                     }
 
+                    // Ask the user if they want to filter volunteers before sorting
+                    Console.WriteLine("\nDo you want to filter volunteers before sorting?");
+                    Console.WriteLine("Press 0 to filter by inactive volunteers");
+                    Console.WriteLine("Press 1 to filter by active volunteers");
+                    Console.WriteLine("Press Enter if you are not interested in filtering");
+
+                    string filterChoice = Console.ReadLine();
+
+                    if (filterChoice == "0")
+                    {
+                        isActive = false;
+                    }
+                    else if (filterChoice == "1")
+                    {
+                        isActive = true;
+                    }
+                    else
+                    {
+                        isActive = null; // No filtering
+                    }
+
                     // Retrieve and display volunteers
                     try
                     {
