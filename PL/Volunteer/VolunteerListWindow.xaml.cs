@@ -49,9 +49,13 @@ namespace PL.Volunteer
         }
 
 
+
         private void queryVolunteerList()
-        => VolunteerList = (Type == BO.CallType.None) ?
-        s_bl?.Volunteer.GetVolunteersList()! : s_bl?.Volunteer.GetVolunteersList(Type, BO.VolunteerInListSortFields.CallType)!;
+        {
+            VolunteerList = (Type == BO.CallType.None) ?
+                s_bl?.Volunteer.GetVolunteersList()! :
+                s_bl?.Volunteer.GetVolunteersList(isActive: null, sortByField: BO.VolunteerInListSortFields.CallType)!;
+        }
 
         private void volunteerListObserver()
             => queryVolunteerList();

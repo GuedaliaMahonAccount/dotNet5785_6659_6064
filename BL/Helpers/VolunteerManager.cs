@@ -172,25 +172,6 @@ namespace Helpers
             var coordinatesList = GetCoordinatesFromAddress(address);
             return coordinatesList != null && coordinatesList.Count > 0; // If at least one result is returned, the address is valid.
         }
-        //public static bool AreCoordinatesMatching(string address, double latitude, double longitude)
-        //{
-        //    var resolvedCoordinates = GetCoordinatesFromAddress(address);
-        //    if (resolvedCoordinates == null || resolvedCoordinates.Count == 0)
-        //        return false;
-
-        //    const double tolerance = 0.001; // Ajustez si nécessaire.
-
-        //    // Check if any of the returned coordinates match
-        //    foreach (var (resolvedLatitude, resolvedLongitude) in resolvedCoordinates)
-        //    {
-        //        if (Math.Abs(resolvedLatitude - latitude) <= tolerance &&
-        //            Math.Abs(resolvedLongitude - longitude) <= tolerance)
-        //        {
-        //            return true; // Found a match
-        //        }
-        //    }
-        //    return false; // No match found
-        //}
 
         /// <summary>
         /// new fonction to check coordinations

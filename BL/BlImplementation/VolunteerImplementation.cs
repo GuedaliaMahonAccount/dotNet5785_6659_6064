@@ -210,9 +210,9 @@ internal class VolunteerImplementation : IVolunteer
             Id = v.Id,
             Name = v.Name,
             IsActive = v.IsActive,
-            CompletedAssignmentsCount = assignments.Count(call => call.VolunteerId == v.Id),
-            CancelledCallsCount = assignments.Count(call => call.VolunteerId == v.Id),
-            ExpiredCallsCount = assignments.Count(call => call.VolunteerId == v.Id),
+            CompletedAssignmentsCount = assignments.Count(call => call.VolunteerId == v.Id && Enum.Equals(call.EndType, DO.EndType.Completed)),
+            CancelledCallsCount = assignments.Count(call => call.VolunteerId == v.Id && Enum.Equals(call.EndType, DO.EndType.SelfCanceled)),
+            ExpiredCallsCount = assignments.Count(call => call.VolunteerId == v.Id && Enum.Equals(call.EndType, DO.EndType.Expired)),
             CurrentCallId = assignments.Where(call => call.VolunteerId == v.Id).Select(call => call.CallId).FirstOrDefault(),
             CurrentCallType = assignments.Where(call => call.VolunteerId == v.Id).Select(call =>
             {
