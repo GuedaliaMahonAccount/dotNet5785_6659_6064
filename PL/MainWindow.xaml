@@ -11,6 +11,12 @@
         DataContext="{Binding RelativeSource={RelativeSource Self}}">
 
     <Grid>
+
+        <Grid.Background>
+            <ImageBrush ImageSource="Assets/background.jpeg" Stretch="UniformToFill"/>
+        </Grid.Background>
+
+
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="300*"/>
             <ColumnDefinition Width="333*"/>
