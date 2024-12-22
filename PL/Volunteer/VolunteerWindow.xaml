@@ -64,7 +64,14 @@
                 <TextBox Grid.Row="8" Grid.Column="1" HorizontalAlignment="Left" Margin="3" Text="{Binding CurrentVolunteer.Longitude, Mode=TwoWay}" VerticalAlignment="Center" Width="120"/>
 
                 <Label Grid.Row="9" Grid.Column="0" Content="Max Distance:" HorizontalAlignment="Left" Margin="3" VerticalAlignment="Center"/>
-                <TextBox Grid.Row="9" Grid.Column="1" HorizontalAlignment="Left" Margin="3" Text="{Binding CurrentVolunteer.MaxDistance, Mode=TwoWay}" VerticalAlignment="Center" Width="120"/>
+                <Grid Grid.Row="9" Grid.Column="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBox Grid.Column="0" HorizontalAlignment="Left" Margin="3" Text="{Binding CurrentVolunteer.MaxDistance, Mode=TwoWay}" VerticalAlignment="Center" Width="120"/>
+                    <TextBlock Grid.Column="1" Text="km" VerticalAlignment="Center" Margin="3" IsHitTestVisible="False"/>
+            </Grid>
 
                 <Label Grid.Row="10" Grid.Column="0" Content="Distance Type:" HorizontalAlignment="Left" Margin="3" VerticalAlignment="Center"/>
                 <ComboBox Grid.Row="10" Grid.Column="1" HorizontalAlignment="Left" Margin="3" ItemsSource="{Binding Source={StaticResource DistanceTypeCollectionKey}}" SelectedValue="{Binding CurrentVolunteer.DistanceType, Mode=TwoWay}" VerticalAlignment="Center" Width="120"/>
