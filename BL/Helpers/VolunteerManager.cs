@@ -327,6 +327,10 @@ namespace Helpers
 
         public static string Encrypt(string plainText)
         {
+            if (IsBase64String(plainText))
+            {
+                return plainText;
+            }
             using Aes aes = Aes.Create();
             aes.Key = Encoding.UTF8.GetBytes(Key);
             aes.IV = Encoding.UTF8.GetBytes(IV);
@@ -337,8 +341,23 @@ namespace Helpers
             {
                 writer.Write(plainText);
             }
-
             return Convert.ToBase64String(ms.ToArray());
+        }
+
+        private static bool IsBase64String(string str)
+        {
+            if (string.IsNullOrEmpty(str) || str.Length % 4 != 0)
+                return false;
+
+            try
+            {
+                Convert.FromBase64String(str);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         public static string Decrypt(string encryptedText)
