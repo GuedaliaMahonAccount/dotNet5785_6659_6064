@@ -91,6 +91,7 @@ public enum TimeUnit
 }
 public enum VolunteerInListSortFields
 {
+    None,
     Id,
     Name,
     Phone,

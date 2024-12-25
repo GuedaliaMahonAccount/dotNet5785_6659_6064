@@ -191,6 +191,24 @@ internal class VolunteerImplementation : IVolunteer
                 case BO.VolunteerInListSortFields.Longitude:
                     volunteersFromDal = volunteersFromDal.OrderBy(v => v.Longitude);
                     break;
+                case BO.VolunteerInListSortFields.CallType:
+                    // Sort volunteers by the type of the current call they are assigned to
+                    volunteersFromDal = volunteersFromDal.OrderBy(v =>
+                    {
+                        // Retrieve the assignment for the current volunteer
+                        var currentAssignment = _dal.Assignment.ReadAll()
+                            .FirstOrDefault(a => a.VolunteerId == v.Id && a.EndTime == null);
+
+                        // Retrieve the associated call type, or default to BO.CallType.None if no active assignment
+                        return currentAssignment == null
+                            ? BO.CallType.None
+                            : _dal.Call.ReadAll()
+                                .Where(c => c.Id == currentAssignment.CallId)
+                                .Select(c => (BO.CallType?)c.CallType)
+                                .FirstOrDefault() ?? BO.CallType.None;
+                    });
+                    break;
+
                 default:
                     throw new LogicException("Invalid sort field provided.");
             }
@@ -429,6 +447,50 @@ internal class VolunteerImplementation : IVolunteer
             return false;
         }
     }
+
+    /// <summary>
+    /// Function to retrieve and sort volunteers based on their current call's CallType.
+    /// </summary>
+    /// <param name="callType">The CallType to filter and sort by.</param>
+    public IEnumerable<VolunteerInList> GetVolunteersListByCallType(BO.CallType callType)
+    {
+        var allVolunteers = _dal.Volunteer.ReadAll();
+
+        return allVolunteers
+            .Where(v =>
+            {
+                var currentAssignment = _dal.Assignment.ReadAll()
+                    .FirstOrDefault(a => a.VolunteerId == v.Id && a.EndTime == null);
+
+                if (currentAssignment == null) return false;
+
+                var currentCall = _dal.Call.ReadAll()
+                    .FirstOrDefault(c => c.Id == currentAssignment.CallId);
+
+                return currentCall != null && (BO.CallType)currentCall.CallType == callType;
+            })
+            .Select(v =>
+            {
+                var currentAssignment = _dal.Assignment.ReadAll()
+                    .FirstOrDefault(a => a.VolunteerId == v.Id && a.EndTime == null);
+
+                var currentCall = _dal.Call.ReadAll()
+                    .FirstOrDefault(c => c.Id == currentAssignment.CallId);
+
+                return new BO.VolunteerInList
+                {
+                    Id = v.Id,
+                    Name = v.Name,
+                    IsActive = v.IsActive,
+                    CurrentCallType = currentCall != null ? (BO.CallType)currentCall.CallType : BO.CallType.None
+                };
+            })
+            .OrderBy(v => v.CurrentCallType) // Sort by CallType
+            .ToList();
+    }
+
+
+
 
     // ...
     #region Stage 5
