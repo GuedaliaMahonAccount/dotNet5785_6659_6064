@@ -1,24 +1,24 @@
-﻿namespace DalTest
-{
-    using DalApi;
-    using DO;
-    using System;
-    using System.Linq;
-    using System.Collections.Generic;
-    using System.Security.Cryptography;
-    using System.Text;
+﻿using System;
+using System.Linq;
+using System.Collections.Generic;
+using System.Security.Cryptography;
+using System.Text;
+using DalApi;
+using DO;
 
+namespace DalTest
+{
     public static class Initialization
     {
         private static IDal? s_dal;
         private static readonly Random s_rand = new();
 
         private static readonly List<int> s_preGeneratedIds = new()
-{
-    322766064, 200000016, 200000024, 200000032, 200000040,
-    200000057, 200000065, 200000073, 200000081, 200000099,
-    200000107, 200000115, 200000123, 200000131, 200000149
-};
+        {
+            322766064, 200000016, 200000024, 200000032, 200000040,
+            200000057, 200000065, 200000073, 200000081, 200000099,
+            200000107, 200000115, 200000123, 200000131, 200000149
+        };
 
         private static void CreateVolunteers()
         {
@@ -68,15 +68,11 @@
             };
 
             List<string> phonePrefixes = new List<string> { "050", "053", "058", "052", "054" };
-            string[] strongPasswords = {
-                "A3b9Kp5vL1", "Z8mQ7xW4rB", "L2dR9yC8zN", "J1fV6kH3tP", "B5gY4nM7jQ",
-                "N6xP8cL2mV", "T3lH7wQ5rZ", "Y9kJ4bM8xL", "R7dF2yW6nP", "X3bZ9mQ5jT",
-                "M1pV8yN6xL", "G7kJ2fT9mB", "H5qZ4pL7nV", "D9yX6kB3rQ", "C1mP7vJ8wZ"
-            };
 
             for (int i = 0; i < 15; i++)
             {
-                string password = strongPasswords[i % strongPasswords.Length];
+                string password = PasswordGenerator.GenerateStrongPassword();
+                string encryptedPassword = AesEncryptionHelper.Encrypt(password);
                 int id = s_preGeneratedIds[i];
 
                 string phone = $"{phonePrefixes[s_rand.Next(phonePrefixes.Count)]}-{s_rand.Next(1000000, 9999999)}";
@@ -95,7 +91,7 @@
                     IsActive: isActive,
                     MaxDistance: maxDistance,
                     DistanceType: distanceType,
-                    Password: password,
+                    Password: encryptedPassword,
                     Address: i < addresses.Length ? addresses[i] : null,
                     Latitude: i < latitudes.Length ? latitudes[i] : null,
                     Longitude: i < longitudes.Length ? longitudes[i] : null
@@ -104,6 +100,7 @@
                 s_dal.Volunteer.Create(volunteer);
             }
         }
+
 
         private static void CreateCalls()
         {
@@ -363,7 +360,7 @@
 
         private static readonly string IV = "YourSecureIV1234";
 
-      
+
 
         public static string Encrypt(string plainText)
         {
@@ -447,4 +444,38 @@
             return AesEncryptionHelper.Encrypt(plainPassword.ToString());
         }
     }
+
+
+    public static class PasswordGenerator
+    {
+        private static readonly Random s_rand = new();
+        public static string GenerateStrongPassword()
+        {
+            const string upperCaseLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            const string lowerCaseLetters = "abcdefghijklmnopqrstuvwxyz";
+            const string digits = "0123456789";
+            const string specialChars = "!@#$%^&*()_+-=[]{}|;:,.<>?";
+
+            var passwordChars = new List<char>();
+
+            // Ensure at least one character from each required set
+            passwordChars.Add(upperCaseLetters[s_rand.Next(upperCaseLetters.Length)]);
+            passwordChars.Add(lowerCaseLetters[s_rand.Next(lowerCaseLetters.Length)]);
+            passwordChars.Add(digits[s_rand.Next(digits.Length)]);
+            passwordChars.Add(specialChars[s_rand.Next(specialChars.Length)]);
+
+            // Fill the rest of the password length with random characters from all sets
+            string allChars = upperCaseLetters + lowerCaseLetters + digits + specialChars;
+            for (int i = passwordChars.Count; i < 8; i++)
+            {
+                passwordChars.Add(allChars[s_rand.Next(allChars.Length)]);
+            }
+
+            // Shuffle the characters to ensure randomness
+            var shuffledPassword = passwordChars.OrderBy(c => s_rand.Next()).ToArray();
+
+            return new string(shuffledPassword);
+        }
+    }
+
 }
