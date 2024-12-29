@@ -52,7 +52,10 @@
                 <ComboBox Grid.Row="4" Grid.Column="1" HorizontalAlignment="Left" Margin="3" ItemsSource="{Binding Source={StaticResource RoleCollectionKey}}" SelectedValue="{Binding CurrentVolunteer.Role}" IsEnabled="False" VerticalAlignment="Center" Width="120"/>
 
                 <Label Grid.Row="5" Grid.Column="0" Content="Password:" HorizontalAlignment="Left" Margin="3" VerticalAlignment="Center"/>
-                <PasswordBox Grid.Row="5" Grid.Column="1" HorizontalAlignment="Left" Margin="3" VerticalAlignment="Center" Width="120" PasswordChanged="PasswordBox_PasswordChanged"/>
+                <PasswordBox Grid.Row="5" Grid.Column="1" HorizontalAlignment="Left" Margin="3"
+             local:PasswordBoxHelper.BindPassword="True"
+             local:PasswordBoxHelper.BoundPassword="{Binding CurrentVolunteer.Password, Mode=TwoWay}"
+             VerticalAlignment="Center" Width="120"/>
 
                 <Label Grid.Row="6" Grid.Column="0" Content="Address:" HorizontalAlignment="Left" Margin="3" VerticalAlignment="Center"/>
                 <TextBox Grid.Row="6" Grid.Column="1" HorizontalAlignment="Left" Margin="3" Text="{Binding CurrentVolunteer.Address, Mode=TwoWay}" VerticalAlignment="Center" Width="120"/>
