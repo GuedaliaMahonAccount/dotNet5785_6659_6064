@@ -38,34 +38,30 @@ namespace DalTest
             };
 
             string[] addresses = {
-                "גרנדר קניון, David Tuviyahu Ave 125, Be'er Sheva",
-                "דרך אליהו נאוי 28, Beersheba",
-                "יוסף בוסל,  5, Rehovot",
-                "Mivtsa Nakhshon Street 60, Be'er Sheva",
-                "Yitzhack I. Rager Boulevard 24, Be'er Sheva",
-                "Tsvi Bornstein Street 312, Yeruham",
-                "איזור תעשייה, הפועלים 5, דימונה",
-                "Herzl Street 43, Be'er Sheva",
-                "Derekh Hebron 21, Beersheba",
-                "Derekh Hebron 4, Beersheba",
-                "לוין אפשטיין,  5, Rehovot",
-                "רסקו סנטר, HaTikva 8, Beersheba",
-                "40, Tlalim, raanana",
-                "הרצל,  88, Rehovot",
-                "פרץ סנטר - אזור תעשיה דרומי, Dimona"
-            };
+    "מרכז אורן יצחק רגר, 185, Beer Sheva",
+    "מרכז הנגב דרך מצדה, 6, Beer Sheva",
+    "מתחם תחנת הדלק אלון, 31, Muza",
+    "איזור תעשייה, 5, Beer Sheva",
+    "רסקו סנטר, 8, Beer Sheva",
+    "ברוך קטינקא, 2, Beer Sheva",
+    "הע, 7, Beer Sheva",
+    "קרן קיימת לישראל, 78, Beer Sheva",
+    "מתחם, 2, Beer Sheva",
+    "מתחם ביג, 1, Beer Sheva",
+    "מרכז ביג, 21, Beer Sheva",
+    "תחנת דלק פז, 4, Beer Sheva",
+    "מגדלי אביסרור, 53, Beer Sheva",
+    "מרכז הנגב דרך מצדה, 6, Beer Sheva",
+    "מרכז אורן יצחק רגר, 185, Beer Sheva"
+};
 
-            double[] latitudes = {
-                31.2506405f, 31.2467805f, 31.8899976f, 31.2605014f, 31.2473633f,
-                30.988506f, 31.062823f, 31.2396368f, 31.2391961f, 31.2377661f,
-                31.896093f, 31.2474244f, 32.185419f, 31.886343f, 31.0599323f
-            };
+            float[] latitudes = {
+31.27042089999999f, 31.2591166f, 31.2544535f, 31.2521018f, 31.2474244f, 31.2242536f, 31.2521018f, 31.2388346f, 31.2521018f, 31.2521018f, 31.2521018f, 31.2521018f, 31.2498359f, 31.2591166f, 31.27042089999999f
+};
 
-            double[] longitudes = {
-                34.7716625f, 34.8156994f, 34.791436f, 34.7873239f, 34.7978134f,
-                34.927951f, 35.0192015f, 34.7877478f, 34.7967932f, 34.7944248f,
-                34.8099685f, 34.79862f, 34.856708f, 34.814607f, 35.0203137f
-            };
+            float[] longitudes = {
+34.7975837f, 34.7955966f, 35.2074844f, 34.7867691f, 34.79862f, 34.8010573f, 34.7867691f, 34.7907967f, 34.7867691f, 34.7867691f, 34.7867691f, 34.7867691f, 34.7739944f, 34.7955966f, 34.7975837f
+};
 
             List<string> phonePrefixes = new List<string> { "050", "053", "058", "052", "054" };
 
@@ -158,64 +154,63 @@ namespace DalTest
     "Delivering donated blankets and winter gear for soldiers in cold areas.",
     "Organizing group therapy sessions to support soldier well-being."
 };
-            string[] addresses = new[] {
-    "גרנדר קניון, David Tuviyahu Ave 125, Be'er Sheva",
-    "דרך אליהו נאוי 28, Beersheba",
-    "מתחם תחנת הדלק אלון, 31, Arad",
-    "Mivtsa Nakhshon Street 60, Be'er Sheva",
-    "Yitzhack I. Rager Boulevard 24, Be'er Sheva",
-    "Tsvi Bornstein Street 312, Yeruham",
-    "איזור תעשייה, הפועלים 5, דימונה",
-    "Herzl Street 43, Be'er Sheva",
-    "Derekh Hebron 21, Beersheba",
-    "Derekh Hebron 4, Beersheba",
-    "Kornmehl Farm M.E. Ramat Negev D.N. Halutza",
-    "רסקו סנטר, HaTikva 8, Beersheba",
-    "40, Tlalim",
-    "קניון פרץ סנטר, דימונה",
-    "פרץ סנטר - אזור תעשיה דרומי, Dimona",
-    "Ha-Bdil Street 17, ב״ש",
-    "ברוך קטינקא 2 ישפרו פלאנט, Beersheba",
-    "Kakal Street 79, Be'er Sheva",
-    "Kfar Hadarom Street 1, Be'er Sheva",
-    "Kakal Street 55-79, Be'er Sheva",
-    "HaAtsmaut Street 14, Be'er Sheva",
-    "Kakal Street 79, Be'er Sheva",
-    "Ha-Histadrut Street 22, Be'er Sheva",
-    "קרן קיימת לישראל 78 באר שבע דרום קקל 78, Kakal 78, Beersheba",
-    "מתחם B7, Heil Handasa 2, Beersheba",
-    "מתחם ביג, חיל ההנדסה 1, באר שבע",
-    "Heil Handasa Street 6, Be'er Sheva",
-    "Eliyahu Nawi Street, Be'er Sheva",
-    "Kakal Street 195, Be'er Sheva",
-    "מרכז ביג, Derekh Hebron 21, Be'er Sheva",
-    "Heil Handasa Street 1, Be'er Sheva",
-    "Derekh Hebron 66, Beersheba",
-    "Herzl Street 55, Be'er Sheva",
-    "Yitshak Ben Zvi Street 4, Be'er Sheva",
-    "Yitshak Nafha Street 36 א', Be'er Sheva",
-    "קניון עזריאלי הנגב, Be'er Sheva",
-    "Eli'ezer Smoli Street 1, Be'er Sheva",
-    "Eli'ezer Smoli Street 1, Be'er Sheva",
-    "Sderot Johana Jabotinsky 11, Beersheba",
-    "Yitshak Nafha Street 25, Be'er Sheva",
-    "Ha-Tikva Street 8, Be'er Sheva",
-    "Sderot Yerushalayim 2, Beersheba",
-    "תחנת דלק פז, Sderot Yerushalayim 4, Beersheba",
-    "מגדלי אביסרור, שדרות יצחק רגר 53, באר שבע",
-    "David Tuviyahu Ave 125, Beersheba",
-    "David Tuviyahu Ave 125, Beersheba",
-    "David Tuviyahu Ave 125, Beersheba",
-    "Derech Metsada 47, Beersheba",
-    "מרכז הנגב דרך מצדה 6, Beersheba",
-    "Rotem Street 17, Omer"
+            string[] addresses = {
+    "שלמה אבן גבירול, 1, Israel",
+    "בן יהודה, 121, Israel",
+    "בן יהודה, 38, Israel",
+    "זיסמן שלום, 14, Israel",
+    "הירקון, 145, Israel",
+    "הירקון, 250, Israel",
+    "הירקון, 121, Israel",
+    "מאפו, 9, Israel",
+    "אליעזר פרי, 10, Israel",
+    "טרומפלדור, 11, Israel",
+    "בן יהודה, 35, Israel",
+    "הירקון, 86, Israel",
+    "בן יהודה, 87, Israel",
+    "דיזנגוף, 43, Israel",
+    "הירקון, 220, Israel",
+    "הירקון, 99, Israel",
+    "הירקון, 80, Israel",
+    "הירקון, 287, Israel",
+    "הירקון, 216, Israel",
+    "רמת גן, 1, Israel",
+    "בן יהודה, 77, Israel",
+    "הירקון, 88, Israel",
+    "בן יהודה, 3, Israel",
+    "הירקון, 115, Israel",
+    "הירקון, 78, Israel",
+    "אליעזר פרי, 9, Israel",
+    "זמנהוף, 2, Israel",
+    "יונה הנביא, 41, Israel",
+    "בני דן, 36, Israel",
+    "בן יהודה, 14, Israel",
+    "חולדה, 11, Israel",
+    "בן סרוק, 13, Israel",
+    "אליעזר קפלן, 4, Israel",
+    "דיזנגוף, 130, Israel",
+    "ארלוזורוב, 23, Israel",
+    "בן יהודה, 84, Israel",
+    "ירמיהו, 4, Israel",
+    "חבקוק הנביא, 3, Israel",
+    "הירקון, 155, Israel",
+    "ויצמן, 1, Israel",
+    "הירקון, 84, Israel",
+    "ניסים אלוני, 17, Israel",
+    "הירקון, 50, Israel",
+    "הירקון, 19, Israel",
+    "הירקון, 205, Israel",
+    "זמנהוף, 1, Israel",
+    "נס ציונה, 10, Israel",
+    "בן יהודה, 28, Israel",
+    "מנדלי מו״ס, 5, Israel",
+    "שלמה אבן גבירול, 1, Israel"
 };
-            float[] latitudes = new float[] {
-31.2506405f, 31.2455992f, 31.26125469999999f, 31.2605014f, 31.2473633f, 30.98850599999999f, 31.062823f, 31.2396368f, 31.2391961f, 31.2377661f, 30.972753f, 31.2474244f, 30.9935689f, 31.0599323f, 31.0599323f, 31.2260083f, 31.2244175f, 31.2333045f, 31.2360614f, 31.2380911f, 31.2385546f, 31.2385105f, 31.2381019f, 31.2388346f, 31.243331f, 31.2447522f, 31.2443165f, 31.2492702f, 31.239762f, 31.2443691f, 31.2447522f, 31.244116f, 31.24109f, 31.2439462f, 31.2476115f, 31.243726f, 31.238365f, 31.238365f, 31.2386544f, 31.2461259f, 31.2474978f, 31.245456f, 31.2457355f, 31.2538143f, 31.2506405f, 31.2506405f, 31.2506405f, 31.2581979f, 31.2591166f, 31.2645541f
+            float[] latitudes = {
+32.0713162f, 32.086167f, 32.0769348f, 32.0841733f, 32.0838289f, 32.0925088f, 32.0831292f, 32.08067f, 32.0865166f, 32.0755646f, 32.0771102f, 32.077606f, 32.082431f, 32.074634f, 32.0896504f, 32.0796764f, 32.0770334f, 32.09414f, 32.0892939f, 32.068424f, 32.0812592f, 32.0777623f, 32.0735194f, 32.0814839f, 32.0767003f, 32.0858688f, 32.0777646f, 32.0720763f, 32.0954946f, 32.07443130000001f, 31.833435f, 32.086776f, 32.0732517f, 32.0816336f, 32.0870125f, 32.0810562f, 32.0951275f, 32.0935645f, 32.0845749f, 32.0775347f, 32.077345f, 32.09000640000001f, 32.0731472f, 32.0704339f, 32.0893245f, 32.078094f, 31.932111f, 32.0758815f, 31.890267f, 32.0713162f
 };
-
-            float[] longitudes = new float[] {
-34.7716625f, 34.81362319999999f, 35.2152179f, 34.7873239f, 34.7978134f, 34.927951f, 35.0192015f, 34.7877478f, 34.7967932f, 34.7944248f, 34.7755085f, 34.79862f, 34.7643578f, 35.0203137f, 35.0203137f, 34.8096236f, 34.8014475f, 34.7965166f, 34.7881834f, 34.7912054f, 34.7924147f, 34.7906793f, 34.7875611f, 34.7907967f, 34.812547f, 34.81256610000001f, 34.8127704f, 34.8178768f, 34.7889659f, 34.8114871f, 34.81256610000001f, 34.8060877f, 34.789058f, 34.7965666f, 34.8106433f, 34.7946189f, 34.7726193f, 34.7726193f, 34.7740828f, 34.8120535f, 34.7986387f, 34.7814817f, 34.7814879f, 34.7983284f, 34.7716625f, 34.7716625f, 34.7716625f, 34.792098f, 34.7955966f, 34.847265f
+            float[] longitudes = {
+34.7817176f, 34.7726997f, 34.7684819f, 34.7994752f, 34.7688932f, 34.77370270000001f, 34.7685983f, 34.7695164f, 34.7695971f, 34.7676861f, 34.7679725f, 34.767611f, 34.7710127f, 34.7760331f, 34.7724391f, 34.7677215f, 34.7673099f, 34.7737286f, 34.772373f, 34.824785f, 34.7704153f, 34.7675604f, 34.7681659f, 34.7682212f, 34.7674762f, 34.7697296f, 34.775037f, 34.7687876f, 34.7883626f, 34.7682201f, 34.886757f, 34.7833573f, 34.7827531f, 34.774047f, 34.7753159f, 34.7706016f, 34.7745326f, 34.7730239f, 34.7691515f, 34.7879046f, 34.7674017f, 34.79633159999999f, 34.7661283f, 34.7646432f, 34.7707709f, 34.774744f, 34.801327f, 34.7682341f, 35.010397f, 34.7817176f
 };
             CallType[] callTypes = new CallType[descriptions.Length];
             for (int i = 0; i < callTypes.Length; i++)

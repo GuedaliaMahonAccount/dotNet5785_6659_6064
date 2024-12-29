@@ -6,6 +6,7 @@ using System.Text.Json;
 using System.Security.Cryptography;
 using System.Text;
 using BO;
+using System.Globalization;
 
 namespace Helpers
 {
@@ -118,9 +119,9 @@ namespace Helpers
         /// Retrieves coordinates from an address using LocationIQ API.
         /// 
         /// exemple of correct adress
-        /// "display_name": "Tiltan, Ramla, Ramla Subdistrict, District centre, 7135275, Israël"
-        /// "lat": "31.9290114"
-        /// "lon": "34.8737578"
+        /// "display_name": "מרכז אורן יצחק רגר, 185, Beer Sheva"
+        /// "lat": "31.27042089999999f"
+        /// "lon": "34.7975837f"
         /// 
         /// 
         /// </summary>
@@ -186,37 +187,40 @@ namespace Helpers
 
             try
             {
-                var request = WebRequest.Create(url);
-                request.Method = "GET";
-                using (var response = request.GetResponse())
-                using (var stream = response.GetResponseStream())
-                using (var reader = new StreamReader(stream))
+                using (var client = new HttpClient())
                 {
-                    var result = reader.ReadToEnd();
-
-                    // Parse JSON using System.Text.Json
-                    var json = JsonDocument.Parse(result);
+                    var response = client.GetStringAsync(url).Result;
+                    var json = JsonDocument.Parse(response);
                     var root = json.RootElement;
 
                     if (root.GetArrayLength() > 0)
                     {
-                        const double tolerance = 0.01; // Ajustez la tolérance en degrés (environ 1 km)
+                        const double tolerance = 0.05; // Augmenté à environ 5km
+                        double closestDistance = double.MaxValue;
+                        (double lat, double lon)? closestCoordinates = null;
 
-                        // Parcourir les résultats pour trouver la correspondance la plus proche
                         foreach (var item in root.EnumerateArray())
                         {
-                            double latitude = double.Parse(item.GetProperty("lat").GetString());
-                            double longitude = double.Parse(item.GetProperty("lon").GetString());
+                            double latitude = double.Parse(item.GetProperty("lat").GetString(), CultureInfo.InvariantCulture);
+                            double longitude = double.Parse(item.GetProperty("lon").GetString(), CultureInfo.InvariantCulture);
 
-                            // Vérifiez si les coordonnées sont proches des cibles
-                            if (Math.Abs(latitude - targetLatitude) <= tolerance &&
-                                Math.Abs(longitude - targetLongitude) <= tolerance)
+                            // Calculer la distance réelle entre les points
+                            double distance = CalculateDistance(latitude, longitude, targetLatitude, targetLongitude);
+
+                            if (distance < closestDistance)
                             {
-                                return (latitude, longitude);
+                                closestDistance = distance;
+                                closestCoordinates = (latitude, longitude);
                             }
                         }
+
+                        // Si la distance la plus proche est dans la tolérance
+                        if (closestDistance <= tolerance * 111.32) // Convertir degrés en km approximativement
+                        {
+                            return closestCoordinates;
+                        }
                     }
-                    return null; // Aucun résultat proche
+                    return null;
                 }
             }
             catch (Exception ex)
@@ -225,6 +229,23 @@ namespace Helpers
                 return null;
             }
         }
+        private static double CalculateDistance(double lat1, double lon1, double lat2, double lon2)
+        {
+            var R = 6371; // Rayon de la Terre en km
+            var dLat = ToRad(lat2 - lat1);
+            var dLon = ToRad(lon2 - lon1);
+            var a = Math.Sin(dLat / 2) * Math.Sin(dLat / 2) +
+                    Math.Cos(ToRad(lat1)) * Math.Cos(ToRad(lat2)) *
+                    Math.Sin(dLon / 2) * Math.Sin(dLon / 2);
+            var c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
+            return R * c;
+        }
+        private static double ToRad(double degrees)
+        {
+            return degrees * (Math.PI / 180);
+        }
+
+
 
         public static bool IsRequesterAuthorizedToCancel(int requesterId, int volunteerId)
         {
