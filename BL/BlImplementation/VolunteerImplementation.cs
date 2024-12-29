@@ -387,14 +387,14 @@ internal class VolunteerImplementation : IVolunteer
         if (!VolunteerManager.ValidName(volunteer.Name))
             throw new BlInvalidValueException("Invalid name.");
 
-        if (!VolunteerManager.ValidPassword(volunteer.Password))
-            throw new BlInvalidValueException("Invalid Password.");
-
         if (!VolunteerManager.ValidPhone(volunteer.Phone))
             throw new BlInvalidValueException("Invalid phone number.");
 
         if (!VolunteerManager.ValidEmail(volunteer.Email))
             throw new BlInvalidValueException("Invalid email.");
+
+        if (!VolunteerManager.ValidPassword(volunteer.Password))
+            throw new BlInvalidValueException("Invalid Password.");
 
         if (!VolunteerManager.ValidAddress(volunteer.Address)) // Validate address
             throw new BlInvalidValueException("Invalid address.");

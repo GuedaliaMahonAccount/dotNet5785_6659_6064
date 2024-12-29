@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -33,7 +31,6 @@ namespace PL.Volunteer
         public static readonly DependencyProperty CurrentVolunteerProperty =
             DependencyProperty.Register(nameof(CurrentVolunteer), typeof(BO.Volunteer), typeof(VolunteerWindow));
 
-      
         public VolunteerWindow(int id = 0)
         {
             ButtonText = id == 0 ? "Add" : "Update";
@@ -46,7 +43,6 @@ namespace PL.Volunteer
             InitializeComponent();
         }
 
-
         // Event handler for Add/Update button
         private void btnAddUpdate_Click(object sender, RoutedEventArgs e)
         {
@@ -54,12 +50,12 @@ namespace PL.Volunteer
             {
                 if (ButtonText == "Add")
                 {
-                    s_bl.Volunteer.AddVolunteer(CurrentVolunteer); // Add new Call
+                    s_bl.Volunteer.AddVolunteer(CurrentVolunteer); // Add new Volunteer
                     MessageBox.Show("Volunteer added successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
                 else
                 {
-                    s_bl.Volunteer.UpdateVolunteer(CurrentVolunteer.Id, CurrentVolunteer); // Update existing Call
+                    s_bl.Volunteer.UpdateVolunteer(CurrentVolunteer.Id, CurrentVolunteer); // Update existing Volunteer
                     MessageBox.Show("Volunteer updated successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
 
@@ -70,8 +66,16 @@ namespace PL.Volunteer
                 MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
-    }
 
+        // PasswordBox event handler
+        private void PasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
+        {
+            if (sender is PasswordBox passwordBox)
+            {
+                CurrentVolunteer.Password = passwordBox.Password;
+            }
+        }
+    }
 
     // Converter for IsReadOnly based on Update state
     public class UpdateToReadOnlyConverter : IValueConverter
@@ -99,7 +103,4 @@ namespace PL.Volunteer
             return value;
         }
     }
-
-    
 }
-
