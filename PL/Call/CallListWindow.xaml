@@ -5,10 +5,16 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PL.Call"
         mc:Ignorable="d"
-        Title="CallListWindow" Height="640" Width="800"
+        Title="CallListWindow" Height="800" Width="1200"
         DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}">
     <!--External Grid-->
     <Grid>
+
+        <!-- Background Image -->
+        <Grid.Background>
+            <ImageBrush ImageSource="../Assets/background1.jpeg" Stretch="UniformToFill"/>
+        </Grid.Background>
+
         <Grid.RowDefinitions>
             <RowDefinition Height="40*"/>
             <RowDefinition Height="500*"/>
