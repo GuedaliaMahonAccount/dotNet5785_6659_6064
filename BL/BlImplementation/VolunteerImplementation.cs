@@ -115,6 +115,7 @@ internal class VolunteerImplementation : IVolunteer
                 AssignmentStartTime = volunteer.CurrentCall.AssignmentStartTime,
                 Distance = volunteer.CurrentCall.Distance,
                 Status = volunteer.CurrentCall.Status
+                
             };
             volunteer.CurrentCall = callInProgress;
         }
