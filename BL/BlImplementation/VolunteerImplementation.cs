@@ -31,18 +31,11 @@ internal class VolunteerImplementation : IVolunteer
         // Retrieve all volunteers from the DAL
         var volunteersFromDal = _dal.Volunteer.ReadAll();
 
-        string decryptedPassword;
-        try
-        {
-            decryptedPassword = AesEncryptionHelper.Decrypt(password);
-        }
-        catch
-        {
-            decryptedPassword = password;
-        }
+        // Encrypt the provided password for comparison
+        string encryptedPassword = AesEncryptionHelper.Encrypt(password);
 
-        // Find the volunteer with matching username and decrypted password
-        var vol = volunteersFromDal.FirstOrDefault(v => v.Name == username && v.Password == decryptedPassword);
+        // Find the volunteer with matching username and encrypted password
+        var vol = volunteersFromDal.FirstOrDefault(v => v.Name == username && v.Password == encryptedPassword);
 
         if (vol == null)
         {
@@ -52,6 +45,7 @@ internal class VolunteerImplementation : IVolunteer
         // Return the role of the authenticated volunteer
         return vol.Role.ToString();
     }
+
 
 
     /// <summary>
@@ -317,6 +311,7 @@ internal class VolunteerImplementation : IVolunteer
             Name = updatedVolunteer.Name,
             Phone = updatedVolunteer.Phone,
             Email = updatedVolunteer.Email,
+            Password = updatedVolunteer.Password,
             Address = updatedVolunteer.Address,
             Latitude = updatedVolunteer.Latitude.Value,
             Longitude = updatedVolunteer.Longitude.Value,
