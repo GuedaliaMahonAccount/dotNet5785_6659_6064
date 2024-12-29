@@ -106,6 +106,7 @@ namespace PL
             }
         }
 
+
         private void btnUpdateMaxYearRange_Click(object sender, RoutedEventArgs e)
         {
             int maxYearRange = MaxYearRange;
