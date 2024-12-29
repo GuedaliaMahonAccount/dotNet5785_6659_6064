@@ -26,6 +26,7 @@ internal class VolunteerImplementation : IVolunteer
     /// - The username and password combination does not match any volunteer.
     /// - Other unexpected errors occur during the login process.
     /// </exception>
+    /// 
     public string Login(string username, string password)
     {
         // Retrieve all volunteers from the DAL
