@@ -98,8 +98,8 @@ namespace Helpers
         /// 
         /// exemple of correct adress
         /// "display_name": "מרכז אורן יצחק רגר, 185, Beer Sheva"
-        /// "lat": "31.27042089999999f"
-        /// "lon": "34.7975837f"
+        /// "lat": "31.27042089999999"
+        /// "lon": "34.7975837"
         /// 
         /// 
         /// </summary>
