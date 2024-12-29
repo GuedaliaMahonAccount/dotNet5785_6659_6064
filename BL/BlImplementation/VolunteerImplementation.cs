@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using BO;
 using BlApi;
+using DO;
 
 
 internal class VolunteerImplementation : IVolunteer
@@ -285,6 +286,9 @@ internal class VolunteerImplementation : IVolunteer
 
         if (!VolunteerManager.ValidPhone(updatedVolunteer.Phone)) // Validate phone
             throw new BlInvalidValueException("Invalid phone number.");
+
+        if (!VolunteerManager.ValidPassword(updatedVolunteer.Password)) // Validate Password
+            throw new BlInvalidValueException("Invalid Password.");
 
         if (!VolunteerManager.ValidEmail(updatedVolunteer.Email)) // Validate email
             throw new BlInvalidValueException("Invalid email.");

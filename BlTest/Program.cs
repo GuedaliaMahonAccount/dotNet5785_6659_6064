@@ -470,6 +470,14 @@ Option Options:
             if (!string.IsNullOrEmpty(newEmail))
                 volunteer.Email = newEmail;
 
+            Console.Write("Enter new password: ");
+            string encryptedPassword = PasswordUtils.ReadAndEncryptPassword();
+            if (!string.IsNullOrEmpty(encryptedPassword))
+            {
+                volunteer.Password = encryptedPassword;
+            }
+
+
             Console.Write("Enter new address: ");
             string newAddress = Console.ReadLine();
             if (!string.IsNullOrEmpty(newAddress))
