@@ -3,51 +3,73 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:PL"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800"
+        Title="MainWindow" Height="800" Width="1200"
         Loaded="Window_Loaded"
         Closed="Window_Closed"
         DataContext="{Binding RelativeSource={RelativeSource Self}}">
 
     <Grid>
 
+        <!-- Background Image -->
         <Grid.Background>
             <ImageBrush ImageSource="Assets/background.jpeg" Stretch="UniformToFill"/>
         </Grid.Background>
 
-
+        <!-- Layout Definitions -->
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="300*"/>
-            <ColumnDefinition Width="333*"/>
-            <ColumnDefinition Width="167*"/>
+            <ColumnDefinition Width="2*" />
+            <ColumnDefinition Width="4*" />
+            <ColumnDefinition Width="2*" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="1*" />
+            <RowDefinition Height="5*" />
             <RowDefinition Height="1*" />
             <RowDefinition Height="1*" />
             <RowDefinition Height="1*" />
             <RowDefinition Height="1*" />
-            <RowDefinition Height="1*" />
-            <RowDefinition Height="6*" />
+            <RowDefinition Height="4*" />
         </Grid.RowDefinitions>
 
-        <Label Grid.Column="1" Content="{Binding CurrentTime}" FontWeight="Bold" FontSize="20" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />
+        <!-- Header Label -->
+        <Label Grid.Column="1" Grid.Row="0" Content="{Binding CurrentTime}" FontWeight="Bold" FontSize="28" 
+               HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White" />
 
-        <Button Grid.Column="1" Grid.Row="1" Content="Add One Minute" Click="btnAddOneMinute_Click" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />
-        <Button Grid.Column="1" Grid.Row="2" Content="Add One Hour" Click="btnAddOneHour_Click" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />
-        <Button Grid.Column="1" Grid.Row="3" Content="Add One Day" Click="btnAddOneDay_Click" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />
-        <Button Grid.Column="1" Grid.Row="4" Content="Add One Month" Click="btnAddOneMonth_Click" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />
-        <Button Grid.Column="1" Grid.Row="5" Content="Add One Year" Click="btnAddOneYear_Click" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />
-        <Button Content="Reset DB" HorizontalAlignment="Left" Margin="51,50,0,0" Grid.Row="6" VerticalAlignment="Top" Height="60" Width="160" Click="btnResetDB_Click"/>
-        <Button Content="Initi DB" HorizontalAlignment="Left" Margin="51,122,0,0" Grid.Row="6" VerticalAlignment="Top" Height="60" Width="160" Click="btnInitializeDB_Click"/>
-        <Button Grid.Column="1" Content="Handle Volunteer" HorizontalAlignment="Left" Margin="67,50,0,0" Grid.Row="6" VerticalAlignment="Top" Height="60" Width="160" Click="BtnHandleVolunteer_Click"/>
-        <Button Grid.Column="1" Content="Handle Call" HorizontalAlignment="Left" Margin="67,122,0,0" Grid.Row="6" VerticalAlignment="Top" Height="60" Width="160" Click="BtnHandleCall_Click"/>
+        <!-- Buttons for Time Adjustments -->
+        <StackPanel Grid.Column="1" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center">
+            <Button Content="Add One Minute" Click="btnAddOneMinute_Click" Margin="10" Width="200" Height="40" FontSize="16" />
+            <Button Content="Add One Hour" Click="btnAddOneHour_Click" Margin="10" Width="200" Height="40" FontSize="16" />
+            <Button Content="Add One Day" Click="btnAddOneDay_Click" Margin="10" Width="200" Height="40" FontSize="16" />
+            <Button Content="Add One Month" Click="btnAddOneMonth_Click" Margin="10" Width="200" Height="40" FontSize="16" />
+            <Button Content="Add One Year" Click="btnAddOneYear_Click" Margin="10" Width="200" Height="40" FontSize="16" />
+        </StackPanel>
 
-        <TextBox HorizontalAlignment="Left" Grid.Row="2" TextWrapping="Wrap" Text="Max years without activity" 
-         VerticalAlignment="Center" Width="146" Height="26" Margin="10,0,0,0" IsReadOnly="True"/>
-        <Button Content="update" HorizontalAlignment="Left" Margin="221,0,0,0" Grid.Row="2" VerticalAlignment="Center" Height="26" Width="66"/>
-        <TextBox HorizontalAlignment="Left" Margin="165,0,0,0" Grid.Row="2" TextWrapping="Wrap" 
-                 Text="{Binding MaxYearRange, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" Width="46" Height="26" TextChanged="TextBox_TextChanged"/>
+        <!-- Max Year Without Activity -->
+        <StackPanel Grid.Column="0" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="20">
+            <TextBlock Text="Max years without activity:" FontSize="16" Foreground="White" Margin="0,0,0,10" />
+            <StackPanel Orientation="Horizontal">
+                <TextBox Text="{Binding MaxYearRange, UpdateSourceTrigger=PropertyChanged}" Width="60" Height="30" 
+                         TextAlignment="Center" FontSize="14" Background="White" Margin="0,0,10,0" />
+                <Button Content="Update" Width="100" Height="30" FontSize="14" Click="btnUpdateMaxYearRange_Click" 
+                        Background="SlateBlue" Foreground="White" />
+            </StackPanel>
+        </StackPanel>
+
+        <!-- Database Actions -->
+        <StackPanel Grid.Column="0" Grid.Row="6" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="20">
+            <Button Content="Reset DB" Click="btnResetDB_Click" Width="160" Height="50" 
+                    FontSize="16" Background="DarkSlateGray" Foreground="White" Margin="0,10,0,0" />
+            <Button Content="Initi DB" Click="btnInitializeDB_Click" Width="160" Height="50" 
+                    FontSize="16" Background="DarkSlateGray" Foreground="White" Margin="0,10,0,0" />
+        </StackPanel>
+
+        <!-- Volunteer and Call Management -->
+        <StackPanel Grid.Column="1" Grid.Row="6" VerticalAlignment="Top" HorizontalAlignment="Center">
+            <Button Content="Handle Volunteer" Click="BtnHandleVolunteer_Click" Width="180" Height="70" 
+                    FontSize="16" Background="DarkOliveGreen" Foreground="White" Margin="10" />
+            <Button Content="Handle Call" Click="BtnHandleCall_Click" Width="180" Height="70" 
+                    FontSize="16" Background="DarkOliveGreen" Foreground="White" Margin="10" />
+        </StackPanel>
     </Grid>
 </Window>
