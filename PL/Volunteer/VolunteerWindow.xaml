@@ -14,6 +14,11 @@
     </Window.Resources>
 
     <Grid>
+        <!-- Background Image -->
+        <Grid.Background>
+            <ImageBrush ImageSource="../Assets/background2.png" Stretch="UniformToFill"/>
+        </Grid.Background>
+        
         <StackPanel>
             <Grid HorizontalAlignment="Left" VerticalAlignment="Top" Margin="45,45,45,0">
                 <Grid.ColumnDefinitions>

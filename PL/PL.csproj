@@ -16,6 +16,7 @@
 	<ItemGroup>
 	  <None Remove="Assets\background.jpeg" />
 	  <None Remove="Assets\background1.jpeg" />
+	  <None Remove="Assets\background2.png" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -27,6 +28,9 @@
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </Resource>
 	  <Resource Include="Assets\background1.jpeg">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Resource>
+	  <Resource Include="Assets\background2.png">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </Resource>
 	</ItemGroup>

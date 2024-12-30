@@ -7,11 +7,18 @@
         mc:Ignorable="d"
         Title="CallWindow" Height="450" Width="350"
         DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}">
+
     <Window.Resources>
         <local:UpdateToReadOnlyConverter x:Key="UpdateToReadOnlyConverter"/>
         <local:UpdateToVisibilityConverter x:Key="UpdateToVisibilityConverter"/>
     </Window.Resources>
+
     <Grid>
+        <!-- Background Image -->
+        <Grid.Background>
+            <ImageBrush ImageSource="../Assets/background2.png" Stretch="UniformToFill"/>
+        </Grid.Background>
+
         <Grid HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,20,0,0" Height="400">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
