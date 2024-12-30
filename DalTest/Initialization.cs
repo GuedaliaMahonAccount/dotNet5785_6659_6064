@@ -13,15 +13,15 @@ namespace DalTest
         private static IDal? s_dal;
         private static readonly Random s_rand = new();
 
-        private static readonly List<int> s_preGeneratedIds = new()
+        private static void CreateVolunteers()
+        {
+            List<int> s_preGeneratedIds = new()
         {
             322766064, 200000016, 200000024, 200000032, 200000040,
             200000057, 200000065, 200000073, 200000081, 200000099,
             200000107, 200000115, 200000123, 200000131, 200000149
         };
 
-        private static void CreateVolunteers()
-        {
             string[] volunteerNames = {
                 "Dani Levy", "Eli Amar", "Yair Cohen", "Ariela Levin", "Dina Klein",
                 "Shira Israelof", "Yael Mizrahi", "Oren Shmuel", "Maya Katz",
@@ -96,7 +96,6 @@ namespace DalTest
                 s_dal.Volunteer.Create(volunteer);
             }
         }
-
 
         private static void CreateCalls()
         {
@@ -361,6 +360,9 @@ namespace DalTest
             CreateAssignments();
         }
     }
+
+
+
 
     //password hash
     public static class AesEncryptionHelper
