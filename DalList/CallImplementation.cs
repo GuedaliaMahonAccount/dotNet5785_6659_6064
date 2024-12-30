@@ -9,12 +9,6 @@ internal class CallImplementation : ICall
 {
     public void Create(Call item)
     {
-        // Check if the call with the same ID already exists
-        if (Read(item.Id) != null)
-        {
-            throw new DalAlreadyExistsException($"Call with ID {item.Id} already exists.");
-        }
-
         // Add the call if ID is unique
         DataSource.Calls.Add(item);
     }

@@ -1,4 +1,5 @@
 ﻿using BO;
+using DalApi;
 using DO;
 using Helpers;
 using System;
@@ -40,7 +41,7 @@ namespace BlImplementation
 
             var callDO = new DO.Call
             (
-                Id: newCall.Id,
+                Id: _dal.Config.NextCallId,
                 CallType: (DO.CallType)newCall.CallType,
                 Address: newCall.Address,
                 Latitude: newCall.Latitude.Value,
