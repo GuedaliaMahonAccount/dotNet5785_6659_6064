@@ -5,8 +5,13 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PL.Call"
         mc:Ignorable="d"
-        Title="CallListWindow" Height="800" Width="1200"
+        Title="CallListWindow" Height="600" Width="800"
         DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}">
+    
+    <Window.Resources>
+        <local:TimeSpanToLabeledStringConverter x:Key="TimeSpanToLabeledStringConverter" />
+    </Window.Resources>
+
     <!--External Grid-->
     <Grid>
 
@@ -49,10 +54,10 @@
                 <DataGridTextColumn Binding="{Binding Status}" Header="Status" Width="Auto"/>
 
                 <!-- Left Time to Expire Column -->
-                <DataGridTemplateColumn Header="Left Time to Expire" Width="Auto">
+                <DataGridTemplateColumn Header="Last volunteer name" Width="Auto">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding LeftTimeToExpire}" FontSize="16"/>
+                            <TextBlock Text="{Binding LastVolunteerName}" FontSize="16"/>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
@@ -61,7 +66,7 @@
                 <DataGridTemplateColumn Header="Left Time to Complete" Width="Auto">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding LeftTimeTocomplete}" FontSize="16"/>
+                            <TextBlock Text="{Binding LeftTimeTocomplete, Converter={StaticResource TimeSpanToLabeledStringConverter}}" FontSize="16"/>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>

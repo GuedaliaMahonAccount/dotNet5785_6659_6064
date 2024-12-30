@@ -219,16 +219,29 @@ namespace DalTest
             }
 
 
-            DateTime start = new DateTime(s_dal!.Config.Clock.Year - 2, 1, 1);
+            DateTime end = DateTime.Now;
+            DateTime start = end.AddDays(-30);
 
             //in case that it s not exactly 50 data
             int minLength = new[] { descriptions.Length, addresses.Length, latitudes.Length, longitudes.Length }.Min();
             for (int i = 0; i < minLength; i++)
             {
-                var startTime = start.AddDays(-s_rand.Next(1, 30));
+                // Generate a random start date within the last 30 days
+                var startTime = start
+                    .AddDays(s_rand.Next(0, 30))            // Random days between 30 days ago and today
+                    .AddHours(s_rand.Next(0, 24))          // Random hours
+                    .AddMinutes(s_rand.Next(0, 60))        // Random minutes
+                    .AddSeconds(s_rand.Next(0, 60));       // Random seconds
+
+                // Generate a random deadline between 30 and 60 days after the start date
                 DateTime? deadline = s_rand.NextDouble() < 0.5
-                    ? (DateTime?)startTime.AddHours(s_rand.Next(1, 72))
+                    ? (DateTime?)startTime
+                        .AddDays(s_rand.Next(30, 60))      // Random days between 30 and 60 days after startTime
+                        .AddHours(s_rand.Next(0, 24))      // Random hours
+                        .AddMinutes(s_rand.Next(0, 60))    // Random minutes
+                        .AddSeconds(s_rand.Next(0, 60))    // Random seconds
                     : null;
+
 
                 int callId = s_dal.Config.NextCallId;
 
@@ -349,6 +362,7 @@ namespace DalTest
         }
     }
 
+    //password hash
     public static class AesEncryptionHelper
     {
         private static readonly string Key = "YourSecureKey123";
@@ -406,7 +420,6 @@ namespace DalTest
             }
         }
     }
-
     public static class PasswordUtils
     {
         public static string ReadAndEncryptPassword()
@@ -439,8 +452,6 @@ namespace DalTest
             return AesEncryptionHelper.Encrypt(plainPassword.ToString());
         }
     }
-
-
     public static class PasswordGenerator
     {
         private static readonly Random s_rand = new();
