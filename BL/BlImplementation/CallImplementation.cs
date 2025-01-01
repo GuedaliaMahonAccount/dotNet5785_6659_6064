@@ -51,9 +51,8 @@ namespace BlImplementation
                 DeadLine: newCall.DeadLine
             );
 
+            // Attempt to add the volunteer to the database
             _dal.Call.Create(callDO);
-
-            // Notify relevant volunteers
             CallManager.Observers.NotifyListUpdated();
         }
 

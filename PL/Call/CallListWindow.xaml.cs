@@ -39,7 +39,6 @@ namespace PL.Call
         public CallListWindow()
         {
             InitializeComponent();
-            queryCallList();
         }
 
         /// <summary>
