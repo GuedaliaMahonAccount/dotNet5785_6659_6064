@@ -113,9 +113,28 @@ namespace PL.Call
         {
             if (value is TimeSpan timeSpan)
             {
-                return $"{timeSpan.Days} days, {timeSpan.Hours} hours, {timeSpan.Minutes} minutes, {timeSpan.Seconds} seconds";
+                var parts = new List<string>();
+
+                if (timeSpan.Days > 0)
+                    parts.Add($"{timeSpan.Days} days");
+
+                if (timeSpan.Hours > 0)
+                    parts.Add($"{timeSpan.Hours} hours");
+
+                if (timeSpan.Minutes > 0)
+                    parts.Add($"{timeSpan.Minutes} minutes");
+
+                if (timeSpan.Seconds > 0)
+                    parts.Add($"{timeSpan.Seconds} seconds");
+
+                if (parts.Count == 0)
+                    return "0";
+
+                return string.Join(", ", parts);
             }
-            return ""; // Return empty string for null or invalid values
+
+
+            return ""; // If the value is null or not a TimeSpan
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
@@ -123,4 +142,5 @@ namespace PL.Call
             throw new NotImplementedException();
         }
     }
+}
 }
