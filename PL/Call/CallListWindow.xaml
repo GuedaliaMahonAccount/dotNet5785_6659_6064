@@ -12,6 +12,7 @@
     
     <Window.Resources>
         <local:TimeSpanToLabeledStringConverter x:Key="TimeSpanToLabeledStringConverter" />
+        <local:CallTypeToColorConverter x:Key="CallTypeToColorConverter" />
     </Window.Resources>
 
     <!--External Grid-->
@@ -52,8 +53,16 @@
                 <!-- Id Column -->
                 <DataGridTextColumn Binding="{Binding CallId}" Header="Id" Width="Auto"/>
 
-                <!-- Status Column -->
-                <DataGridTextColumn Binding="{Binding Status}" Header="Status" Width="Auto"/>
+                <!-- CallType (Status) Column -->
+                <DataGridTemplateColumn Header="Status" Width="Auto">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Status}"
+                               FontSize="16"
+                               Foreground="{Binding Status, Converter={StaticResource CallTypeToColorConverter}}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
 
                 <!-- Left Time to Expire Column -->
                 <DataGridTemplateColumn Header="Last volunteer name" Width="Auto">
