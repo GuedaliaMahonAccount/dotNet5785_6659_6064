@@ -9,6 +9,11 @@
         DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}"
         Loaded="Window_Loaded"
         Closed="Window_Closed">
+
+    <Window.Resources>
+        <local:CallTypeToColorConverter x:Key="CallTypeToColorConverter" />
+    </Window.Resources>
+    
     <Grid>
 
         <!-- Background Image -->
@@ -46,8 +51,18 @@
             <DataGrid.Columns>
                 <DataGridTextColumn Binding="{Binding Id}" Header="Id" Width="Auto"/>
                 <DataGridTextColumn Binding="{Binding Name}" Header="Name" Width="Auto"/>
-                <DataGridTextColumn Binding="{Binding CurrentCallType}" Header="CurrentCallType" Width="Auto"/>
 
+                <!-- CurrentCallType Column -->
+                <DataGridTemplateColumn Header="Status" Width="Auto">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding CurrentCallType}"
+                                FontSize="16"
+                                Foreground="{Binding CurrentCallType, Converter={StaticResource CallTypeToColorConverter}}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                
                 <DataGridTemplateColumn Header="Is Active" Width="Auto">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
