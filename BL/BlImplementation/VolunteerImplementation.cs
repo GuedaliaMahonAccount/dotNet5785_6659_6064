@@ -381,6 +381,36 @@ internal class VolunteerImplementation : IVolunteer
     /// </exception>
     public void AddVolunteer(BO.Volunteer volunteer)
     {
+        // Check for null values
+        if (volunteer == null)
+            throw new BlNullPropertyException("Volunteer object cannot be null.");
+
+        if (string.IsNullOrWhiteSpace(volunteer.Id.ToString()))
+            throw new BlNullPropertyException("Volunteer ID cannot be empty.");
+
+        if (string.IsNullOrWhiteSpace(volunteer.Name))
+            throw new BlNullPropertyException("Volunteer name cannot be empty.");
+
+        if (string.IsNullOrWhiteSpace(volunteer.Phone))
+            throw new BlNullPropertyException("Volunteer phone number cannot be empty.");
+
+        if (string.IsNullOrWhiteSpace(volunteer.Email))
+            throw new BlNullPropertyException("Volunteer email cannot be empty.");
+
+        if (string.IsNullOrWhiteSpace(volunteer.Password))
+            throw new BlNullPropertyException("Volunteer password cannot be empty.");
+
+        if (string.IsNullOrWhiteSpace(volunteer.Address))
+            throw new BlNullPropertyException("Volunteer address cannot be empty.");
+
+        // Check Latitude and Longitude for null or invalid values
+        if (!volunteer.Latitude.HasValue || string.IsNullOrWhiteSpace(volunteer.Latitude.ToString()))
+            throw new BlNullPropertyException("Volunteer Latitude cannot be empty.");
+
+        if (!volunteer.Longitude.HasValue || string.IsNullOrWhiteSpace(volunteer.Longitude.ToString()))
+            throw new BlNullPropertyException("Volunteer Longitude cannot be empty.");
+
+
         // Validate all fields
         if (!VolunteerManager.ValidId(volunteer.Id.ToString()))
             throw new BlInvalidValueException("Invalid ID.");
@@ -399,6 +429,11 @@ internal class VolunteerImplementation : IVolunteer
 
         if (!VolunteerManager.ValidAddress(volunteer.Address)) // Validate address
             throw new BlInvalidValueException("Invalid address.");
+
+        if (!double.TryParse(volunteer.Latitude.ToString(), out double latitude))
+            throw new BlInvalidValueException("Invalid latitude value. Must be a valid number.");
+        if (!double.TryParse(volunteer.Longitude.ToString(), out double longitude))
+            throw new BlInvalidValueException("Invalid longitude value. Must be a valid number.");
 
         // Ensure coordinates are not null and valid
         if (!volunteer.Latitude.HasValue || !volunteer.Longitude.HasValue)
