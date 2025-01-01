@@ -1,6 +1,9 @@
-﻿using System.Windows;
+﻿using System.Globalization;
+using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
+using System.Windows.Media;
 
 namespace PL.Volunteer
 {
@@ -82,6 +85,41 @@ namespace PL.Volunteer
                     }
                 }
             }
+        }
+    }
+
+    /// <summary>
+    /// enum colors converter
+    /// </summary>
+    public class CallTypeToColorConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is BO.CallType callType)
+            {
+                // Map CallType values to colors
+                return callType switch
+                {
+                    BO.CallType.None => Brushes.Gray,
+                    BO.CallType.Open => Brushes.Green,
+                    BO.CallType.InTreatment => Brushes.Blue,
+                    BO.CallType.Completed => Brushes.DarkGreen,
+                    BO.CallType.Expired => Brushes.OrangeRed,
+                    BO.CallType.SelfCanceled => Brushes.Orange,
+                    BO.CallType.AdminCanceled => Brushes.Red,
+                    BO.CallType.OpenAtRisk => Brushes.Yellow,
+                    BO.CallType.InTreatmentAtRisk => Brushes.Gold,
+                    _ => Brushes.Black
+                };
+
+            }
+
+            return Brushes.Black; // Default color
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
         }
     }
 }
