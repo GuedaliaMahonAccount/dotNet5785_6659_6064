@@ -1,23 +1,14 @@
-﻿using PL.Call;
-using PL.Volunteer;
-using System.Text;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace PL
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Interaction logic for AdminMenu.xaml
     /// </summary>
 
-    public partial class MainWindow : Window
+    public partial class AdminMenu : Window
     {
         static readonly BlApi.IBl s_bl = BlApi.Factory.Get();
 
@@ -27,7 +18,7 @@ namespace PL
             set { SetValue(CurrentTimeProperty, value); }
         }
         public static readonly DependencyProperty CurrentTimeProperty =
-            DependencyProperty.Register("CurrentTime", typeof(DateTime), typeof(MainWindow));
+            DependencyProperty.Register("CurrentTime", typeof(DateTime), typeof(AdminMenu));
 
         public int MaxYearRange
         {
@@ -36,9 +27,9 @@ namespace PL
         }
 
         public static readonly DependencyProperty MaxYearRangeProperty =
-            DependencyProperty.Register("MaxYearRange", typeof(int), typeof(MainWindow), new PropertyMetadata(0));
+            DependencyProperty.Register("MaxYearRange", typeof(int), typeof(AdminMenu), new PropertyMetadata(0));
 
-        public MainWindow()
+        public AdminMenu()
         {
             InitializeComponent();
         }

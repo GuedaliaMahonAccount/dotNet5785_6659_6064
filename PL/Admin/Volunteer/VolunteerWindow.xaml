@@ -21,7 +21,7 @@
     <Grid>
         <!-- Background Image -->
         <Grid.Background>
-            <ImageBrush ImageSource="../Assets/background2.png" Stretch="UniformToFill" />
+            <ImageBrush ImageSource="../../Assets/background2.png" Stretch="UniformToFill" />
         </Grid.Background>
 
         <StackPanel>

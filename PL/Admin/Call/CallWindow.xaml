@@ -16,7 +16,7 @@
     <Grid>
         <!-- Background Image -->
         <Grid.Background>
-            <ImageBrush ImageSource="../Assets/background2.png" Stretch="UniformToFill"/>
+            <ImageBrush ImageSource="../../Assets/background2.png" Stretch="UniformToFill"/>
         </Grid.Background>
 
         <Grid HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,20,0,0" Height="400">

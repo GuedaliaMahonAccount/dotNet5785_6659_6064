@@ -20,7 +20,7 @@
 
         <!-- Background Image -->
         <Grid.Background>
-            <ImageBrush ImageSource="../Assets/background1.jpeg" Stretch="UniformToFill"/>
+            <ImageBrush ImageSource="../../Assets/background1.jpeg" Stretch="UniformToFill"/>
         </Grid.Background>
 
         <Grid.RowDefinitions>
