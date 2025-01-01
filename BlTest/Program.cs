@@ -609,21 +609,11 @@ Option Options:
             {
                 volunteer.Latitude = latitude;
             }
-            else
-            {
-                Console.WriteLine("Invalid latitude.");
-                return;
-            }
-
+           
             Console.Write("Enter longitude: ");
             if (double.TryParse(Console.ReadLine(), out double longitude))
             {
                 volunteer.Longitude = longitude;
-            }
-            else
-            {
-                Console.WriteLine("Invalid longitude.");
-                return;
             }
 
             try

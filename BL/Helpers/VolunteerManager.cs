@@ -59,16 +59,21 @@ namespace Helpers
             // Check if name contains only letters and spaces
             return Regex.IsMatch(name, @"^[A-Za-z\u0590-\u05FF\s]+$");
         }
+       
         public static bool ValidPhone(string phone)
         {
-            // Remove any non-digit characters
-            string cleanedPhone = Regex.Replace(phone, @"[^\d]", "");
+            if (string.IsNullOrEmpty(phone))
+                return false;
 
-            // Israeli phone number validation
-            // Mobile: 10 digits, starts with 05x
-            // Landline: 9 digits
-            return Regex.IsMatch(cleanedPhone, @"^(0)?5\d{8}$") ||
-                   Regex.IsMatch(cleanedPhone, @"^\d{9}$");
+            phone = phone.Trim().Replace("-", "").Replace(" ", "");
+
+            if (phone.Length != 10)
+                return false;
+
+            if (!phone.StartsWith("05"))
+                return false;
+
+            return phone.All(char.IsDigit);
         }
         public static bool ValidEmail(string email)
         {
@@ -116,10 +121,9 @@ namespace Helpers
 
 
         /// <summary>
-        /// Retrieves coordinates from an address using LocationIQ API.
-        /// 
+        /// Retrieves coordinates from an address using LocationIQ API. 
         /// exemple of correct adress
-        /// "display_name": "מרכז אורן יצחק רגר, 185, Beer Sheva"
+        /// "display_name": "מרכז אורן יצחק רגר, 185, באר שבע"
         /// "lat": "31.27042089999999"
         /// "lon": "34.7975837"
         /// 
