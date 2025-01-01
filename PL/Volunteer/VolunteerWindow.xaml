@@ -5,90 +5,140 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PL.Volunteer"
         mc:Ignorable="d"
-        Title="VolunteerWindow" Height="550" Width="350"
+        Title="VolunteerWindow"
+        Height="550"
+        Width="350"
         DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}">
 
     <Window.Resources>
-        <local:UpdateToReadOnlyConverter x:Key="UpdateToReadOnlyConverter"/>
-        <local:UpdateToVisibilityConverter x:Key="UpdateToVisibilityConverter"/>
+        <local:UpdateToReadOnlyConverter x:Key="UpdateToReadOnlyConverter" />
+        <local:UpdateToVisibilityConverter x:Key="UpdateToVisibilityConverter" />
+        <local:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+        <local:InvertedBoolToVisibilityConverter x:Key="InvertedBoolToVisibilityConverter" />
+        <local:BoolToEyeIconConverter x:Key="BoolToEyeIconConverter" />
     </Window.Resources>
 
     <Grid>
         <!-- Background Image -->
         <Grid.Background>
-            <ImageBrush ImageSource="../Assets/background2.png" Stretch="UniformToFill"/>
+            <ImageBrush ImageSource="../Assets/background2.png" Stretch="UniformToFill" />
         </Grid.Background>
-        
+
         <StackPanel>
             <Grid HorizontalAlignment="Left" VerticalAlignment="Top" Margin="45,45,45,0">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
-                <Label Grid.Row="0" Grid.Column="0" Content="Id:" HorizontalAlignment="Left" Margin="3" VerticalAlignment="Center"/>
-                <TextBox Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left" Margin="3" Text="{Binding CurrentVolunteer.Id, Mode=TwoWay}" VerticalAlignment="Center" Width="120" IsReadOnly="{Binding ButtonText, Converter={StaticResource UpdateToReadOnlyConverter}}"/>
+                <Label Grid.Row="0" Grid.Column="0" Content="Id:" HorizontalAlignment="Left" Margin="3" VerticalAlignment="Center" />
+                <TextBox Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left" Margin="3" Text="{Binding CurrentVolunteer.Id, Mode=TwoWay}" VerticalAlignment="Center" Width="120" IsReadOnly="{Binding ButtonText, Converter={StaticResource UpdateToReadOnlyConverter}}" />
 
-                <Label Grid.Row="1" Grid.Column="0" Content="Name:" HorizontalAlignment="Left" Margin="3" VerticalAlignment="Center"/>
-                <TextBox Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" Margin="3" Text="{Binding CurrentVolunteer.Name, Mode=TwoWay}" VerticalAlignment="Center" Width="120"/>
+                <Label Grid.Row="1" Grid.Column="0" Content="Name:" HorizontalAlignment="Left" Margin="3" VerticalAlignment="Center" />
+                <TextBox Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" Margin="3" Text="{Binding CurrentVolunteer.Name, Mode=TwoWay}" VerticalAlignment="Center" Width="120" />
 
-                <Label Grid.Row="2" Grid.Column="0" Content="Phone:" HorizontalAlignment="Left" Margin="3" VerticalAlignment="Center"/>
-                <TextBox Grid.Row="2" Grid.Column="1" HorizontalAlignment="Left" Margin="3" Text="{Binding CurrentVolunteer.Phone, Mode=TwoWay}" VerticalAlignment="Center" Width="120"/>
+                <Label Grid.Row="2" Grid.Column="0" Content="Phone:" HorizontalAlignment="Left" Margin="3" VerticalAlignment="Center" />
+                <TextBox Grid.Row="2" Grid.Column="1" HorizontalAlignment="Left" Margin="3" Text="{Binding CurrentVolunteer.Phone, Mode=TwoWay}" VerticalAlignment="Center" Width="120" />
 
-                <Label Grid.Row="3" Grid.Column="0" Content="Email:" HorizontalAlignment="Left" Margin="3" VerticalAlignment="Center"/>
-                <TextBox Grid.Row="3" Grid.Column="1" HorizontalAlignment="Left" Margin="3" Text="{Binding CurrentVolunteer.Email, Mode=TwoWay}" VerticalAlignment="Center" Width="120"/>
+                <Label Grid.Row="3" Grid.Column="0" Content="Email:" HorizontalAlignment="Left" Margin="3" VerticalAlignment="Center" />
+                <TextBox Grid.Row="3" Grid.Column="1" HorizontalAlignment="Left" Margin="3" Text="{Binding CurrentVolunteer.Email, Mode=TwoWay}" VerticalAlignment="Center" Width="120" />
 
-                <Label Grid.Row="4" Grid.Column="0" Content="Role:" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="3"/>
-                <ComboBox Grid.Row="4" Grid.Column="1" HorizontalAlignment="Left" Margin="3" ItemsSource="{Binding Source={StaticResource RoleCollectionKey}}" SelectedValue="{Binding CurrentVolunteer.Role}" IsEnabled="False" VerticalAlignment="Center" Width="120"/>
+                <Label Grid.Row="4" Grid.Column="0" Content="Role:" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="3" />
+                <ComboBox Grid.Row="4" Grid.Column="1" HorizontalAlignment="Left" Margin="3" ItemsSource="{Binding Source={StaticResource RoleCollectionKey}}" SelectedValue="{Binding CurrentVolunteer.Role}" IsEnabled="False" VerticalAlignment="Center" Width="120" />
 
-                <Label Grid.Row="5" Grid.Column="0" Content="Password:" HorizontalAlignment="Left" Margin="3" VerticalAlignment="Center"/>
-                <PasswordBox Grid.Row="5" Grid.Column="1" HorizontalAlignment="Left" Margin="3"
-             local:PasswordBoxHelper.BindPassword="True"
-             local:PasswordBoxHelper.BoundPassword="{Binding CurrentVolunteer.Password, Mode=TwoWay}"
-             VerticalAlignment="Center" Width="120"/>
+                <Label Grid.Row="5" Grid.Column="0" Content="Password:" HorizontalAlignment="Left" Margin="3" VerticalAlignment="Center" />
+                <Grid Grid.Row="5" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="3">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
 
-                <Label Grid.Row="6" Grid.Column="0" Content="Address:" HorizontalAlignment="Left" Margin="3" VerticalAlignment="Center"/>
-                <TextBox Grid.Row="6" Grid.Column="1" HorizontalAlignment="Left" Margin="3" Text="{Binding CurrentVolunteer.Address, Mode=TwoWay}" VerticalAlignment="Center" Width="120"/>
+                    <!-- PasswordBox -->
+                    <PasswordBox x:Name="PasswordBox"
+                                 VerticalAlignment="Center"
+                                 Margin="0,0,5,0"
+                                 Width="120"
+                                 Visibility="{Binding IsPasswordVisible, Converter={StaticResource InvertedBoolToVisibilityConverter}}"
+                                 local:PasswordBoxHelper.BindPassword="True"
+                                 local:PasswordBoxHelper.BoundPassword="{Binding CurrentVolunteer.Password, Mode=TwoWay}" />
 
-                <Label Grid.Row="7" Grid.Column="0" Content="Latitude:" HorizontalAlignment="Left" Margin="3" VerticalAlignment="Center"/>
-                <TextBox Grid.Row="7" Grid.Column="1" HorizontalAlignment="Left" Margin="3" Text="{Binding CurrentVolunteer.Latitude, Mode=TwoWay}" VerticalAlignment="Center" Width="120"/>
+                    <!-- Plain Text Password -->
+                    <TextBox x:Name="PlainTextBox"
+                             VerticalAlignment="Center"
+                             Margin="0,0,5,0"
+                             Width="120"
+                             Visibility="{Binding IsPasswordVisible, Converter={StaticResource BoolToVisibilityConverter}}"
+                             Text="{Binding CurrentVolunteer.Password, Mode=TwoWay}" />
 
-                <Label Grid.Row="8" Grid.Column="0" Content="Longitude:" HorizontalAlignment="Left" Margin="3" VerticalAlignment="Center"/>
-                <TextBox Grid.Row="8" Grid.Column="1" HorizontalAlignment="Left" Margin="3" Text="{Binding CurrentVolunteer.Longitude, Mode=TwoWay}" VerticalAlignment="Center" Width="120"/>
+                    <!-- Styled Toggle Button -->
+                    <Button Grid.Column="1"
+                            Command="{Binding TogglePasswordVisibilityCommand}"
+                            ToolTip="Toggle password visibility"
+                            Width="20"
+                            Height="20"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Right"
+                            Margin="5,0,0,0">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Grid>
+                                    <!-- Circle background -->
+                                    <Ellipse Fill="#E0E0E0" Stroke="#B0B0B0" StrokeThickness="1" />
+                                    <!-- Eye Icon -->
+                                    <TextBlock Text="{Binding IsPasswordVisible, Converter={StaticResource BoolToEyeIconConverter}}"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"
+                                               FontSize="16"
+                                               FontWeight="Bold"
+                                               Foreground="#606060" />
+                                </Grid>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
+                </Grid>
 
-                <Label Grid.Row="9" Grid.Column="0" Content="Max Distance:" HorizontalAlignment="Left" Margin="3" VerticalAlignment="Center"/>
+                <Label Grid.Row="6" Grid.Column="0" Content="Address:" HorizontalAlignment="Left" Margin="3" VerticalAlignment="Center" />
+                <TextBox Grid.Row="6" Grid.Column="1" HorizontalAlignment="Left" Margin="3" Text="{Binding CurrentVolunteer.Address, Mode=TwoWay}" VerticalAlignment="Center" Width="120" />
+
+                <Label Grid.Row="7" Grid.Column="0" Content="Latitude:" HorizontalAlignment="Left" Margin="3" VerticalAlignment="Center" />
+                <TextBox Grid.Row="7" Grid.Column="1" HorizontalAlignment="Left" Margin="3" Text="{Binding CurrentVolunteer.Latitude, Mode=TwoWay}" VerticalAlignment="Center" Width="120" />
+
+                <Label Grid.Row="8" Grid.Column="0" Content="Longitude:" HorizontalAlignment="Left" Margin="3" VerticalAlignment="Center" />
+                <TextBox Grid.Row="8" Grid.Column="1" HorizontalAlignment="Left" Margin="3" Text="{Binding CurrentVolunteer.Longitude, Mode=TwoWay}" VerticalAlignment="Center" Width="120" />
+
+                <Label Grid.Row="9" Grid.Column="0" Content="Max Distance:" HorizontalAlignment="Left" Margin="3" VerticalAlignment="Center" />
                 <Grid Grid.Row="9" Grid.Column="1">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
-                    <TextBox Grid.Column="0" HorizontalAlignment="Left" Margin="3" Text="{Binding CurrentVolunteer.MaxDistance, Mode=TwoWay}" VerticalAlignment="Center" Width="120"/>
-                    <TextBlock Grid.Column="1" Text="km" VerticalAlignment="Center" Margin="3" IsHitTestVisible="False"/>
+                    <TextBox Grid.Column="0" HorizontalAlignment="Left" Margin="3" Text="{Binding CurrentVolunteer.MaxDistance, Mode=TwoWay}" VerticalAlignment="Center" Width="120" />
+                    <TextBlock Grid.Column="1" Text="km" VerticalAlignment="Center" Margin="3" IsHitTestVisible="False" />
+                </Grid>
+
+                <Label Grid.Row="10" Grid.Column="0" Content="Distance Type:" HorizontalAlignment="Left" Margin="3" VerticalAlignment="Center" />
+                <ComboBox Grid.Row="10" Grid.Column="1" HorizontalAlignment="Left" Margin="3" ItemsSource="{Binding Source={StaticResource DistanceTypeCollectionKey}}" SelectedValue="{Binding CurrentVolunteer.DistanceType, Mode=TwoWay}" VerticalAlignment="Center" Width="120" />
+
+                <Label Grid.Row="11" Grid.Column="0" Content="Current Call:" HorizontalAlignment="Left" Margin="3" VerticalAlignment="Center" />
+                <ComboBox Grid.Row="11" Grid.Column="1" HorizontalAlignment="Left" Margin="3" ItemsSource="{Binding CurrentVolunteer.CurrentCall}" SelectedValue="{Binding CurrentVolunteer.CurrentCall}" VerticalAlignment="Center" Width="120" IsEnabled="False" />
             </Grid>
 
-                <Label Grid.Row="10" Grid.Column="0" Content="Distance Type:" HorizontalAlignment="Left" Margin="3" VerticalAlignment="Center"/>
-                <ComboBox Grid.Row="10" Grid.Column="1" HorizontalAlignment="Left" Margin="3" ItemsSource="{Binding Source={StaticResource DistanceTypeCollectionKey}}" SelectedValue="{Binding CurrentVolunteer.DistanceType, Mode=TwoWay}" VerticalAlignment="Center" Width="120"/>
-
-                <Label Grid.Row="11" Grid.Column="0" Content="Current Call:" HorizontalAlignment="Left" Margin="3" VerticalAlignment="Center"/>
-                <ComboBox Grid.Row="11" Grid.Column="1" HorizontalAlignment="Left" Margin="3" ItemsSource="{Binding CurrentVolunteer.CurrentCall}" SelectedValue="{Binding CurrentVolunteer.CurrentCall}" VerticalAlignment="Center" Width="120" IsEnabled="False"/>
-            </Grid>
-
-            <Button Content="{Binding ButtonText}" HorizontalAlignment="Center" Margin="0,45,0,45" Padding="5" Click="btnAddUpdate_Click"/>
+            <Button Content="{Binding ButtonText}" HorizontalAlignment="Center" Margin="0,45,0,45" Padding="5" Click="btnAddUpdate_Click" />
         </StackPanel>
     </Grid>
 </Window>
