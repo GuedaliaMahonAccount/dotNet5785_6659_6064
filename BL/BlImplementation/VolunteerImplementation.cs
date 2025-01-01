@@ -273,10 +273,30 @@ internal class VolunteerImplementation : IVolunteer
             throw new LogicException("The requester is not authorized to update this volunteer.");
         }
 
-        // Check all fields
-        if (!VolunteerManager.ValidId(updatedVolunteer.Id.ToString()))
-            throw new BlInvalidValueException("Invalid ID.");
+        if (string.IsNullOrWhiteSpace(updatedVolunteer.Id.ToString()))
+            throw new BlNullPropertyException("Volunteer ID cannot be empty.");
 
+        if (string.IsNullOrWhiteSpace(updatedVolunteer.Name))
+            throw new BlNullPropertyException("Volunteer name cannot be empty.");
+
+        if (string.IsNullOrWhiteSpace(updatedVolunteer.Phone))
+            throw new BlNullPropertyException("Volunteer phone number cannot be empty.");
+
+        if (string.IsNullOrWhiteSpace(updatedVolunteer.Email))
+            throw new BlNullPropertyException("Volunteer email cannot be empty.");
+
+        if (string.IsNullOrWhiteSpace(updatedVolunteer.Password))
+            throw new BlNullPropertyException("Volunteer password cannot be empty.");
+
+        if (string.IsNullOrWhiteSpace(updatedVolunteer.Address))
+            throw new BlNullPropertyException("Volunteer address cannot be empty.");
+        if (!updatedVolunteer.Latitude.HasValue || string.IsNullOrWhiteSpace(updatedVolunteer.Latitude.ToString()))
+            throw new BlNullPropertyException("Volunteer Latitude cannot be empty.");
+
+        if (!updatedVolunteer.Longitude.HasValue || string.IsNullOrWhiteSpace(updatedVolunteer.Longitude.ToString()))
+            throw new BlNullPropertyException("Volunteer Longitude cannot be empty.");
+
+        // Check all fields
         if (!VolunteerManager.ValidName(updatedVolunteer.Name)) // Validate name
             throw new BlInvalidValueException("Invalid name.");
 
@@ -284,7 +304,7 @@ internal class VolunteerImplementation : IVolunteer
             throw new BlInvalidValueException("Invalid phone number.");
 
         if (!VolunteerManager.ValidPassword(updatedVolunteer.Password)) // Validate Password
-            throw new BlInvalidValueException("Invalid Password.");
+            throw new BlInvalidValueException("The password must be at least 8 characters long and must contain a capital letter, a lowercase letter, and one digit");
 
         if (!VolunteerManager.ValidEmail(updatedVolunteer.Email)) // Validate email
             throw new BlInvalidValueException("Invalid email.");
@@ -403,7 +423,6 @@ internal class VolunteerImplementation : IVolunteer
         if (string.IsNullOrWhiteSpace(volunteer.Address))
             throw new BlNullPropertyException("Volunteer address cannot be empty.");
 
-        // Check Latitude and Longitude for null or invalid values
         if (!volunteer.Latitude.HasValue || string.IsNullOrWhiteSpace(volunteer.Latitude.ToString()))
             throw new BlNullPropertyException("Volunteer Latitude cannot be empty.");
 
@@ -425,7 +444,7 @@ internal class VolunteerImplementation : IVolunteer
             throw new BlInvalidValueException("Invalid email.");
 
         if (!VolunteerManager.ValidPassword(volunteer.Password))
-            throw new BlInvalidValueException("Invalid Password.");
+            throw new BlInvalidValueException("The password must be at least 8 characters long and must contain a capital letter, a lowercase letter, and one digit");
 
         if (!VolunteerManager.ValidAddress(volunteer.Address)) // Validate address
             throw new BlInvalidValueException("Invalid address.");
@@ -458,6 +477,11 @@ internal class VolunteerImplementation : IVolunteer
             Role = (DO.Role)volunteer.Role, // Convert BO.Role to DO.Role
             IsActive = volunteer.IsActive
         };
+
+        // Check if the volunteer already exists by ID
+        var existingVolunteer = _dal.Volunteer.Read(volunteer.Id);
+        if (existingVolunteer != null)
+            throw new BlInvalidValueException($"Volunteer with ID {volunteer.Id} already exists.");
 
         try
         {
