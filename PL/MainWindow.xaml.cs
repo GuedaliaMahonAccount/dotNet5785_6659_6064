@@ -92,14 +92,14 @@ namespace PL
             s_bl.Admin.AddConfigObserver(configObserver);
         }
 
-        private void Window_Closed(object sender, EventArgs e) 
+        private void Window_Closed(object sender, EventArgs e)
         {
             s_bl.Admin.RemoveClockObserver(clockObserver);
             s_bl.Admin.RemoveConfigObserver(configObserver);
 
             foreach (Window window in Application.Current.Windows)
             {
-                if (window != this) 
+                if (window != this)
                 {
                     window.Close();
                 }
@@ -119,7 +119,7 @@ namespace PL
         {
 
         }
-       
+
         private void BtnHandleVolunteer_Click(object sender, RoutedEventArgs e)
         {
             new Volunteer.VolunteerListWindow().Show();
@@ -184,5 +184,21 @@ namespace PL
             }
         }
 
+
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            var result = MessageBox.Show("Are you sure you want to close this window?",
+                                         "Confirm Close",
+                                         MessageBoxButton.YesNo,
+                                         MessageBoxImage.Question);
+
+            if (result == MessageBoxResult.No)
+            {
+                e.Cancel = true;
+            }
+        }
     }
+
+
 }
