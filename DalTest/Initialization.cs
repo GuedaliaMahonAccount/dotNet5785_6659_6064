@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Collections.Generic;
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 using System.Text;
 using DalApi;
 using DO;
@@ -13,15 +10,15 @@ namespace DalTest
         private static IDal? s_dal;
         private static readonly Random s_rand = new();
 
-        private static readonly List<int> s_preGeneratedIds = new()
+        private static void CreateVolunteers()
+        {
+            List<int> s_preGeneratedIds = new()
         {
             322766064, 200000016, 200000024, 200000032, 200000040,
             200000057, 200000065, 200000073, 200000081, 200000099,
             200000107, 200000115, 200000123, 200000131, 200000149
         };
 
-        private static void CreateVolunteers()
-        {
             string[] volunteerNames = {
                 "Dani Levy", "Eli Amar", "Yair Cohen", "Ariela Levin", "Dina Klein",
                 "Shira Israelof", "Yael Mizrahi", "Oren Shmuel", "Maya Katz",
@@ -96,7 +93,6 @@ namespace DalTest
                 s_dal.Volunteer.Create(volunteer);
             }
         }
-
 
         private static void CreateCalls()
         {
@@ -219,16 +215,29 @@ namespace DalTest
             }
 
 
-            DateTime start = new DateTime(s_dal!.Config.Clock.Year - 2, 1, 1);
+            DateTime end = DateTime.Now;
+            DateTime start = end.AddDays(-30);
 
             //in case that it s not exactly 50 data
             int minLength = new[] { descriptions.Length, addresses.Length, latitudes.Length, longitudes.Length }.Min();
             for (int i = 0; i < minLength; i++)
             {
-                var startTime = start.AddDays(-s_rand.Next(1, 30));
+                // Generate a random start date within the last 30 days
+                var startTime = start
+                    .AddDays(s_rand.Next(0, 30))            // Random days between 30 days ago and today
+                    .AddHours(s_rand.Next(0, 24))          // Random hours
+                    .AddMinutes(s_rand.Next(0, 60))        // Random minutes
+                    .AddSeconds(s_rand.Next(0, 60));       // Random seconds
+
+                // Generate a random deadline between 30 and 60 days after the start date
                 DateTime? deadline = s_rand.NextDouble() < 0.5
-                    ? (DateTime?)startTime.AddHours(s_rand.Next(1, 72))
+                    ? (DateTime?)startTime
+                        .AddDays(s_rand.Next(30, 60))      // Random days between 30 and 60 days after startTime
+                        .AddHours(s_rand.Next(0, 24))      // Random hours
+                        .AddMinutes(s_rand.Next(0, 60))    // Random minutes
+                        .AddSeconds(s_rand.Next(0, 60))    // Random seconds
                     : null;
+
 
                 int callId = s_dal.Config.NextCallId;
 
@@ -349,6 +358,10 @@ namespace DalTest
         }
     }
 
+
+
+
+    //password hash
     public static class AesEncryptionHelper
     {
         private static readonly string Key = "YourSecureKey123";
@@ -406,7 +419,6 @@ namespace DalTest
             }
         }
     }
-
     public static class PasswordUtils
     {
         public static string ReadAndEncryptPassword()
@@ -439,8 +451,6 @@ namespace DalTest
             return AesEncryptionHelper.Encrypt(plainPassword.ToString());
         }
     }
-
-
     public static class PasswordGenerator
     {
         private static readonly Random s_rand = new();

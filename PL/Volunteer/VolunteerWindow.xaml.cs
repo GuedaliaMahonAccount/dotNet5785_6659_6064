@@ -1,16 +1,32 @@
-﻿using System;
+﻿using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using BO;
+using System.Windows.Input;
 
 namespace PL.Volunteer
 {
     /// <summary>
     /// Interaction logic for VolunteerWindow.xaml
     /// </summary>
-    public partial class VolunteerWindow : Window
+    public partial class VolunteerWindow : Window, INotifyPropertyChanged
     {
+        // Property to toggle password visibility
+        private bool _isPasswordVisible;
+        public bool IsPasswordVisible
+        {
+            get => _isPasswordVisible;
+            set
+            {
+                _isPasswordVisible = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public ICommand TogglePasswordVisibilityCommand { get; }
+
+        // Static reference to business logic layer
         static readonly BlApi.IBl s_bl = BlApi.Factory.Get();
 
         // Dependency property for button text
@@ -33,14 +49,22 @@ namespace PL.Volunteer
 
         public VolunteerWindow(int id = 0)
         {
+            TogglePasswordVisibilityCommand = new RelayCommand(() => IsPasswordVisible = !IsPasswordVisible);
+
             ButtonText = id == 0 ? "Add" : "Update";
 
-            // Initialize CurrentVolunteer based on whether an id is provided
+            // Initialize CurrentVolunteer based on whether an ID is provided
             CurrentVolunteer = id == 0
                 ? new BO.Volunteer() // New Volunteer
                 : s_bl.Volunteer.GetVolunteerDetails(id); // Fetch existing Volunteer from BL
 
             InitializeComponent();
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         // Event handler for Add/Update button
@@ -66,7 +90,6 @@ namespace PL.Volunteer
                 MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
-
     }
 
     // Helper class for PasswordBox binding
@@ -147,5 +170,69 @@ namespace PL.Volunteer
         {
             return value;
         }
+    }
+
+    // Converter for Visibility based on Update state
+    public class BoolToVisibilityConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            return value is bool isVisible && isVisible ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    // Converter for Visibility based on Update state
+    public class InvertedBoolToVisibilityConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            return value is bool isVisible && !isVisible ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    // Converter for Eye icon based on visibility
+    public class BoolToEyeIconConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            return value is bool isVisible && isVisible ? "🙈" : "👁";
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+
+    // RelayCommand Implementation
+    public class RelayCommand : ICommand
+    {
+        private readonly Action _execute;
+        private readonly Func<bool> _canExecute;
+
+        public RelayCommand(Action execute, Func<bool> canExecute = null)
+        {
+            _execute = execute;
+            _canExecute = canExecute;
+        }
+
+        public event EventHandler CanExecuteChanged;
+
+        public bool CanExecute(object parameter) => _canExecute?.Invoke() ?? true;
+
+        public void Execute(object parameter) => _execute();
+
+        public void RaiseCanExecuteChanged() => CanExecuteChanged?.Invoke(this, EventArgs.Empty);
     }
 }
