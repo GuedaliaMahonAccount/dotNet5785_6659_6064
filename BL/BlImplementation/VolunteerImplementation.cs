@@ -310,7 +310,7 @@ internal class VolunteerImplementation : IVolunteer
             throw new BlInvalidValueException("Invalid email.");
 
         if (!VolunteerManager.ValidAddress(updatedVolunteer.Address)) // Validate address
-            throw new BlInvalidValueException("Invalid address.");
+            throw new BlInvalidValueException("Invalid address, Please enter the address in this template: number, street , city ");
 
         // Ensure coordinates are not null and valid
         if (!updatedVolunteer.Latitude.HasValue || !updatedVolunteer.Longitude.HasValue)
