@@ -518,9 +518,9 @@ namespace BlImplementation
         public void AddObserver(int id, Action observer) =>
                 CallManager.Observers.AddObserver(id, observer);
         public void RemoveObserver(Action listObserver) =>
-                CallManager.Observers.AddListObserver(listObserver);
+                CallManager.Observers.RemoveListObserver(listObserver);
         public void RemoveObserver(int id, Action observer) =>
-                CallManager.Observers.AddObserver(id, observer);
+                CallManager.Observers.RemoveObserver(id, observer);
 
     }
 }
