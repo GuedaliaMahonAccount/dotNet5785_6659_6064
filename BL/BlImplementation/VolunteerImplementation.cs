@@ -92,7 +92,7 @@ internal class VolunteerImplementation : IVolunteer
             Latitude = volunteerData.Latitude,
             Longitude = volunteerData.Longitude,
             MaxDistance = volunteerData.MaxDistance,
-            Password = IsEncrypted(volunteerData.Password) ? volunteerData.Password : AesEncryptionHelper.Encrypt(volunteerData.Password)
+            Password = IsEncrypted(volunteerData.Password) ? AesEncryptionHelper.Decrypt(volunteerData.Password) : volunteerData.Password
         };
 
         // Map the current call in progress if applicable
