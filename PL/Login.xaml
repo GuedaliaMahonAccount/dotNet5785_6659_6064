@@ -11,6 +11,21 @@
         Closing="Window_Closing">
     <Grid>
 
-        
+        <Grid.Background>
+            <ImageBrush ImageSource="Assets\Login item.jpg" Stretch="UniformToFill"/>
+        </Grid.Background>
+
+        <!-- Email TextBox -->
+        <TextBox HorizontalAlignment="Left" Margin="490,600,0,0" TextWrapping="Wrap" Text="Enter Name" VerticalAlignment="Top" Width="300" Height="40"
+                 FontSize="16" FontWeight="Bold" Foreground="Blue"/>
+
+        <!-- Password TextBox -->
+        <TextBox HorizontalAlignment="Left" Margin="490,660,0,0" TextWrapping="Wrap" Text="Enter Password" VerticalAlignment="Top" Width="300" Height="40"
+                 FontSize="16" FontWeight="Bold" Foreground="Blue"/>
+
+        <!-- Login Button -->
+        <Button Content="Login" HorizontalAlignment="Left" Margin="490,720,0,0" VerticalAlignment="Top" Height="40" Width="300"
+                FontSize="18" FontWeight="Bold" Foreground="White" Background="Green"/>
+
     </Grid>
 </Window>
