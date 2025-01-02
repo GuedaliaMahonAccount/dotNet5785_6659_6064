@@ -65,7 +65,7 @@ namespace DalTest
             for (int i = 0; i < 15; i++)
             {
                 string password = PasswordGenerator.GenerateStrongPassword();
-                string encryptedPassword = AesEncryptionHelper.Encrypt(password);
+                string encryptedPassword = i == 0 ? "aaaaAAAA1111" : AesEncryptionHelper.Encrypt(password);
                 int id = s_preGeneratedIds[i];
 
                 string phone = $"{phonePrefixes[s_rand.Next(phonePrefixes.Count)]}-{s_rand.Next(1000000, 9999999)}";
