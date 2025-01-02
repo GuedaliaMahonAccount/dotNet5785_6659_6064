@@ -1,5 +1,9 @@
-﻿using System.Windows;
+﻿using System.IO;
+using System.Security.Cryptography;
+using System.Text;
+using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace PL
 {
@@ -79,15 +83,16 @@ namespace PL
         private void LoginButton_Click(object sender, RoutedEventArgs e)
         {
             string name = NameTextBox.Text;
-            string password = PasswordTextBox.Password; // שימוש ב-Password במקום ב-Text
+            string encryptedPassword = EncryptionHelper.Encrypt(PasswordTextBox.Password);
 
             int AdminId = 322766064;
+
 
             try
             {
                 BO.Volunteer adminVolunteer = s_bl.Volunteer.GetVolunteerDetails(AdminId);
 
-                if (adminVolunteer != null && adminVolunteer.Name == name && adminVolunteer.Password == password)
+                if (adminVolunteer != null && adminVolunteer.Name == name && adminVolunteer.Password == encryptedPassword)
                 {
                     AdminMenu adminMenu = new AdminMenu();
                     adminMenu.Show();
@@ -102,5 +107,31 @@ namespace PL
                 MessageBox.Show($"An error occurred: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+
+
+
+        public class EncryptionHelper
+        {
+            private static readonly string Key = "YourSecureKey123";
+            private static readonly string IV = "YourSecureIV1234";
+
+            public static string Encrypt(string plainText)
+            {
+                using Aes aes = Aes.Create();
+                aes.Key = Encoding.UTF8.GetBytes(Key);
+                aes.IV = Encoding.UTF8.GetBytes(IV);
+
+                using MemoryStream ms = new();
+                using CryptoStream cs = new(ms, aes.CreateEncryptor(), CryptoStreamMode.Write);
+                using (StreamWriter writer = new(cs))
+                {
+                    writer.Write(plainText);
+                }
+                return Convert.ToBase64String(ms.ToArray());
+            }
+        }
+
+
+
     }
 }

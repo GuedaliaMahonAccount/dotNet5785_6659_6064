@@ -66,6 +66,7 @@ namespace DalTest
             {
                 string password = i == 0 ? "aaaaAAAA1111" : PasswordGenerator.GenerateStrongPassword();
                 string encryptedPassword = AesEncryptionHelper.Encrypt(password);
+
                 int id = s_preGeneratedIds[i];
 
                 string phone = $"{phonePrefixes[s_rand.Next(phonePrefixes.Count)]}-{s_rand.Next(1000000, 9999999)}";
@@ -372,14 +373,13 @@ namespace DalTest
 
         public static string Encrypt(string plainText)
         {
-            if (IsBase64String(plainText))
+            if (IsEncryptedString(plainText))
             {
                 return plainText;
             }
             using Aes aes = Aes.Create();
             aes.Key = Encoding.UTF8.GetBytes(Key);
             aes.IV = Encoding.UTF8.GetBytes(IV);
-
             using MemoryStream ms = new();
             using CryptoStream cs = new(ms, aes.CreateEncryptor(), CryptoStreamMode.Write);
             using (StreamWriter writer = new(cs))
@@ -389,15 +389,14 @@ namespace DalTest
             return Convert.ToBase64String(ms.ToArray());
         }
 
-        private static bool IsBase64String(string str)
+        private static bool IsEncryptedString(string str)
         {
             if (string.IsNullOrEmpty(str) || str.Length % 4 != 0)
                 return false;
-
             try
             {
-                Convert.FromBase64String(str);
-                return true;
+                byte[] bytes = Convert.FromBase64String(str);
+                return bytes.Length >= 16; 
             }
             catch
             {
