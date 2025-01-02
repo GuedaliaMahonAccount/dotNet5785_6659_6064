@@ -40,7 +40,7 @@ namespace PL
         private void TextBox_GotFocus(object sender, RoutedEventArgs e)
         {
             var textBox = sender as TextBox;
-            if (textBox != null && (textBox.Text == "Enter Name" || textBox.Text == "Enter Password"))
+            if (textBox != null && textBox.Text == "Enter Name")
             {
                 textBox.Text = string.Empty;
             }
@@ -55,17 +55,31 @@ namespace PL
                 {
                     textBox.Text = "Enter Name";
                 }
-                else if (textBox.Name == "PasswordTextBox")
-                {
-                    textBox.Text = "Enter Password";
-                }
+            }
+        }
+
+        private void PasswordBox_GotFocus(object sender, RoutedEventArgs e)
+        {
+            var passwordBox = sender as PasswordBox;
+            if (passwordBox != null && passwordBox.Password == "Enter Password")
+            {
+                passwordBox.Password = string.Empty;
+            }
+        }
+
+        private void PasswordBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            var passwordBox = sender as PasswordBox;
+            if (passwordBox != null && string.IsNullOrEmpty(passwordBox.Password))
+            {
+                passwordBox.Password = "Enter Password";
             }
         }
 
         private void LoginButton_Click(object sender, RoutedEventArgs e)
         {
             string name = NameTextBox.Text;
-            string password = PasswordTextBox.Text;
+            string password = PasswordTextBox.Password; // שימוש ב-Password במקום ב-Text
 
             int AdminId = 322766064;
 
