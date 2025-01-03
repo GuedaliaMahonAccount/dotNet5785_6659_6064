@@ -129,26 +129,26 @@
 
                 <Label Grid.Row="10" Grid.Column="0" Content="Distance Type:" HorizontalAlignment="Left" Margin="3" VerticalAlignment="Center" />
                 <ComboBox Grid.Row="10" Grid.Column="1" HorizontalAlignment="Left" Margin="3" ItemsSource="{Binding Source={StaticResource DistanceTypeCollectionKey}}" SelectedValue="{Binding CurrentVolunteer.DistanceType, Mode=TwoWay}" VerticalAlignment="Center" Width="120" />
-          
+
                 <!-- View Current Call Button Styled as Label -->
-                <Label Grid.Row="11" Grid.Column="0" Content="Current Call:" HorizontalAlignment="Left" Margin="3" VerticalAlignment="Center" />
-                <Button Grid.Row="11" 
+                <Button Grid.Row="11"
                         Grid.Column="1"
                         Content="View Current Call"
-                        Style="{StaticResource {x:Type Label}}"
                         HorizontalAlignment="Left"
-                        Margin="0,15,0,15"
+                        Margin="3"
+                        VerticalAlignment="Center"
                         Click="btnViewCurrentCall_Click"
-                        VerticalAlignment="Center" 
-                        Width="120"/>  
-                
+                        Background="Transparent"
+                        BorderBrush="Transparent"
+                        Foreground="Blue"
+                        FontSize="12"
+                        FontWeight="Normal"
+                        Cursor="Hand" />
+
             </Grid>
 
-            
             <!-- Update Button -->
             <Button Content="{Binding ButtonText}" HorizontalAlignment="Center" Margin="0,15,0,15" Padding="5" Click="btnAddUpdate_Click" />
-
-
         </StackPanel>
     </Grid>
 </Window>

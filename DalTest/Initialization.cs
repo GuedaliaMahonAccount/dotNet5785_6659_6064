@@ -282,14 +282,14 @@ namespace DalTest
 
                 if (i < noAssignmentCount) continue;
                 else if (i < noAssignmentCount + singleAssignmentCount) assignmentsForThisVolunteer = 1;
-                else assignmentsForThisVolunteer = s_rand.Next(2, Math.Max(2, 5)); // Ensure valid range
+                else assignmentsForThisVolunteer = s_rand.Next(2, Math.Max(2, 5));
 
                 for (int j = 0; j < assignmentsForThisVolunteer && hasMoreCalls; j++)
                 {
                     Call call = callEnumerator.Current;
                     hasMoreCalls = callEnumerator.MoveNext();
 
-                    DateTime startTime = call.StartTime.AddHours(s_rand.Next(1, Math.Max(1, 24))); // Ensure valid range
+                    DateTime startTime = call.StartTime.AddHours(s_rand.Next(1, Math.Max(1, 24)));
                     DateTime? endTime = null;
                     EndType? endType = null;
 
@@ -297,35 +297,17 @@ namespace DalTest
 
                     if (outcomeChance < 0.3)
                     {
-                        // Fix for calculating endTime when DeadLine is defined
-                        if (call.DeadLine.HasValue && call.DeadLine.Value > startTime)
-                        {
-                            int maxHours = (int)(call.DeadLine.Value - startTime).TotalHours;
-
-                            if (maxHours >= 1)
-                            {
-                                endTime = call.StartTime.AddHours(s_rand.Next(1, maxHours + 1));
-                            }
-                            else
-                            {
-                                Console.WriteLine($"Invalid maxHours={maxHours}, setting endTime to default range");
-                                endTime = startTime.AddHours(s_rand.Next(1, 72));
-                            }
-                        }
-                        else
-                        {
-                            endTime = startTime.AddHours(s_rand.Next(1, 72));
-                        }
+                        endTime = startTime.AddHours(s_rand.Next(1, 72));
                         endType = EndType.Completed;
                     }
                     else if (outcomeChance < 0.5)
                     {
-                        endTime = startTime.AddHours(s_rand.Next(1, 48)); // Ensure valid range
+                        endTime = startTime.AddHours(s_rand.Next(1, 48));
                         endType = EndType.SelfCanceled;
                     }
                     else if (outcomeChance < 0.7)
                     {
-                        endTime = startTime.AddHours(s_rand.Next(1, 48)); // Ensure valid range
+                        endTime = startTime.AddHours(s_rand.Next(1, 48));
                         endType = EndType.AdminCanceled;
                     }
                     else
@@ -333,9 +315,10 @@ namespace DalTest
                         endType = EndType.Expired;
                     }
 
+                    // Create the assignment
                     var assignment = new Assignment
                     {
-                        Id = s_dal.Config.NextAssignmentId,
+                        Id = assignmentId++,
                         CallId = call.Id,
                         VolunteerId = volunteer.Id,
                         StartTime = startTime,
