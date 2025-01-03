@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:PL.Volunteer"
         mc:Ignorable="d"
         Title="VolunteerWindow"
-        Height="550"
+        Height="600"
         Width="350"
         DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}">
 
@@ -24,13 +24,14 @@
             <ImageBrush ImageSource="../../Assets/background2.png" Stretch="UniformToFill" />
         </Grid.Background>
 
-        <StackPanel>
+        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
             <Grid HorizontalAlignment="Left" VerticalAlignment="Top" Margin="45,45,45,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
@@ -68,7 +69,6 @@
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
-                    <!-- PasswordBox -->
                     <PasswordBox x:Name="PasswordBox"
                                  VerticalAlignment="Center"
                                  Margin="0,0,5,0"
@@ -77,7 +77,6 @@
                                  local:PasswordBoxHelper.BindPassword="True"
                                  local:PasswordBoxHelper.BoundPassword="{Binding CurrentVolunteer.Password, Mode=TwoWay}" />
 
-                    <!-- Plain Text Password -->
                     <TextBox x:Name="PlainTextBox"
                              VerticalAlignment="Center"
                              Margin="0,0,5,0"
@@ -85,7 +84,6 @@
                              Visibility="{Binding IsPasswordVisible, Converter={StaticResource BoolToVisibilityConverter}}"
                              Text="{Binding CurrentVolunteer.Password, Mode=TwoWay}" />
 
-                    <!-- Styled Toggle Button -->
                     <Button Grid.Column="1"
                             Command="{Binding TogglePasswordVisibilityCommand}"
                             ToolTip="Toggle password visibility"
@@ -97,9 +95,7 @@
                         <Button.Template>
                             <ControlTemplate TargetType="Button">
                                 <Grid>
-                                    <!-- Circle background -->
                                     <Ellipse Fill="#E0E0E0" Stroke="#B0B0B0" StrokeThickness="1" />
-                                    <!-- Eye Icon -->
                                     <TextBlock Text="{Binding IsPasswordVisible, Converter={StaticResource BoolToEyeIconConverter}}"
                                                HorizontalAlignment="Center"
                                                VerticalAlignment="Center"
@@ -133,12 +129,26 @@
 
                 <Label Grid.Row="10" Grid.Column="0" Content="Distance Type:" HorizontalAlignment="Left" Margin="3" VerticalAlignment="Center" />
                 <ComboBox Grid.Row="10" Grid.Column="1" HorizontalAlignment="Left" Margin="3" ItemsSource="{Binding Source={StaticResource DistanceTypeCollectionKey}}" SelectedValue="{Binding CurrentVolunteer.DistanceType, Mode=TwoWay}" VerticalAlignment="Center" Width="120" />
-
+          
+                <!-- View Current Call Button Styled as Label -->
                 <Label Grid.Row="11" Grid.Column="0" Content="Current Call:" HorizontalAlignment="Left" Margin="3" VerticalAlignment="Center" />
-                <ComboBox Grid.Row="11" Grid.Column="1" HorizontalAlignment="Left" Margin="3" ItemsSource="{Binding CurrentVolunteer.CurrentCall}" SelectedValue="{Binding CurrentVolunteer.CurrentCall}" VerticalAlignment="Center" Width="120" IsEnabled="False" />
+                <Button Grid.Row="11" 
+                        Grid.Column="1"
+                        Content="View Current Call"
+                        Style="{StaticResource {x:Type Label}}"
+                        HorizontalAlignment="Left"
+                        Margin="0,15,0,15"
+                        Click="btnViewCurrentCall_Click"
+                        VerticalAlignment="Center" 
+                        Width="120"/>  
+                
             </Grid>
 
-            <Button Content="{Binding ButtonText}" HorizontalAlignment="Center" Margin="0,45,0,45" Padding="5" Click="btnAddUpdate_Click" />
+            
+            <!-- Update Button -->
+            <Button Content="{Binding ButtonText}" HorizontalAlignment="Center" Margin="0,15,0,15" Padding="5" Click="btnAddUpdate_Click" />
+
+
         </StackPanel>
     </Grid>
 </Window>

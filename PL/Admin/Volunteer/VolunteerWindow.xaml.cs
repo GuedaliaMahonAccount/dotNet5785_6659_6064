@@ -90,8 +90,28 @@ namespace PL.Volunteer
                 MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+
+        // see current call window
+        private void btnViewCurrentCall_Click(object sender, RoutedEventArgs e)
+        {
+            if (CurrentVolunteer.CurrentCall == null)
+            {
+                MessageBox.Show("No current call assigned.", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            var currentCallWindow = new CurrentCallWindow(CurrentVolunteer.CurrentCall);
+            currentCallWindow.ShowDialog();
+        }
+
     }
 
+
+    /// <summary>
+    /// helpers
+    /// </summary>
+    /// 
+    ///
     // Helper class for PasswordBox binding
     public static class PasswordBoxHelper
     {
