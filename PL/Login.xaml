@@ -10,7 +10,38 @@
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
         Closing="Window_Closing">
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="288*"/>
+            <RowDefinition Height="35*"/>
+            <RowDefinition Height="35*"/>
+            <RowDefinition Height="35*"/>
+            <RowDefinition Height="5*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="505*"/>
+            <ColumnDefinition Width="312*"/>
+            <ColumnDefinition Width="383*"/>
+        </Grid.ColumnDefinitions>
 
-        
+        <Grid.Background>
+            <ImageBrush ImageSource="C:\Users\hyora\Source\Repos\dotNet5785_6659_6064\PL\Assets\Login.item.jpg" Stretch="UniformToFill"/>
+        </Grid.Background>
+
+        <!-- UserName TextBox -->
+        <TextBox Name="NameTextBox" HorizontalAlignment="Stretch" VerticalAlignment="Top" TextWrapping="Wrap" Text="Enter Name" 
+                 FontSize="30" FontWeight="Bold" Foreground="Black"
+                 GotFocus="TextBox_GotFocus" LostFocus="TextBox_LostFocus" Grid.Column="1" Grid.Row="1" Margin="6,0"
+                 Height="50"/>
+
+        <!-- Password PasswordBox -->
+        <PasswordBox Name="PasswordTextBox" HorizontalAlignment="Stretch" VerticalAlignment="Top" 
+                     FontSize="30" FontWeight="Bold" Foreground="Black"
+                     GotFocus="PasswordBox_GotFocus" LostFocus="PasswordBox_LostFocus" Grid.Column="1" Grid.Row="2" Margin="6,0"
+                     Height="50"/>
+
+        <!-- Login Button -->
+        <Button Content="Login" HorizontalAlignment="Stretch" VerticalAlignment="Center" Height="50"
+                FontSize="30" FontWeight="Bold" Foreground="White" Background="Green"
+                Click="LoginButton_Click" Grid.Column="1" Grid.Row="3" Margin="6,0"/>
     </Grid>
 </Window>
