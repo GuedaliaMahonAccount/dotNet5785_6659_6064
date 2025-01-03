@@ -69,6 +69,22 @@ namespace PL.Call
             }
         }
 
+        // see all the assignement for this call
+        private void BtnViewAssignments_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                // Open the AssignmentCall window and pass the CurrentCall object
+                var assignmentWindow = new AssignmentCall(CurrentCall);
+                assignmentWindow.ShowDialog(); // Open as a modal window
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+
     }
 
     public class UpdateToReadOnlyConverter : IValueConverter
@@ -92,7 +108,7 @@ namespace PL.Call
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value == null || !int.TryParse(value.ToString(), out int intValue) || intValue == 0)
+            if (value is string buttonText && buttonText == "Update")
             {
                 return Visibility.Visible;
             }

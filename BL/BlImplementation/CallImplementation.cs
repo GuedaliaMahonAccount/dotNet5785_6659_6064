@@ -508,6 +508,28 @@ namespace BlImplementation
 
         }
 
+        /// <summary>
+        /// get the history of the call assignement by id
+        public IEnumerable<BO.CallAssignInList> GetAssignmentsByCallId(int callId)
+        {
+            // Retrieve all assignments related to the call ID
+            var assignments = _dal.Assignment.ReadAll()
+                .Where(a => a.CallId == callId);
+
+            // Transform the data to match the CallAssignInList model
+            return assignments.Select(a =>
+            {
+                var volunteer = _dal.Volunteer.Read(a.VolunteerId);
+                return new CallAssignInList
+                {
+                    VolunteerId = a.VolunteerId,
+                    VolunteerName = volunteer?.Name ?? "Unknown",
+                    StartTime = a.StartTime,
+                    EndTime = a.EndTime,
+                    EndType = a.EndType != null ? (BO.EndType)a.EndType : null
+                };
+            }).ToList();
+        }
 
         ///<sumary>
         ///observable

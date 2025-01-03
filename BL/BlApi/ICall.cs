@@ -14,6 +14,7 @@ namespace BlApi
         void CompleteCall(int volunteerId, int assignmentId);
         void CancelCall(int requesterId, int assignmentId);
         void selectionCall(int volunteerId, int callId);
+        IEnumerable<BO.CallAssignInList> GetAssignmentsByCallId(int callId);
     }
 
 }
