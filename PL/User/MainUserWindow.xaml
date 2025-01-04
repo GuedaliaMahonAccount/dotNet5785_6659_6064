@@ -1,0 +1,58 @@
+﻿<Window x:Class="PL.MainUserWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Main User Window" Height="600" Width="800">
+    <Grid>
+        <!-- Background -->
+        <Grid.Background>
+            <ImageBrush ImageSource="../Assets/background2.png" Stretch="UniformToFill" />
+        </Grid.Background>
+
+        <!-- Main Content -->
+        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+
+            <!-- User Info Section -->
+            <GroupBox Header="User Details" Margin="10">
+                <StackPanel>
+                    <Label Content="ID:" />
+                    <TextBlock Text="{Binding CurrentUser.Id}" />
+
+                    <Label Content="Name:" />
+                    <TextBlock Text="{Binding CurrentUser.Name}" />
+
+                    <Label Content="Email:" />
+                    <TextBlock Text="{Binding CurrentUser.Email}" />
+
+                    <Label Content="Phone:" />
+                    <TextBlock Text="{Binding CurrentUser.Phone}" />
+                </StackPanel>
+            </GroupBox>
+
+            <!-- Current Call Section -->
+            <GroupBox Header="Current Call Details" Margin="10">
+                <StackPanel>
+                    <Label Content="Call ID:" />
+                    <TextBlock Text="{Binding CurrentCall.CallId}" />
+
+                    <Label Content="Type:" />
+                    <TextBlock Text="{Binding CurrentCall.CallType}" />
+
+                    <Label Content="Status:" />
+                    <TextBlock Text="{Binding CurrentCall.Status}" />
+
+                    <!-- Complete and Cancel Buttons -->
+                    <StackPanel Orientation="Horizontal" Margin="10">
+                        <Button Content="Complete Call" Click="CompleteCall_Click" Margin="5" />
+                        <Button Content="Cancel Call" Click="CancelCall_Click" Margin="5" />
+                    </StackPanel>
+                </StackPanel>
+            </GroupBox>
+
+            <!-- Navigation Buttons -->
+            <StackPanel Orientation="Horizontal" Margin="10">
+                <Button Content="View History" Click="ViewHistory_Click" Margin="5" />
+                <Button Content="Choose Call" Click="ChooseCall_Click" Margin="5" />
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</Window>
