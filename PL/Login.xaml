@@ -24,7 +24,7 @@
         </Grid.ColumnDefinitions>
 
         <Grid.Background>
-            <ImageBrush ImageSource="C:\Users\hyora\Source\Repos\dotNet5785_6659_6064\PL\Assets\Login.item.jpg" Stretch="UniformToFill"/>
+            <ImageBrush ImageSource="Assets\loginitem.jpg" Stretch="UniformToFill"/>
         </Grid.Background>
 
         <!-- UserName TextBox -->

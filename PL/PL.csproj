@@ -19,6 +19,7 @@
 	  <None Remove="Assets\background1.jpeg" />
 	  <None Remove="Assets\background2.png" />
 	  <None Remove="Assets\icon.png" />
+	  <None Remove="Assets\loginitem.jpg" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -36,6 +37,9 @@
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </Resource>
 	  <Resource Include="Assets\icon.png">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Resource>
+	  <Resource Include="Assets\loginitem.jpg">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </Resource>
 	</ItemGroup>
