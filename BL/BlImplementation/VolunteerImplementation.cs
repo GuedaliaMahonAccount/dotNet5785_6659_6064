@@ -92,26 +92,35 @@ internal class VolunteerImplementation : IVolunteer
             Latitude = volunteerData.Latitude,
             Longitude = volunteerData.Longitude,
             MaxDistance = volunteerData.MaxDistance,
-            Password = volunteerData.Password
+            Password = volunteerData.Password,
+            CurrentCall = null // Initialize as null
         };
 
-        // Map the current call in progress if applicable
-        if (volunteer.CurrentCall != null)
+        // Check if the volunteer has an active assignment
+        var assignments = _dal.Assignment.ReadAll();
+        var activeAssignment = assignments.FirstOrDefault(a => a.VolunteerId == volunteerId && a.EndTime == null);
+
+        if (activeAssignment != null)
         {
+            // Retrieve the associated call from the DAL
+            var callData = _dal.Call.Read(activeAssignment.CallId);
+
+            // Map the active assignment and call to BO.CallInProgress
             var callInProgress = new BO.CallInProgress
             {
-                Id = volunteer.CurrentCall.Id,
-                CallId = volunteer.CurrentCall.CallId,
-                CallType = volunteer.CurrentCall.CallType,
-                GeneralDescription = volunteer.CurrentCall.GeneralDescription,
-                Address = volunteer.CurrentCall.Address,
-                StartTime = volunteer.CurrentCall.StartTime,
-                EstimatedCompletionTime = volunteer.CurrentCall.EstimatedCompletionTime,
-                AssignmentStartTime = volunteer.CurrentCall.AssignmentStartTime,
-                Distance = volunteer.CurrentCall.Distance,
-                Status = volunteer.CurrentCall.Status
-                
+                Id = activeAssignment.Id,
+                CallId = callData.Id,
+                CallType = (BO.CallType)callData.CallType,
+                GeneralDescription = callData.Description,
+                Address = callData.Address,
+                StartTime = callData.StartTime,
+                EstimatedCompletionTime = activeAssignment.EndTime,
+                AssignmentStartTime = activeAssignment.StartTime,
+                Distance = VolunteerManager.CalculateDistance(volunteerData.Latitude, volunteerData.Longitude, callData.Latitude, callData.Longitude),
+                Status = BO.CallType.InTreatment 
             };
+
+            // Assign the call in progress to the volunteer
             volunteer.CurrentCall = callInProgress;
         }
 
