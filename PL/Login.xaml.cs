@@ -87,7 +87,6 @@ namespace PL
 
             int AdminId = 322766064;
 
-
             try
             {
                 BO.Volunteer adminVolunteer = s_bl.Volunteer.GetVolunteerDetails(AdminId);
@@ -99,7 +98,20 @@ namespace PL
                 }
                 else
                 {
-                    MessageBox.Show("Invalid name or password", "Login Failed", MessageBoxButton.OK, MessageBoxImage.Error);
+                    int GeneralVolunteerID= s_bl.Volunteer.FindVolunteerID(name);
+                    BO.Volunteer GeneralVolunteer = s_bl.Volunteer.GetVolunteerDetails(GeneralVolunteerID);
+
+                    if (GeneralVolunteer != null && GeneralVolunteer.Name == name && GeneralVolunteer.Password == encryptedPassword)
+
+                        if (GeneralVolunteer != null)
+                    {
+                        MainUserWindow volunteerMenu = new MainUserWindow(GeneralVolunteerID);
+                        volunteerMenu.Show();
+                    }
+                    else
+                    {
+                        MessageBox.Show("Invalid name or password", "Login Failed", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
                 }
             }
             catch (Exception ex)
@@ -107,6 +119,7 @@ namespace PL
                 MessageBox.Show($"An error occurred: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+
 
 
 

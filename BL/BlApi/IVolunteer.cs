@@ -12,6 +12,7 @@ namespace BlApi
         void UpdateVolunteer(int requesterId, Volunteer updatedVolunteer);
         void DeleteVolunteer(int volunteerId);
         void AddVolunteer(Volunteer volunteer);
+        int FindVolunteerID(string name);
         IEnumerable<VolunteerInList> GetVolunteersListByCallType(BO.CallType callType);
     }
 }

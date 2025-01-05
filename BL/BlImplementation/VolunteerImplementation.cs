@@ -127,6 +127,26 @@ internal class VolunteerImplementation : IVolunteer
         return volunteer;
     }
 
+    public int FindVolunteerID(string name)
+    {
+        // Retrieve all volunteers from the DAL
+        var volunteersFromDal = _dal.Volunteer.ReadAll();
+
+        foreach (var volunteer in volunteersFromDal)
+        {
+            if (volunteer.Name == name)
+            {
+                return volunteer.Id;
+            }
+        }
+
+        // If no volunteer is found, throw an exception or return a default value
+        throw new BlDoesNotExistException($"Volunteer with name {name} not found.");
+
+    }
+
+
+
     /// <summary>
     /// Retrieves a list of volunteers filtered by call type and optionally sorted by specified fields.
     /// </summary>
