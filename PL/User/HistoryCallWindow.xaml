@@ -9,28 +9,32 @@
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" MinHeight="45" />
+            <RowDefinition />
         </Grid.RowDefinitions>
 
+        <!-- Title: Handled Calls -->
+        <TextBlock Grid.Row="0" Text="Handled Calls" FontSize="24" FontWeight="Bold" Foreground="Black" HorizontalAlignment="Right" Margin="0,0,0,20" Width="168" />
+
         <!-- Volunteer Info Section -->
-        <StackPanel Orientation="Horizontal" Grid.Row="0" Margin="0,0,0,10" HorizontalAlignment="Left" Width="310">
+        <StackPanel Orientation="Horizontal" Grid.Row="1" Margin="0,0,0,10" HorizontalAlignment="Left" Width="310">
             <TextBlock Text="ID:" FontWeight="Bold" FontSize="16" Foreground="Black" VerticalAlignment="Center" Margin="0,0,5,0" />
             <TextBlock x:Name="VolunteerIdTextBlock" FontSize="16" FontWeight="Bold" Foreground="Black" VerticalAlignment="Center" Margin="0,0,15,0" />
             <TextBlock Text="Name:" FontWeight="Bold" FontSize="16" Foreground="Black" VerticalAlignment="Center" Margin="0,0,5,0" />
             <TextBlock x:Name="VolunteerNameTextBlock" FontSize="16" FontWeight="Bold" Foreground="Black" VerticalAlignment="Center" />
         </StackPanel>
 
-
         <!-- Filters Section -->
-        <StackPanel Orientation="Horizontal" Grid.Row="0" Margin="0,10,0,0" HorizontalAlignment="Center">
+        <StackPanel Orientation="Horizontal" Grid.Row="1" Margin="0,10,0,317" HorizontalAlignment="Center" Grid.RowSpan="2" Width="150">
             <Button Width="150" Height="35" Content="Filter" Click="FilterButton_Click" />
         </StackPanel>
 
         <!-- DataGrid Section -->
-        <DataGrid x:Name="CallsDataGrid" Grid.Row="1" AutoGenerateColumns="False" IsReadOnly="True" CanUserSortColumns="True">
+        <DataGrid x:Name="CallsDataGrid" Grid.Row="2" AutoGenerateColumns="False" IsReadOnly="True" CanUserSortColumns="True" ItemsSource="{Binding Calls}">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Call ID" Binding="{Binding CallId}" />
-                <DataGridTextColumn Header="Date" Binding="{Binding Date}" />
+                <DataGridTextColumn Header="Call ID" Binding="{Binding Id}" />
+                <DataGridTextColumn Header="Date" Binding="{Binding StartTime}" />
+                <DataGridTextColumn Header="Description" Binding="{Binding Description}" />
                 <DataGridTextColumn Header="Status" Binding="{Binding Status}" />
             </DataGrid.Columns>
         </DataGrid>
