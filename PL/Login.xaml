@@ -27,6 +27,15 @@
             <ImageBrush ImageSource="Assets\loginitem.jpg" Stretch="UniformToFill"/>
         </Grid.Background>
 
+        <!-- Admin and User Text -->
+        <StackPanel Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="10" Grid.Column="2" Grid.Row="0">
+            <TextBlock Text="Dani Levy , aaaaAAAA1111"
+                       FontSize="12" FontWeight="Bold" Foreground="Gray"/>
+            <TextBlock Text="Eli Amar , bbbbBBBB2222"
+                       FontSize="12" FontWeight="Bold" Foreground="Gray"/>
+        </StackPanel>
+        
+
         <!-- UserName TextBox -->
         <TextBox Name="NameTextBox" HorizontalAlignment="Stretch" VerticalAlignment="Top" TextWrapping="Wrap" Text="Enter Name" 
                  FontSize="30" FontWeight="Bold" Foreground="Black"
