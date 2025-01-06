@@ -3,10 +3,18 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:PL.User"
         mc:Ignorable="d"
-        Title="ChoiceCallWindow" Height="450" Width="800">
+        Title="Choice Call Window" Height="450" Width="800">
     <Grid>
-        
+        <DataGrid x:Name="CallDataGrid" AutoGenerateColumns="False" IsReadOnly="True" Margin="10">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="50"/>
+                <DataGridTextColumn Header="Type" Binding="{Binding CallType}" Width="120"/>
+                <DataGridTextColumn Header="Address" Binding="{Binding Address}" Width="200"/>
+                <DataGridTextColumn Header="Start Time" Binding="{Binding StartTime}" Width="150"/>
+                <DataGridTextColumn Header="Deadline" Binding="{Binding DeadLine}" Width="150"/>
+                <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="200"/>
+            </DataGrid.Columns>
+        </DataGrid>
     </Grid>
 </Window>
