@@ -156,11 +156,6 @@ namespace PL
             {
                 Mouse.OverrideCursor = Cursors.Wait;
 
-                foreach (Window window in Application.Current.Windows)
-                {
-                    if (window != this)
-                        window.Close();
-                }
                 s_bl.Admin.InitializeDatabase();
 
                 MessageBox.Show("Database initialized successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
