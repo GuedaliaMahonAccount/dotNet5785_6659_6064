@@ -61,7 +61,7 @@ namespace PL
 
         private void ViewHistory_Click(object sender, RoutedEventArgs e)
         {
-            var historyWindow = new HistoryCallWindow(CurrentUser.Id);
+            var historyWindow = new HistoryCallWindow(CurrentUser.Name);
             historyWindow.Show();
         }
 
