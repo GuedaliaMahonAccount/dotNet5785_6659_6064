@@ -543,5 +543,27 @@ namespace BlImplementation
         public void RemoveObserver(int id, Action observer) =>
                 CallManager.Observers.RemoveObserver(id, observer);
 
+
+
+
+
+        public IEnumerable<BO.CallAssignInList> GetCallHistoryByVolunteerId(int volunteerId)
+        {
+            // Retrieve all assignments related to the volunteer ID
+            var assignments = _dal.Assignment.ReadAll()
+                .Where(a => a.VolunteerId == volunteerId);
+
+            // Transform the data to match the CallAssignInList model
+            return assignments.Select(a =>
+            {
+                var call = _dal.Call.Read(a.CallId);
+                return new BO.CallAssignInList
+                {
+                    StartTime = a.StartTime,
+                    EndTime = a.EndTime,
+                    EndType = a.EndType != null ? (BO.EndType)a.EndType : null
+                };
+            }).ToList();
+        }
     }
 }

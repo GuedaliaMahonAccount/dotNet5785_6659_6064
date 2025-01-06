@@ -102,8 +102,6 @@ namespace PL
                     BO.Volunteer GeneralVolunteer = s_bl.Volunteer.GetVolunteerDetails(GeneralVolunteerID);
 
                     if (GeneralVolunteer != null && GeneralVolunteer.Name == name && GeneralVolunteer.Password == encryptedPassword)
-
-                        if (GeneralVolunteer != null)
                     {
                         MainUserWindow volunteerMenu = new MainUserWindow(GeneralVolunteerID);
                         volunteerMenu.Show();

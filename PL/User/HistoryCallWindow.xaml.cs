@@ -33,7 +33,6 @@ namespace PL.User
                 DependencyProperty.Register("Calls", typeof(IEnumerable<BO.CallInList>),
                     typeof(HistoryCallWindow), new PropertyMetadata(null));
 
-            // Constructor
             public HistoryCallWindow(string volunteerName)
             {
                 InitializeComponent();
@@ -46,19 +45,32 @@ namespace PL.User
                 LoadCalls(volunteerId);
             }
 
+            /// <summary>
+            /// Loads the call list for a specific volunteer into the DataGrid.
+            /// </summary>
+            //private void LoadCalls(int volunteerId)
+            //{
+            //    Calls = s_bl.Call.GetCallHistoryByVolunteerId(volunteerId);
+            //}
+
         /// <summary>
         /// Loads the call list for a specific volunteer into the DataGrid.
         /// </summary>
         private void LoadCalls(int volunteerId)
         {
-            var openCalls = s_bl.Call.GetOpenCalls(volunteerId, null, null)
-                                     .Cast<BO.CallInList>(); 
-            var closedCalls = s_bl.Call.GetClosedCalls(volunteerId, null, null)
-                                       .Cast<BO.CallInList>(); 
-
-            Calls = openCalls.Concat(closedCalls);
+            try
+            {
+                var calls = s_bl.Call.GetCallHistoryByVolunteerId(volunteerId);
+                if (calls == null)
+                {
+                    MessageBox.Show("No calls found for the specified volunteer.");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"An error occurred while loading calls: {ex.Message}");
+            }
         }
-
 
 
         /// <summary>

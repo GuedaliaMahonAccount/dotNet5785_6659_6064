@@ -350,6 +350,8 @@ internal class VolunteerImplementation : IVolunteer
         if (closestCoordinates == null)
             throw new BlInvalidValueException("Coordinates do not match the address.");
 
+        string encryptedPassword = AesEncryptionHelper.Encrypt(updatedVolunteer.Password);
+        updatedVolunteer.Password = encryptedPassword;
 
         if (currentVolunteer == null)
             throw new BlDoesNotExistException("Volunteer with the given ID does not exist.");

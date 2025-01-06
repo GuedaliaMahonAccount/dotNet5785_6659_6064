@@ -375,7 +375,7 @@ namespace Helpers
 
         private static bool IsBase64String(string str)
         {
-            if (string.IsNullOrEmpty(str) || str.Length % 4 != 0)
+            if (string.IsNullOrEmpty(str) || str.Length % 4 != 0||str.Length <= 20)
                 return false;
 
             try
