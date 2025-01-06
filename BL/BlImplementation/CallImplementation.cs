@@ -563,7 +563,7 @@ namespace BlImplementation
         public IEnumerable<int> GetCallIdsByVolunteer(int volunteerId)
         {
             // Assuming _dal is properly initialized and accessible
-            var callHistory = _dal.Call.ReadAll(call => call.Id== volunteerId);
+            var callHistory = _dal.Assignment.ReadAll(call => call.VolunteerId == volunteerId);
 
             // Extracting call IDs from the call history
             var callIds = callHistory.Select(call => call.Id);

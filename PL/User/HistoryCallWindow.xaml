@@ -13,8 +13,19 @@
             <RowDefinition />
         </Grid.RowDefinitions>
 
-        <!-- Title: Handled Calls -->
-        <TextBlock Grid.Row="0" Text="Handled Calls" FontSize="24" FontWeight="Bold" Foreground="Black" HorizontalAlignment="Right" Margin="0,0,0,20" Width="168" />
+        <!-- Row 0: Title and Filter Button -->
+        <Grid Grid.Row="0" Margin="0,0,0,20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Title -->
+            <TextBlock Text="Handled Calls" FontSize="24" FontWeight="Bold" Foreground="Black" HorizontalAlignment="Left" />
+
+            <!-- Filter Button -->
+            <Button Width="154" Height="47" Content="Filter" Click="FilterButton_Click" Margin="231,0,231,0" />
+        </Grid>
 
         <!-- Volunteer Info Section -->
         <StackPanel Orientation="Horizontal" Grid.Row="1" Margin="0,0,0,10" HorizontalAlignment="Left" Width="310">
@@ -22,11 +33,6 @@
             <TextBlock x:Name="VolunteerIdTextBlock" FontSize="16" FontWeight="Bold" Foreground="Black" VerticalAlignment="Center" Margin="0,0,15,0" />
             <TextBlock Text="Name:" FontWeight="Bold" FontSize="16" Foreground="Black" VerticalAlignment="Center" Margin="0,0,5,0" />
             <TextBlock x:Name="VolunteerNameTextBlock" FontSize="16" FontWeight="Bold" Foreground="Black" VerticalAlignment="Center" />
-        </StackPanel>
-
-        <!-- Filters Section -->
-        <StackPanel Orientation="Horizontal" Grid.Row="1" Margin="0,10,0,317" HorizontalAlignment="Center" Grid.RowSpan="2" Width="150">
-            <Button Width="150" Height="35" Content="Filter" Click="FilterButton_Click" />
         </StackPanel>
 
         <!-- DataGrid Section -->

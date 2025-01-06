@@ -34,15 +34,15 @@ namespace PL.User
         public HistoryCallWindow(string volunteerName)
         {
             InitializeComponent();
-            this.DataContext = this; // הגדרת ה-DataContext
+            this.DataContext = this; 
 
             int volunteerId = s_bl.Volunteer.FindVolunteerID(volunteerName);
             VolunteerIdTextBlock.Text = volunteerId.ToString();
             VolunteerNameTextBlock.Text = volunteerName;
 
-            LoadCalls(volunteerId); // טעינת הנתונים לאחר אתחול החלון
+            LoadCalls(volunteerId); 
         }
-
+        
         /// <summary>
         /// Loads the call list for a specific volunteer into the DataGrid.
         /// </summary>
