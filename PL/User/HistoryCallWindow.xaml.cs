@@ -152,7 +152,6 @@ namespace PL.User
         private void FilterByCallType()
         {
             var callTypes = Enum.GetNames(typeof(CallType)).ToList(); // Get all call type names as strings
-            callTypes.Insert(0, "none"); // Add "none" option at the beginning of the list
 
             // Create a custom dialog to let the user choose a call type
             var dialog = new Window
@@ -181,12 +180,8 @@ namespace PL.User
             okButton.Click += (sender, e) =>
             {
                 var selectedCallTypeString = comboBox.SelectedItem as string;
-                if (selectedCallTypeString == "none")
-                {
-                    // If "none" is selected, reset the filter to show all calls
-                    CallsDataGrid.ItemsSource = _callDetails;
-                }
-                else if (!string.IsNullOrEmpty(selectedCallTypeString) && Enum.TryParse(selectedCallTypeString, out CallType selectedCallType))
+                
+                if (!string.IsNullOrEmpty(selectedCallTypeString) && Enum.TryParse(selectedCallTypeString, out CallType selectedCallType))
                 {
                     // Filter by the selected call type
                     var filteredCalls = _callDetails.Where(call => ((dynamic)call).Status == selectedCallType).ToList();
@@ -215,20 +210,19 @@ namespace PL.User
             ApplyFilter();
         }
 
+        private void ResetFilterButton_Click(object sender, RoutedEventArgs e)
+        {
+            ResetFilter();
+        }
+
         /// <summary>
         /// Resets the filter and displays all calls.
         /// </summary>
+
         private void ResetFilter()
         {
             CallsDataGrid.ItemsSource = _callDetails;
         }
 
-        /// <summary>
-        /// Handler for the Reset Filter button click event.
-        /// </summary>
-        private void ResetFilterButton_Click(object sender, RoutedEventArgs e)
-        {
-            ResetFilter();
-        }
     }
 }

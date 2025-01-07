@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PL.User"
         mc:Ignorable="d"
-        Title="HistoryCallWindow" Height="450" Width="800">
+        Title="HistoryCallWindow" Height="500" Width="966">
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -18,13 +18,17 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
             <!-- Title -->
             <TextBlock Text="Handled Calls" FontSize="24" FontWeight="Bold" Foreground="Black" HorizontalAlignment="Left" />
 
             <!-- Filter Button -->
-            <Button Width="154" Height="47" Content="Filter" Click="FilterButton_Click" Margin="231,0,231,0" />
+            <Button Grid.Column="1" Width="154" Height="47" Content="Filter" Click="FilterButton_Click" Margin="10,0,10,0" />
+
+            <!-- Without Filter Button -->
+            <Button Grid.Column="2" Width="154" Height="47" Content="Without filter" Click="ResetFilterButton_Click" Margin="10,0,10,0" />
         </Grid>
 
         <!-- Volunteer Info Section -->
