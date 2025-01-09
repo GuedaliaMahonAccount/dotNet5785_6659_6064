@@ -5,26 +5,100 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         Title="Choice Call Window" Height="450" Width="800">
+
+    <Window.Resources>
+        <!-- Style for Buttons -->
+        <Style x:Key="StyledButton" TargetType="Button">
+            <Setter Property="Background" Value="#FF4CAF50" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="Padding" Value="5,2" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="5" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#FF81C784" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="#FF388E3C" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Style for DataGrid Column Headers -->
+        <Style x:Key="DataGridHeaderStyle" TargetType="DataGridColumnHeader">
+            <Setter Property="Background" Value="#FF333333" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+        </Style>
+
+        <!-- Row Style for Adding Separator Lines -->
+        <Style TargetType="DataGridRow">
+            <Setter Property="BorderBrush" Value="Gray" />
+            <Setter Property="BorderThickness" Value="0,0,0,1" />
+        </Style>
+    </Window.Resources>
+
     <Grid>
-        <DataGrid x:Name="CallDataGrid" AutoGenerateColumns="False" IsReadOnly="True" Margin="10"
-                  ItemsSource="{Binding CallList}">
-            <DataGrid.Columns>
-                <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="50"/>
-                <DataGridTextColumn Header="Type" Binding="{Binding CallType}" Width="120"/>
-                <DataGridTextColumn Header="Address" Binding="{Binding Address}" Width="200"/>
-                <DataGridTextColumn Header="Start Time" Binding="{Binding StartTime}" Width="150"/>
-                <DataGridTextColumn Header="Deadline" Binding="{Binding DeadLine}" Width="150"/>
-                <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="200"/>
-                <DataGridTemplateColumn Header="Assign">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <Button Content="Assign"
-                                    Command="{Binding DataContext.AssignCallCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                    CommandParameter="{Binding Id}" />
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-            </DataGrid.Columns>
-        </DataGrid>
+        <Grid.Background>
+            <ImageBrush ImageSource="../Assets/background2.png" Stretch="UniformToFill" />
+        </Grid.Background>
+
+        <Border Background="#AA000000" Margin="10" Padding="10" CornerRadius="10">
+            <DataGrid x:Name="CallDataGrid"
+                      AutoGenerateColumns="False"
+                      IsReadOnly="True"
+                      ItemsSource="{Binding CallList}"
+                      GridLinesVisibility="None"
+                      ColumnHeaderStyle="{StaticResource DataGridHeaderStyle}">
+
+                <DataGrid.Resources>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="Foreground" Value="White" />
+                    </Style>
+                    <Style TargetType="DataGridCell">
+                        <Setter Property="Background" Value="Transparent" />
+                    </Style>
+                </DataGrid.Resources>
+
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="50" />
+                    <DataGridTextColumn Header="Type" Binding="{Binding CallType}" Width="120" />
+                    <DataGridTextColumn Header="Address" Binding="{Binding Address}" Width="200" />
+                    <DataGridTextColumn Header="Start Time" Binding="{Binding StartTime}" Width="150" />
+                    <DataGridTextColumn Header="Deadline" Binding="{Binding DeadLine}" Width="150" />
+
+                    <!-- Description Column with TextWrapping -->
+                    <DataGridTemplateColumn Header="Description" Width="250">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Description}" TextWrapping="Wrap" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <DataGridTemplateColumn Header="Assign">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Content="Assign"
+                                        Style="{StaticResource StyledButton}"
+                                        Command="{Binding DataContext.AssignCallCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                        CommandParameter="{Binding Id}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Border>
     </Grid>
 </Window>
