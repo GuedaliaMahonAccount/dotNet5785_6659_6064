@@ -6,7 +6,8 @@
         mc:Ignorable="d"
         Title="Choice Call Window" Height="450" Width="800">
     <Grid>
-        <DataGrid x:Name="CallDataGrid" AutoGenerateColumns="False" IsReadOnly="True" Margin="10">
+        <DataGrid x:Name="CallDataGrid" AutoGenerateColumns="False" IsReadOnly="True" Margin="10"
+                  ItemsSource="{Binding CallList}">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="50"/>
                 <DataGridTextColumn Header="Type" Binding="{Binding CallType}" Width="120"/>
@@ -14,6 +15,15 @@
                 <DataGridTextColumn Header="Start Time" Binding="{Binding StartTime}" Width="150"/>
                 <DataGridTextColumn Header="Deadline" Binding="{Binding DeadLine}" Width="150"/>
                 <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="200"/>
+                <DataGridTemplateColumn Header="Assign">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button Content="Assign"
+                                    Command="{Binding DataContext.AssignCallCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                    CommandParameter="{Binding Id}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>
     </Grid>

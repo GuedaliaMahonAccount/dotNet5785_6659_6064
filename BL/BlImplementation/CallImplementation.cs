@@ -415,40 +415,38 @@ namespace BlImplementation
         /// <exception cref="BlInvalidValueException">Thrown when the call is already assigned or expired.</exception>
         public void selectionCall(int volunteerId, int callId)
         {
-            // Retrieve the call from the DAL by callId
             var callDO = _dal.Call.Read(callId)
                 ?? throw new BlDoesNotExistException($"No call found with ID: {callId}");
 
-            // Retrieve the volunteer from the DAL by volunteerId
             var volunteerDO = _dal.Volunteer.Read(volunteerId)
                 ?? throw new BlDoesNotExistException($"No volunteer found with ID: {volunteerId}");
 
-            // Check if the call has already been assigned and is open
             var assignments = _dal.Assignment.ReadAll()
                 .Where(a => a.CallId == callId && a.EndTime == null);
             if (assignments.Any())
                 throw new BlInvalidValueException("This call is already assigned to a volunteer and in progress.");
 
-            // Check if the call is expired
             if (callDO.DeadLine != null && callDO.DeadLine < DateTime.Now)
                 throw new BlInvalidValueException("This call has expired and can no longer be assigned.");
 
-            // Create a new assignment
             var newAssignment = new DO.Assignment
             (
-                Id: 0, // Let the DAL auto-generate the ID if supported
+                Id: _dal.Config.NextAssignmentId,
                 CallId: callId,
                 VolunteerId: volunteerId,
-                StartTime: DateTime.Now, // System time for assignment start
-                EndTime: null,           // Not completed yet
-                EndType: null            // No end type as it's not completed
+                StartTime: DateTime.Now,
+                EndTime: null,
+                EndType: null
             );
 
-
-            // Add the new assignment to the DAL
             _dal.Assignment.Create(newAssignment);
 
+            var updatedCall = callDO with { CallType = DO.CallType.InTreatment };
 
+            _dal.Call.Update(updatedCall);
+
+            CallManager.Observers.NotifyItemUpdated(callId);
+            CallManager.Observers.NotifyListUpdated();
         }
 
         /// <summary>
@@ -530,6 +528,21 @@ namespace BlImplementation
                 };
             }).ToList();
         }
+
+        /// <summary>
+        /// Retrieves the assignment ID for a specific call and volunteer.
+        /// </summary>
+        public int GetAssignmentIdByCallId(int callId, int volunteerId)
+        {
+            var assignment = _dal.Assignment.ReadAll()
+                .FirstOrDefault(a => a.CallId == callId && a.VolunteerId == volunteerId);
+
+            if (assignment == null)
+                throw new BlDoesNotExistException($"No assignment found for CallId: {callId} and VolunteerId: {volunteerId}");
+
+            return assignment.Id;
+        }
+
 
         ///<sumary>
         ///observable

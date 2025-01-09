@@ -318,7 +318,7 @@ namespace DalTest
                     // Create the assignment
                     var assignment = new Assignment
                     {
-                        Id = assignmentId++,
+                        Id = s_dal.Config.NextAssignmentId,
                         CallId = call.Id,
                         VolunteerId = volunteer.Id,
                         StartTime = startTime,

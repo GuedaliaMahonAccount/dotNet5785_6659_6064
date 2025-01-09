@@ -1,4 +1,5 @@
-﻿using PL.User;
+﻿using BO;
+using PL.User;
 using System.Windows;
 
 namespace PL
@@ -33,14 +34,32 @@ namespace PL
         {
             try
             {
-                BlApi.Factory.Get().Call.CompleteCall(CurrentUser.Id , CurrentCall.CallId);
+                // Fetch the AssignmentId for the current call and volunteer
+                int assignmentId = BlApi.Factory.Get().Call.GetAssignmentIdByCallId(CurrentCall.CallId, CurrentUser.Id);
+
+                // Use the AssignmentId to complete the call
+                BlApi.Factory.Get().Call.CompleteCall(CurrentUser.Id, assignmentId);
+
                 MessageBox.Show("Call completed successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
-                CurrentCall = null; // Clear current call
-                DataContext = this; // Refresh binding
+
+                CurrentCall = null; // Clear the current call
+                DataContext = this; // Refresh the binding
+            }
+            catch (BlDoesNotExistException ex)
+            {
+                MessageBox.Show($"Call not found: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            catch (BlInvalidRoleException ex)
+            {
+                MessageBox.Show($"You are not authorized to complete this call: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            catch (BlInvalidValueException ex)
+            {
+                MessageBox.Show($"Invalid operation: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error completing call: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Unexpected error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -48,14 +67,34 @@ namespace PL
         {
             try
             {
-                BlApi.Factory.Get().Call.CancelCall(CurrentUser.Id , CurrentCall.CallId);
-                MessageBox.Show("Call canceled.", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
-                CurrentCall = null; // Clear current call
-                DataContext = this; // Refresh binding
+
+                // Fetch the AssignmentId for the current call and volunteer
+                int assignmentId = BlApi.Factory.Get().Call.GetAssignmentIdByCallId(CurrentCall.CallId, CurrentUser.Id);
+
+                // Use the AssignmentId to cancel the call
+                BlApi.Factory.Get().Call.CancelCall(CurrentUser.Id, assignmentId);
+  
+
+                MessageBox.Show("Call canceled successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                CurrentCall = null; // Clear the current call
+                DataContext = this; // Refresh the binding
+            }
+            catch (BlDoesNotExistException ex)
+            {
+                MessageBox.Show($"Call not found: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            catch (BlInvalidRoleException ex)
+            {
+                MessageBox.Show($"You are not authorized to cancel this call: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            catch (BlInvalidValueException ex)
+            {
+                MessageBox.Show($"Invalid operation: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error canceling call: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Unexpected error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 

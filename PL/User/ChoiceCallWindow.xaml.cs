@@ -1,42 +1,122 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Windows;
+﻿using System.Windows;
+using System.Windows.Input;
 
 namespace PL.User
 {
-    /// <summary>
-    /// Interaction logic for ChoiceCallWindow.xaml
-    /// </summary>
     public partial class ChoiceCallWindow : Window
     {
-        // Static reference to business logic layer
         static readonly BlApi.IBl s_bl = BlApi.Factory.Get();
 
-        public ChoiceCallWindow(int id)
+        public RelayCommand AssignCallCommand { get; }
+
+        public IEnumerable<BO.Call> CallList
         {
-            InitializeComponent();
-            LoadCalls();
+            get { return (IEnumerable<BO.Call>)GetValue(CallListProperty); }
+            set { SetValue(CallListProperty, value); }
         }
 
-        private void LoadCalls()
+        public static readonly DependencyProperty CallListProperty =
+            DependencyProperty.Register("CallList", typeof(IEnumerable<BO.Call>),
+            typeof(ChoiceCallWindow), new PropertyMetadata(null));
+
+        private readonly int _volunteerId;
+
+        public ChoiceCallWindow(int volunteerId)
+        {
+            InitializeComponent();
+            _volunteerId = volunteerId;
+
+            DataContext = this;
+
+            AssignCallCommand = new RelayCommand(param =>
+            {
+                if (param != null)
+                {
+                    AssignCall((int)param);
+                }
+                else
+                {
+                    MessageBox.Show("Parameter is null");
+                }
+            });
+
+            // Initial query to populate the call list
+            queryCallList();
+
+            // Add an observer to automatically refresh the list
+            s_bl.Call.AddObserver(CallListObserver);
+        }
+
+        private void queryCallList()
         {
             try
             {
-                // Fetch calls with specific CallType values
-                var calls = s_bl.Call.GetCallList()
+                // Fetch initial list of calls
+                var callIds = s_bl.Call.GetCallList()
                     .Where(call => call.CallType == BO.CallType.Open
                                    || call.CallType == BO.CallType.SelfCanceled
                                    || call.CallType == BO.CallType.AdminCanceled
                                    || call.CallType == BO.CallType.OpenAtRisk)
+                    .Select(call => call.CallId)
                     .ToList();
 
-                CallDataGrid.ItemsSource = calls;
+                // Fetch full details for each call using GetCallDetails
+                CallList = callIds
+                    .Select(callId => s_bl.Call.GetCallDetails(callId.Value))
+                    .ToList();
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Failed to load calls: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+
+        private void CallListObserver()
+        {
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                queryCallList(); // Refresh the call list on UI thread
+            });
+        }
+
+        private void AssignCall(int callId)
+        {
+            try
+            {
+                s_bl.Call.selectionCall(_volunteerId, callId);
+                MessageBox.Show($"Call {callId} successfully assigned to volunteer {_volunteerId}.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Failed to assign call: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        protected override void OnClosed(EventArgs e)
+        {
+            base.OnClosed(e);
+            s_bl.Call.RemoveObserver(CallListObserver);
+        }
+    }
+
+    public class RelayCommand : ICommand
+    {
+        private readonly Action<object> _execute;
+        private readonly Func<object, bool> _canExecute;
+
+        public RelayCommand(Action<object> execute, Func<object, bool> canExecute = null)
+        {
+            _execute = execute;
+            _canExecute = canExecute;
+        }
+
+        public event EventHandler CanExecuteChanged;
+
+        public bool CanExecute(object parameter) => _canExecute == null || _canExecute(parameter);
+
+        public void Execute(object parameter) => _execute(parameter);
+
+        public void RaiseCanExecuteChanged() => CanExecuteChanged?.Invoke(this, EventArgs.Empty);
     }
 }
