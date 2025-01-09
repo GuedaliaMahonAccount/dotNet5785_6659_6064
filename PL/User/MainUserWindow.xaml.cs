@@ -71,7 +71,8 @@ namespace PL
 
                 MessageBox.Show("Call completed successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
 
-                CurrentCall = null; // Clear the current call
+                // Update to the next assignment
+                UpdateToNextAssignment();
             }
             catch (Exception ex)
             {
@@ -87,12 +88,34 @@ namespace PL
                 s_bl.Call.CancelCall(CurrentUser.Id, assignmentId);
 
                 MessageBox.Show("Call canceled successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
-
-                CurrentCall = null; // Clear the current call
+        
+        // Update to the next assignment
+                UpdateToNextAssignment();
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Failed to cancel call: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void UpdateToNextAssignment()
+        {
+            try
+            {
+                // Fetch updated user details
+                var updatedUser = s_bl.Volunteer.GetVolunteerDetails(_volunteerId);
+
+                // Update CurrentCall to the next available assignment, if any
+                CurrentCall = updatedUser.CurrentCall;
+
+                if (CurrentCall == null)
+                {
+                    MessageBox.Show("No more assignments available.", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Failed to update to next assignment: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 

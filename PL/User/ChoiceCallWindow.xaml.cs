@@ -54,8 +54,6 @@ namespace PL.User
                 // Fetch initial list of calls
                 var callIds = s_bl.Call.GetCallList()
                     .Where(call => call.CallType == BO.CallType.Open
-                                   || call.CallType == BO.CallType.SelfCanceled
-                                   || call.CallType == BO.CallType.AdminCanceled
                                    || call.CallType == BO.CallType.OpenAtRisk)
                     .Select(call => call.CallId)
                     .ToList();

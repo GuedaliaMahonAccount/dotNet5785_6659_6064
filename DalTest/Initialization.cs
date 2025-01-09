@@ -260,58 +260,65 @@ namespace DalTest
 
         private static void CreateAssignments()
         {
+            // Retrieve all volunteers and calls from the database
             IEnumerable<Volunteer> volunteers = s_dal!.Volunteer.ReadAll();
             IEnumerable<Call> calls = s_dal.Call.ReadAll();
 
-            int assignmentId = s_dal.Config.NextAssignmentId;
-
+            // Shuffle the list of volunteers for random assignment
             Volunteer[] shuffledVolunteers = volunteers.OrderBy(_ => s_rand.Next()).ToArray();
             int totalVolunteers = shuffledVolunteers.Length;
 
-            int noAssignmentCount = Math.Max(1, totalVolunteers / 5);
-            int singleAssignmentCount = Math.Max(1, totalVolunteers / 3);
-            int multipleAssignmentCount = totalVolunteers - noAssignmentCount - singleAssignmentCount;
-
+            // Create an enumerator for the calls to iterate over them
             using var callEnumerator = calls.GetEnumerator();
             bool hasMoreCalls = callEnumerator.MoveNext();
 
-            for (int i = 0; i < totalVolunteers; i++)
+            for (int i = 0; i < totalVolunteers && hasMoreCalls; i++)
             {
                 Volunteer volunteer = shuffledVolunteers[i];
-                int assignmentsForThisVolunteer;
 
-                if (i < noAssignmentCount) continue;
-                else if (i < noAssignmentCount + singleAssignmentCount) assignmentsForThisVolunteer = 1;
-                else assignmentsForThisVolunteer = s_rand.Next(2, Math.Max(2, 5));
+                // Get the current call
+                Call call = callEnumerator.Current;
 
-                for (int j = 0; j < assignmentsForThisVolunteer && hasMoreCalls; j++)
+                // Skip calls that do not require an assignment
+                if (call.CallType == CallType.Open ||
+                    call.CallType == CallType.OpenAtRisk)
                 {
-                    Call call = callEnumerator.Current;
+                    // Move to the next call and continue
                     hasMoreCalls = callEnumerator.MoveNext();
+                    continue;
+                }
 
+                // Ensure calls with 'InTreatment' or 'InTreatmentAtRisk' have an assignment
+                if (call.CallType == CallType.InTreatment || call.CallType == CallType.InTreatmentAtRisk)
+                {
+                    // Generate a random start time within a reasonable range
                     DateTime startTime = call.StartTime.AddHours(s_rand.Next(1, Math.Max(1, 24)));
                     DateTime? endTime = null;
                     EndType? endType = null;
 
+                    // Randomly determine the end type and end time
                     double outcomeChance = s_rand.NextDouble();
-
                     if (outcomeChance < 0.3)
                     {
+                        // Completed call
                         endTime = startTime.AddHours(s_rand.Next(1, 72));
                         endType = EndType.Completed;
                     }
                     else if (outcomeChance < 0.5)
                     {
+                        // Call self-canceled
                         endTime = startTime.AddHours(s_rand.Next(1, 48));
                         endType = EndType.SelfCanceled;
                     }
                     else if (outcomeChance < 0.7)
                     {
+                        // Call admin-canceled
                         endTime = startTime.AddHours(s_rand.Next(1, 48));
                         endType = EndType.AdminCanceled;
                     }
                     else
                     {
+                        // Call expired without resolution
                         endType = EndType.Expired;
                     }
 
@@ -326,7 +333,9 @@ namespace DalTest
                         EndType = endType
                     };
 
+                    // Save the assignment in the database
                     s_dal.Assignment.Create(assignment);
+                    hasMoreCalls = callEnumerator.MoveNext();
                 }
             }
         }
