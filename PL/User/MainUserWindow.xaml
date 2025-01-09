@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Main User Window" Height="600" Width="800">
 
-    <!-- Déclaration des ressources -->
+    <!-- Define resources -->
     <Window.Resources>
         <Style x:Key="StyledButton" TargetType="Button">
             <Setter Property="Background" Value="#FF4CAF50" />
@@ -35,7 +35,7 @@
         </Style>
     </Window.Resources>
 
-    <!-- Contenu de la fenêtre -->
+    <!-- Window content -->
     <Grid>
         <Grid.Background>
             <ImageBrush ImageSource="../Assets/background4.jpeg" Stretch="UniformToFill" />
@@ -43,6 +43,7 @@
 
         <Border Background="#AA000000" Padding="20" VerticalAlignment="Center" HorizontalAlignment="Center">
             <StackPanel>
+                <!-- User details -->
                 <GroupBox Header="User Details" Margin="10" Foreground="White" Background="#AA333333">
                     <StackPanel>
                         <Label Content="ID:" Foreground="White" />
@@ -59,24 +60,31 @@
                     </StackPanel>
                 </GroupBox>
 
-                <GroupBox Header="Current Call Details" Margin="10" Foreground="White" Background="#AA333333">
-                    <StackPanel>
-                        <Label Content="Call ID:" Foreground="White" />
-                        <TextBlock Text="{Binding CurrentCall.CallId}" Foreground="White" />
-
-                        <Label Content="Type:" Foreground="White" />
-                        <TextBlock Text="{Binding CurrentCall.CallType}" Foreground="White" />
-
-                        <Label Content="Status:" Foreground="White" />
-                        <TextBlock Text="{Binding CurrentCall.Status}" Foreground="White" />
-
-                        <StackPanel Orientation="Horizontal" Margin="10">
-                            <Button Content="Complete Call" Click="CompleteCall_Click" Style="{StaticResource StyledButton}" Margin="5" />
-                            <Button Content="Cancel Call" Click="CancelCall_Click" Style="{StaticResource StyledButton}" Margin="5" />
-                        </StackPanel>
-                    </StackPanel>
+                <!-- Current calls list -->
+                <GroupBox Header="Current Calls" Margin="10" Foreground="White" Background="#AA333333">
+                    <ListView ItemsSource="{Binding CurrentCalls}" Margin="5" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                        <ListView.View>
+                            <GridView>
+                                <GridViewColumn Header="Call ID" DisplayMemberBinding="{Binding CallId}" Width="100" />
+                                <GridViewColumn Header="Status" DisplayMemberBinding="{Binding Status}" Width="100" />
+                                <GridViewColumn Header="Description" DisplayMemberBinding="{Binding GeneralDescription}" Width="200" />
+                                
+                                <GridViewColumn Header="Actions" Width="150">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal">
+                                                <Button Content="Complete" Command="{Binding DataContext.CompleteCallCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" Style="{StaticResource StyledButton}" />
+                                                <Button Content="Cancel" Command="{Binding DataContext.CancelCallCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" Style="{StaticResource StyledButton}" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
                 </GroupBox>
 
+                <!-- Additional buttons -->
                 <Border Background="#AA333333" Margin="10" Padding="10">
                     <StackPanel Orientation="Horizontal">
                         <Button Content="View History" Click="ViewHistory_Click" Style="{StaticResource StyledButton}" Margin="5" />
