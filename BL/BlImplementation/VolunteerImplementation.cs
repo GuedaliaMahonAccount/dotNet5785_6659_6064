@@ -123,7 +123,6 @@ internal class VolunteerImplementation : IVolunteer
             // Assign the call in progress to the volunteer
             volunteer.CurrentCall = callInProgress;
         }
-
         return volunteer;
     }
 
@@ -551,7 +550,7 @@ internal class VolunteerImplementation : IVolunteer
             .Where(v =>
             {
                 var currentAssignment = _dal.Assignment.ReadAll()
-                    .FirstOrDefault(a => a.VolunteerId == v.Id && a.EndTime == null);
+                    .FirstOrDefault(a => a.VolunteerId == v.Id);
 
                 if (currentAssignment == null) return false;
 
@@ -564,6 +563,7 @@ internal class VolunteerImplementation : IVolunteer
             {
                 var currentAssignment = _dal.Assignment.ReadAll()
                     .FirstOrDefault(a => a.VolunteerId == v.Id && a.EndTime == null);
+
 
                 var currentCall = _dal.Call.ReadAll()
                     .FirstOrDefault(c => c.Id == currentAssignment.CallId);
