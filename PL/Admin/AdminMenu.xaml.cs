@@ -88,13 +88,13 @@ namespace PL
             s_bl.Admin.RemoveClockObserver(clockObserver);
             s_bl.Admin.RemoveConfigObserver(configObserver);
 
-            foreach (Window window in Application.Current.Windows)
-            {
-                if (window != this)
-                {
-                    window.Close();
-                }
-            }
+            //foreach (Window window in Application.Current.Windows)
+            //{
+            //    if (window != this)
+            //    {
+            //        window.Close();
+            //    }
+            //}
         }
 
         private void btnUpdateMaxYearRange_Click(object sender, RoutedEventArgs e)
