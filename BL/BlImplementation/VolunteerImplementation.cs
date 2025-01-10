@@ -580,6 +580,45 @@ internal class VolunteerImplementation : IVolunteer
             .ToList();
     }
 
+    /// <summary>
+    /// Retrieves all current calls assigned to a volunteer.
+    /// </summary>
+    /// <param name="volunteerId">The unique ID of the volunteer.</param>
+    /// <returns>A list of <see cref="BO.CallInProgress"/> objects representing all current calls.</returns>
+    public List<BO.CallInProgress> GetCurrentCallsForVolunteer(int volunteerId)
+    {
+        var assignments = _dal.Assignment.ReadAll()
+            .Where(a => a.VolunteerId == volunteerId && a.EndTime == null); // Active assignments only
+
+        var currentCalls = new List<BO.CallInProgress>();
+
+        foreach (var assignment in assignments)
+        {
+            var callData = _dal.Call.Read(assignment.CallId);
+
+            var callInProgress = new BO.CallInProgress
+            {
+                Id = assignment.Id,
+                CallId = callData.Id,
+                CallType = (BO.CallType)callData.CallType,
+                GeneralDescription = callData.Description,
+                Address = callData.Address,
+                StartTime = callData.StartTime,
+                EstimatedCompletionTime = assignment.EndTime,
+                AssignmentStartTime = assignment.StartTime,
+                Distance = VolunteerManager.CalculateDistance(
+                    _dal.Volunteer.Read(volunteerId).Latitude,
+                    _dal.Volunteer.Read(volunteerId).Longitude,
+                    callData.Latitude,
+                    callData.Longitude),
+                Status = BO.CallType.InTreatment // Example status; adjust as necessary
+            };
+
+            currentCalls.Add(callInProgress);
+        }
+
+        return currentCalls;
+    }
 
 
 

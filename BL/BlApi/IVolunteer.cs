@@ -14,6 +14,7 @@ namespace BlApi
         void AddVolunteer(Volunteer volunteer);
         int FindVolunteerID(string name);
         IEnumerable<VolunteerInList> GetVolunteersListByCallType(BO.CallType callType);
+        List<BO.CallInProgress> GetCurrentCallsForVolunteer(int volunteerId);
     }
 }
 
