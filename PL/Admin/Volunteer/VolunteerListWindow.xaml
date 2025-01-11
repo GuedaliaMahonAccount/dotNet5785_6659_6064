@@ -82,7 +82,7 @@
                 <DataGridTextColumn Binding="{Binding Name}" Header="Name" Width="Auto"/>
 
                 <!-- CurrentCallType Column -->
-                <DataGridTemplateColumn Header="Status" Width="Auto">
+                <DataGridTemplateColumn Header="Current call status" Width="Auto">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding CurrentCallType}"
