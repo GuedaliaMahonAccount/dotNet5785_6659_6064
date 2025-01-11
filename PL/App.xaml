@@ -8,5 +8,6 @@
         <local:CurrentCallTypeCollection x:Key="CurrentCallTypeCollectionKey" />
         <local:RoleCollection x:Key="RoleCollectionKey" />
         <local:DistanceTypeCollection x:Key="DistanceTypeCollectionKey" />
+        <local:CountToVisibilityConverter x:Key="CountToVisibilityConverter"/>
     </Application.Resources>
 </Application>
