@@ -13,41 +13,70 @@
     <Window.Resources>
         <local:CallTypeToColorConverter x:Key="CallTypeToColorConverter" />
     </Window.Resources>
-    
-    <Grid>
 
+    <Grid>
         <!-- Background Image -->
         <Grid.Background>
             <ImageBrush ImageSource="../../Assets/background1.jpeg" Stretch="UniformToFill"/>
         </Grid.Background>
-        
+
         <Grid.RowDefinitions>
-            <RowDefinition Height="40*"/>
-            <RowDefinition Height="500*"/>
             <RowDefinition Height="Auto"/>
+            <!-- Filters Section -->
+            <RowDefinition Height="*"/>
+            <!-- DataGrid Section -->
+            <RowDefinition Height="Auto"/>
+            <!-- Add Button -->
         </Grid.RowDefinitions>
 
-        <!-- Top Grid -->
-        <Grid HorizontalAlignment="Stretch" Height="Auto" Grid.Row="0" VerticalAlignment="Stretch" Width="Auto">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-            <Label Content="Label" Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
-            <ComboBox ItemsSource="{Binding Source={StaticResource CurrentCallTypeCollectionKey}}"
-                      SelectedValue="{Binding Type, Mode=TwoWay}"
-                      SelectionChanged="CbVolunteerTypeSelector_SelectionChanged"
-                      Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
-        </Grid>
+        <!-- Filters Section -->
+        <Border Grid.Row="0" Background="#CCFFFFFF" Padding="10" Margin="10" CornerRadius="5">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="3*"/>
+                    <!-- Name Filter -->
+                    <ColumnDefinition Width="2*"/>
+                    <!-- Call Type Filter -->
+                </Grid.ColumnDefinitions>
 
-        <!-- DataGrid -->
+                <!-- Name Filter -->
+                <StackPanel Orientation="Vertical" Grid.Column="0" Margin="10">
+                    <TextBlock Text="Filter by Name" FontSize="14" FontWeight="Bold" Margin="0,0,0,5"/>
+                    <TextBox Name="TxtVolunteerNameFilter" 
+                             Width="300" 
+                             FontSize="14" 
+                             TextChanged="TxtVolunteerNameFilter_TextChanged"
+                             ToolTip="Type to filter volunteers by name"
+                             Padding="5"/>
+                </StackPanel>
+
+                <!-- Call Type Filter -->
+                <StackPanel Orientation="Vertical" Grid.Column="1" Margin="10">
+                    <TextBlock Text="Filter by Call Type" FontSize="14" FontWeight="Bold" Margin="0,0,0,5"/>
+                    <ComboBox ItemsSource="{Binding Source={StaticResource CurrentCallTypeCollectionKey}}"
+                              SelectedValue="{Binding Type, Mode=TwoWay}"
+                              SelectionChanged="CbVolunteerTypeSelector_SelectionChanged"
+                              FontSize="14"
+                              Width="200"
+                              ToolTip="Filter by Call Type"
+                              Padding="5"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- DataGrid Section -->
         <DataGrid Grid.Row="1" ItemsSource="{Binding VolunteerList}"
                   IsReadOnly="True" AutoGenerateColumns="False" 
                   EnableRowVirtualization="True"
                   RowDetailsVisibilityMode="VisibleWhenSelected"
                   SelectedItem="{Binding SelectedVolunteer}"
-                  MouseDoubleClick="lsvVolunteerList_MouseDoubleClick">
-            <!-- DataGrid.Columns -->
+                  MouseDoubleClick="lsvVolunteerList_MouseDoubleClick"
+                  Margin="10" 
+                  Background="#F9F9F9" 
+                  RowBackground="White" 
+                  AlternatingRowBackground="#EAEAEA" 
+                  BorderThickness="1" 
+                  BorderBrush="#CCCCCC">
             <DataGrid.Columns>
                 <DataGridTextColumn Binding="{Binding Id}" Header="Id" Width="Auto"/>
                 <DataGridTextColumn Binding="{Binding Name}" Header="Name" Width="Auto"/>
@@ -57,12 +86,12 @@
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding CurrentCallType}"
-                                FontSize="16"
-                                Foreground="{Binding CurrentCallType, Converter={StaticResource CallTypeToColorConverter}}" />
+                                       FontSize="16"
+                                       Foreground="{Binding CurrentCallType, Converter={StaticResource CallTypeToColorConverter}}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                
+
                 <DataGridTemplateColumn Header="Is Active" Width="Auto">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
@@ -87,6 +116,6 @@
         </DataGrid>
 
         <!-- Add Button -->
-        <Button Content="Add" Grid.Row="2" HorizontalAlignment="Center" Height="50" Width="100" Click="AddvolunteerButton_Click"/>
+        <Button Content="Add" Grid.Row="2" HorizontalAlignment="Center" Height="50" Width="100" Click="AddvolunteerButton_Click" Margin="10"/>
     </Grid>
 </Window>

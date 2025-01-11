@@ -1,5 +1,8 @@
 ﻿using BO;
+using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -11,6 +14,8 @@ namespace PL.Volunteer
     public partial class VolunteerListWindow : Window
     {
         static readonly BlApi.IBl s_bl = BlApi.Factory.Get();
+
+        private IEnumerable<BO.VolunteerInList> _allVolunteers;
 
         public IEnumerable<BO.VolunteerInList> VolunteerList
         {
@@ -29,12 +34,17 @@ namespace PL.Volunteer
         public VolunteerListWindow()
         {
             InitializeComponent();
-            VolunteerList = s_bl.Volunteer.GetVolunteersList(); // Load all volunteers initially
+            _allVolunteers = s_bl.Volunteer.GetVolunteersList(); // Load all volunteers initially
+            VolunteerList = _allVolunteers;
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            s_bl.Volunteer.AddObserver(() => VolunteerList = s_bl.Volunteer.GetVolunteersList());
+            s_bl.Volunteer.AddObserver(() =>
+            {
+                _allVolunteers = s_bl.Volunteer.GetVolunteersList();
+                FilterVolunteersByName(TxtVolunteerNameFilter.Text);
+            });
         }
 
         private void Window_Closed(object sender, EventArgs e)
@@ -67,7 +77,7 @@ namespace PL.Volunteer
                     try
                     {
                         s_bl.Volunteer.DeleteVolunteer(volunteerId);
-                        // No need to refresh the list manually as the Observer pattern will handle it
+                        // Observer pattern will refresh the list
                     }
                     catch (Exception ex)
                     {
@@ -88,31 +98,46 @@ namespace PL.Volunteer
             }
         }
 
+        private void TxtVolunteerNameFilter_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            FilterVolunteersByName((sender as TextBox)?.Text);
+        }
+
+        private void FilterVolunteersByName(string? name)
+        {
+            if (string.IsNullOrEmpty(name))
+            {
+                VolunteerList = _allVolunteers;
+            }
+            else
+            {
+                VolunteerList = _allVolunteers
+                                .Where(volunteer => volunteer.Name.IndexOf(name, StringComparison.OrdinalIgnoreCase) >= 0)
+                                .ToList();
+            }
+        }
+
         private void FilterVolunteersByStatus(BO.CallType? status)
         {
             if (status == null || status == BO.CallType.None)
             {
-                VolunteerList = s_bl.Volunteer.GetVolunteersList();
+                VolunteerList = _allVolunteers;
             }
             else
             {
-                VolunteerList = s_bl.Volunteer.GetVolunteersList()
-                                              .Where(volunteer => volunteer.CurrentCallType == status)
-                                              .ToList();
+                VolunteerList = _allVolunteers
+                                .Where(volunteer => volunteer.CurrentCallType == status)
+                                .ToList();
             }
         }
     }
 
-    /// <summary>
-    /// Enum to color converter for CallType.
-    /// </summary>
     public class CallTypeToColorConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value is BO.CallType callType)
             {
-                // Map CallType values to colors
                 return callType switch
                 {
                     BO.CallType.None => Brushes.Gray,
@@ -128,7 +153,7 @@ namespace PL.Volunteer
                 };
             }
 
-            return Brushes.Black; // Default color
+            return Brushes.Black;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
