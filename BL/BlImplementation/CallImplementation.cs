@@ -54,6 +54,9 @@ namespace BlImplementation
             // Attempt to add the volunteer to the database
             _dal.Call.Create(callDO);
             CallManager.Observers.NotifyListUpdated();
+
+            // Notify nearby volunteers
+            Helpers.CallManager.NotifyNearbyVolunteers(newCall);
         }
 
         /// <summary>

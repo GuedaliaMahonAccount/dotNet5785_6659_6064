@@ -402,5 +402,64 @@ namespace Helpers
             }
 
         }
+
+        /// <summary>
+        /// Notifies nearby volunteers of a new call.
+        /// </summary>
+        /// <param name="newCall">The new call to notify volunteers about.</param>
+        /// <param name="radiusInKm">The radius within which volunteers will be notified.</param>
+        public static void NotifyNearbyVolunteers(BO.Call newCall, double radiusInKm = 5.0)
+        {
+            // Retrieve all volunteers
+            var volunteers = s_dal.Volunteer.ReadAll();
+
+            // Filter volunteers within the specified radius
+            var nearbyVolunteers = volunteers.Where(volunteer =>
+            {
+                if (volunteer.Latitude.HasValue && volunteer.Longitude.HasValue)
+                {
+                    double distance = CalculateDistance(
+                        newCall.Latitude.Value, newCall.Longitude.Value,
+                        volunteer.Latitude.Value, volunteer.Longitude.Value,
+                        (BO.DistanceType)volunteer.DistanceType);
+                    return distance <= radiusInKm;
+                }
+                return false;
+            });
+
+            // Send notification email to each nearby volunteer
+            foreach (var volunteer in nearbyVolunteers)
+            {
+                if (string.IsNullOrWhiteSpace(volunteer.Email))
+                {
+                    // Skip if email is not available
+                    Console.WriteLine($"Skipping volunteer ID {volunteer.Id} - Email is missing.");
+                    continue;
+                }
+
+                string subject = "New Call Alert: Assistance Needed!";
+                string body = $@"
+            <p>Dear {volunteer.Name},</p>
+            <p>A new call for assistance has been added in your area:</p>
+            <ul>
+                <li><strong>Address:</strong> {newCall.Address}</li>
+                <li><strong>Description:</strong> {newCall.Description}</li>
+                <li><strong>Deadline:</strong> {newCall.DeadLine?.ToString("f") ?? "N/A"}</li>
+            </ul>
+            <p>If you can help, please log in to the system and volunteer for the call.</p>
+            <p>Thank you for your support!</p>";
+
+                try
+                {
+                    EmailService.SendEmail(volunteer.Email, subject, body);
+                    Console.WriteLine($"Email sent to {volunteer.Email} successfully.");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Failed to send email to {volunteer.Email}: {ex.Message}");
+                }
+            }
+        }
+
     }
 }
