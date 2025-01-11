@@ -123,7 +123,6 @@ internal class VolunteerImplementation : IVolunteer
             // Assign the call in progress to the volunteer
             volunteer.CurrentCall = callInProgress;
         }
-
         return volunteer;
     }
 
@@ -539,46 +538,7 @@ internal class VolunteerImplementation : IVolunteer
         }
     }
 
-    /// <summary>
-    /// Function to retrieve and sort volunteers based on their current call's CallType.
-    /// </summary>
-    /// <param name="callType">The CallType to filter and sort by.</param>
-    public IEnumerable<VolunteerInList> GetVolunteersListByCallType(BO.CallType callType)
-    {
-        var allVolunteers = _dal.Volunteer.ReadAll();
-
-        return allVolunteers
-            .Where(v =>
-            {
-                var currentAssignment = _dal.Assignment.ReadAll()
-                    .FirstOrDefault(a => a.VolunteerId == v.Id && a.EndTime == null);
-
-                if (currentAssignment == null) return false;
-
-                var currentCall = _dal.Call.ReadAll()
-                    .FirstOrDefault(c => c.Id == currentAssignment.CallId);
-
-                return currentCall != null && (BO.CallType)currentCall.CallType == callType;
-            })
-            .Select(v =>
-            {
-                var currentAssignment = _dal.Assignment.ReadAll()
-                    .FirstOrDefault(a => a.VolunteerId == v.Id && a.EndTime == null);
-
-                var currentCall = _dal.Call.ReadAll()
-                    .FirstOrDefault(c => c.Id == currentAssignment.CallId);
-
-                return new BO.VolunteerInList
-                {
-                    Id = v.Id,
-                    Name = v.Name,
-                    IsActive = v.IsActive,
-                    CurrentCallType = currentCall != null ? (BO.CallType)currentCall.CallType : BO.CallType.None
-                };
-            })
-            .OrderBy(v => v.CurrentCallType) // Sort by CallType
-            .ToList();
-    }
+   
 
     /// <summary>
     /// Retrieves all current calls assigned to a volunteer.
