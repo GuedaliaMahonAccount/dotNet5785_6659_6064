@@ -55,4 +55,5 @@
                 FontSize="30" FontWeight="Bold" Foreground="White" Background="Green"
                 Click="LoginButton_Click" Grid.Column="1" Grid.Row="3" Margin="6,0"/>
     </Grid>
+    
 </Window>
