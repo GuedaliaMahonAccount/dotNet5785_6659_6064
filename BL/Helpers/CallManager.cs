@@ -251,58 +251,59 @@ namespace Helpers
         {
             var systemTime = DateTime.Now;
 
-            // Retrieve all calls from the DAL (assuming DO.Call objects)
+            // Retrieve all calls from the DAL
             var calls = s_dal.Call.ReadAll();
 
-            // Convert DO.Call objects to BO.Call (assuming a conversion helper exists)
+            // Convert DO.Call to BO.Call
             var boCalls = calls.Select(call => ConvertToBOCall(call)).ToList();
 
-            // Iterate through calls whose deadline has passed
             foreach (var call in boCalls)
             {
                 if (call.DeadLine.HasValue && call.DeadLine.Value < systemTime && !IsCallClosed(call))
                 {
-                    // Check if call has no assignment
                     if (call.Assignments == null || !call.Assignments.Any())
                     {
-                        // Add a new assignment with "Expired Cancellation"
+                        // Create a new assignment with "Expired Cancellation"
                         var newAssignment = new BO.CallAssignInList
                         {
-                            VolunteerId = null,
-                            VolunteerName = null,
+                            VolunteerId = 0, // No volunteer
+                            VolunteerName = "System",
                             StartTime = DateTime.MinValue,
-                            EndTime = systemTime,
-                            EndType = EndType.Expired // Assuming an enum value
-                        };
-
-                        call.Assignments?.Add(newAssignment);
-                    }
-                    else
-                    {
-                        // Update the last assignment if EndTime is null
-                        var openAssignment = call.Assignments.LastOrDefault(a => a.EndTime == null);
-                        var updatedAssignment = new BO.CallAssignInList
-                        {
-                            VolunteerId = openAssignment.VolunteerId,
-                            VolunteerName = openAssignment.VolunteerName,
-                            StartTime = openAssignment.StartTime,
                             EndTime = systemTime,
                             EndType = EndType.Expired
                         };
 
-                        // Replace the existing assignment in the list
-                        var index = call.Assignments.IndexOf(openAssignment);
-                        if (index >= 0)
-                        {
-                            call.Assignments[index] = updatedAssignment;
-                        }
+                        if (call.Assignments == null)
+                            call.Assignments = new List<BO.CallAssignInList>();
 
+                        call.Assignments.Add(newAssignment);
+                    }
+                    else
+                    {
+                        // Update existing assignment by creating a new object
+                        var openAssignment = call.Assignments.LastOrDefault(a => a.EndTime == null);
+                        if (openAssignment != null)
+                        {
+                            var updatedAssignment = new BO.CallAssignInList
+                            {
+                                VolunteerId = openAssignment.VolunteerId,
+                                VolunteerName = openAssignment.VolunteerName,
+                                StartTime = openAssignment.StartTime,
+                                EndTime = systemTime, // Updated EndTime
+                                EndType = EndType.Expired // Updated EndType
+                            };
+
+                            // Replace the existing assignment in the list
+                            var index = call.Assignments.IndexOf(openAssignment);
+                            if (index >= 0)
+                            {
+                                call.Assignments[index] = updatedAssignment;
+                            }
+                        }
                     }
 
-                    // Convert BO.Call back to DO.Call
-                    var updatedDOCall = ConvertToDOCall(call);
-
                     // Update the call in the DAL
+                    var updatedDOCall = ConvertToDOCall(call);
                     s_dal.Call.Update(updatedDOCall);
                     Observers.NotifyListUpdated();
                 }
