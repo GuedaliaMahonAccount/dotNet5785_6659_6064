@@ -46,7 +46,7 @@ namespace BlImplementation
         public TimeSpan GetRiskTime()
         {
             // No try-catch, throw the exception directly
-            return AdminManager.MaxRange;
+            return AdminManager.RiskRange;
         }
 
         public void InitializeDatabase()
@@ -54,18 +54,18 @@ namespace BlImplementation
             ResetDatabase();
             DalTest.Initialization.Do();
             AdminManager.UpdateClock(AdminManager.Now);
-            AdminManager.MaxRange = AdminManager.MaxRange;
+            AdminManager.RiskRange = AdminManager.RiskRange;
         }
 
         public void ResetDatabase()
         {
             _dal.ResetDB();
-            AdminManager.MaxRange = AdminManager.MaxRange;
+            AdminManager.RiskRange = AdminManager.RiskRange;
         }
 
         public void SetRiskTime(TimeSpan riskTimeSpan)
         {
-            AdminManager.MaxRange = riskTimeSpan;
+            AdminManager.RiskRange = riskTimeSpan;
         }
 
 

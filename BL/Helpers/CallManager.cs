@@ -321,6 +321,14 @@ namespace Helpers
         }
 
         /// <summary>
+        ///
+        ///</summary>
+        public static void UpdateRiskCall(DateTime oldClock, DateTime newClock, TimeSpan RiskRange)
+        {
+
+        }
+
+        /// <summary>
         /// Converts a DO.Call object to a BO.Call object.
         /// </summary>
         private static BO.Call ConvertToBOCall(DO.Call doCall)

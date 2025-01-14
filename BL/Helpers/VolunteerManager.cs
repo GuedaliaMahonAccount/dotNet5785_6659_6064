@@ -268,82 +268,92 @@ namespace Helpers
         }
 
 
-        public static void PeriodicVolunteersUpdates()
-        {
-            try
-            {
-                var volunteersFromDal = s_dal.Volunteer.ReadAll();
-                var assignmentsFromDal = s_dal.Assignment.ReadAll();
+        //public static void PeriodicVolunteersUpdates(DateTime oldClock, DateTime newClock, TimeSpan MaxRange)
+        //{
+        //    try
+        //    {
+        //        bool volunteerUpdated = false; // Indicates if any volunteer has been updated
 
-                var volunteersInBO = volunteersFromDal.Select(v => new BO.VolunteerInList
-                {
-                    Id = v.Id,
-                    Name = v.Name,
-                    IsActive = v.IsActive,
-                    CompletedAssignmentsCount = assignmentsFromDal.Count(call => call.VolunteerId == v.Id),
-                    CancelledCallsCount = assignmentsFromDal.Count(call => call.VolunteerId == v.Id),
-                    ExpiredCallsCount = assignmentsFromDal.Count(call => call.VolunteerId == v.Id),
-                    CurrentCallId = assignmentsFromDal.Where(call => call.VolunteerId == v.Id).Select(call => call.CallId).FirstOrDefault(),
-                    CurrentCallType = assignmentsFromDal.Where(call => call.VolunteerId == v.Id).Select(call =>
-                    {
-                        switch ((BO.EndType)call.EndType)
-                        {
-                            case BO.EndType.Completed:
-                                return BO.CallType.Completed;
-                            case BO.EndType.SelfCanceled:
-                                return BO.CallType.SelfCanceled;
-                            case BO.EndType.Expired:
-                                return BO.CallType.Expired;
-                            case BO.EndType.AdminCanceled:
-                                return BO.CallType.AdminCanceled;
-                            default:
-                                throw new InvalidOperationException("Unknown EndType");
-                        }
-                    }).FirstOrDefault()
-                }).ToList();
+        //        var volunteersFromDal = s_dal.Volunteer.ReadAll();
+        //        var assignmentsFromDal = s_dal.Assignment.ReadAll();
 
-                var volunteersWithNullCallType = volunteersInBO.Where(v => v.CurrentCallType == null).ToList();
+        //        var volunteersInBO = volunteersFromDal.Select(v => new BO.VolunteerInList
+        //        {
+        //            Id = v.Id,
+        //            Name = v.Name,
+        //            IsActive = v.IsActive,
+        //            CompletedAssignmentsCount = assignmentsFromDal.Count(call => call.VolunteerId == v.Id),
+        //            CancelledCallsCount = assignmentsFromDal.Count(call => call.VolunteerId == v.Id),
+        //            ExpiredCallsCount = assignmentsFromDal.Count(call => call.VolunteerId == v.Id),
+        //            CurrentCallId = assignmentsFromDal.Where(call => call.VolunteerId == v.Id).Select(call => call.CallId).FirstOrDefault(),
+        //            CurrentCallType = assignmentsFromDal.Where(call => call.VolunteerId == v.Id).Select(call =>
+        //            {
+        //                switch ((BO.EndType)call.EndType)
+        //                {
+        //                    case BO.EndType.Completed:
+        //                        return BO.CallType.Completed;
+        //                    case BO.EndType.SelfCanceled:
+        //                        return BO.CallType.SelfCanceled;
+        //                    case BO.EndType.Expired:
+        //                        return BO.CallType.Expired;
+        //                    case BO.EndType.AdminCanceled:
+        //                        return BO.CallType.AdminCanceled;
+        //                    default:
+        //                        throw new InvalidOperationException("Unknown EndType");
+        //                }
+        //            }).FirstOrDefault()
+        //        }).ToList();
 
-                foreach (var volunteer in volunteersWithNullCallType)
-                {
-                    try
-                    {
-                        var volunteerAssignments = assignmentsFromDal
-                            .Where(a => a.VolunteerId == volunteer.Id)
-                            .OrderByDescending(a => a.StartTime)
-                            .ToList();
+        //        lock (AdminManager.blMutex) // Synchronization to avoid conflicts
+        //        {
+        //            foreach (var volunteer in volunteersInBO)
+        //            {
+        //                var volunteerAssignments = assignmentsFromDal
+        //                    .Where(a => a.VolunteerId == volunteer.Id)
+        //                    .OrderByDescending(a => a.StartTime)
+        //                    .ToList();
 
-                        if (volunteerAssignments.Any())
-                        {
-                            var latestAssignment = volunteerAssignments.First();
+        //                if (volunteerAssignments.Any())
+        //                {
+        //                    var latestAssignment = volunteerAssignments.First();
 
-                            if (latestAssignment.StartTime < DateTime.Now.AddYears(-5))
-                            {
-                                s_dal.Volunteer.Delete(volunteer.Id);
+        //                    // Calculate the time difference
+        //                    var timeDifference = AdminManager.Now - latestAssignment.StartTime;
 
-                                // Remove the observer
-                                VolunteerManager.Observers.NotifyItemUpdated(volunteer.Id);
-                            }
-                        }
-                        else
-                        {
-                            s_dal.Volunteer.Delete(volunteer.Id);
+        //                    if (timeDifference >= MaxRange)
+        //                    {
+        //                        volunteerUpdated = true;
+        //                        var updatedVolunteer = s_dal.Volunteer.Read(volunteer.Id);
 
-                            // Remove the observer
-                            VolunteerManager.Observers.NotifyItemUpdated(volunteer.Id);
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        throw new BlDoesNotExistException($"Error processing volunteer with ID {volunteer.Id}.", ex);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("An error occurred while removing volunteers with no active call for 5 years.", ex);
-            }
-        }
+        //                        // Create a new object with updated IsActive property
+        //                        var updatedVolunteerWithInactive = updatedVolunteer with { IsActive = false };
+        //                        s_dal.Volunteer.Update(updatedVolunteerWithInactive);
+
+        //                        VolunteerManager.Observers.NotifyItemUpdated(volunteer.Id);
+        //                    }
+        //                }
+        //                else
+        //                {
+        //                    // Delete the volunteer if no assignments exist
+        //                    s_dal.Volunteer.Delete(volunteer.Id);
+        //                    VolunteerManager.Observers.NotifyItemUpdated(volunteer.Id);
+        //                }
+        //            }
+        //        }
+
+        //        // Check if the year has changed
+        //        bool yearChanged = oldClock.Year != newClock.Year;
+
+        //        if (yearChanged || volunteerUpdated)
+        //        {
+        //            VolunteerManager.Observers.NotifyListUpdated();
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw new Exception("An error occurred while updating volunteers.", ex);
+        //    }
+        //}
 
     }
 

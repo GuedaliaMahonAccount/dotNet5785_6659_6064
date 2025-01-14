@@ -21,7 +21,7 @@ internal static class AdminManager //stage 4
     /// <summary>
     /// Property for providing/setting current configuration variable value for any BL class that may need it
     /// </summary>
-    internal static TimeSpan MaxRange
+    internal static TimeSpan RiskRange
     {
         get => s_dal.Config.RiskRange;
         set
@@ -53,7 +53,8 @@ internal static class AdminManager //stage 4
         s_dal.Config.Clock = newClock; //stage 4
 
         CallManager.UpdateExpiredCalls();
-        VolunteerManager.PeriodicVolunteersUpdates();
+        //VolunteerManager.PeriodicVolunteersUpdates(oldClock, newClock);
+        CallManager.UpdateRiskCall(oldClock, newClock, RiskRange);
 
         //Calling all the observers of clock update
         ClockUpdatedObservers?.Invoke(); //prepared for stage 5
