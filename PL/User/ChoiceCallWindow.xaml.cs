@@ -15,6 +15,9 @@ namespace PL.User
             set { SetValue(CallListProperty, value); }
         }
 
+        public RelayCommand ShowDescriptionCommand { get; }
+
+
         public static readonly DependencyProperty CallListProperty =
             DependencyProperty.Register("CallList", typeof(IEnumerable<BO.Call>),
             typeof(ChoiceCallWindow), new PropertyMetadata(null));
@@ -27,6 +30,14 @@ namespace PL.User
             _volunteerId = volunteerId;
 
             DataContext = this;
+
+            ShowDescriptionCommand = new RelayCommand(param =>
+            {
+                if (param is BO.Call call)
+                {
+                    MessageBox.Show(call.Description, "Description", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+            });
 
             AssignCallCommand = new RelayCommand(param =>
             {

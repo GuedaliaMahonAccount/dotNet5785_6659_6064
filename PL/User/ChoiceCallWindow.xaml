@@ -42,34 +42,47 @@
             <Setter Property="HorizontalContentAlignment" Value="Center" />
         </Style>
 
-        <!-- Row Style for Adding Separator Lines -->
+        <!-- Style for DataGrid Cells -->
+        <Style TargetType="DataGridCell">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="Black" />
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="LightGray" />
+                    <Setter Property="Foreground" Value="Black" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Style for DataGrid Rows -->
         <Style TargetType="DataGridRow">
-            <Setter Property="BorderBrush" Value="Gray" />
-            <Setter Property="BorderThickness" Value="0,0,0,1" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="Black" />
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="LightGray" />
+                    <Setter Property="Foreground" Value="Black" />
+                </Trigger>
+            </Style.Triggers>
         </Style>
     </Window.Resources>
 
     <Grid>
         <Grid.Background>
-            <ImageBrush ImageSource="../Assets/background2.png" Stretch="UniformToFill" />
+            <SolidColorBrush Color="White"/>
         </Grid.Background>
 
-        <Border Background="#AA000000" Margin="10" Padding="10" CornerRadius="10">
+        <Border Background="#FFFFFF" Margin="10" Padding="10" CornerRadius="10">
             <DataGrid x:Name="CallDataGrid"
                       AutoGenerateColumns="False"
                       IsReadOnly="True"
                       ItemsSource="{Binding CallList}"
                       GridLinesVisibility="None"
-                      ColumnHeaderStyle="{StaticResource DataGridHeaderStyle}">
-
-                <DataGrid.Resources>
-                    <Style TargetType="TextBlock">
-                        <Setter Property="Foreground" Value="White" />
-                    </Style>
-                    <Style TargetType="DataGridCell">
-                        <Setter Property="Background" Value="Transparent" />
-                    </Style>
-                </DataGrid.Resources>
+                      SelectionMode="Single"
+                      SelectionUnit="FullRow"
+                      EnableRowVirtualization="True"
+                      ColumnHeaderStyle="{StaticResource DataGridHeaderStyle}"
+                      Background="Transparent">
 
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="50" />
@@ -78,11 +91,19 @@
                     <DataGridTextColumn Header="Start Time" Binding="{Binding StartTime}" Width="150" />
                     <DataGridTextColumn Header="Deadline" Binding="{Binding DeadLine}" Width="150" />
 
-                    <!-- Description Column with TextWrapping -->
+                    <!-- Description Column with Button -->
                     <DataGridTemplateColumn Header="Description" Width="250">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding Description}" TextWrapping="Wrap" />
+                                <Button Background="Transparent" 
+                                        BorderThickness="0"
+                                        Padding="0"
+                                        Command="{Binding DataContext.ShowDescriptionCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                        CommandParameter="{Binding}">
+                                    <TextBlock Text="{Binding Description}" 
+                                               TextWrapping="Wrap" 
+                                               Foreground="Black"/>
+                                </Button>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
