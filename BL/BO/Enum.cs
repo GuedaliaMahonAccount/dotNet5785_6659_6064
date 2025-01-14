@@ -64,6 +64,7 @@ public enum DistanceType
 }
 public enum CallType
 {
+    None,
     Open,              // The call is open and not currently assigned to any volunteer. It may have been previously assigned but was canceled by the volunteer or administrator.
     InTreatment,       // The call is currently being handled by a volunteer.
     Completed,         // A volunteer has completed the call.
@@ -71,8 +72,7 @@ public enum CallType
     SelfCanceled,      // The volunteer chose to cancel their assignment before the maximum allowed time.
     AdminCanceled,     // The administrator canceled the volunteer's assignment before the maximum allowed time.
     OpenAtRisk,        // The call is open and nearing its required completion time, within a risk time range defined by the administrator.
-    InTreatmentAtRisk, // The call is currently in treatment but nearing its required completion time, within a risk time range defined by the administrator.
-    None
+    InTreatmentAtRisk // The call is currently in treatment but nearing its required completion time, within a risk time range defined by the administrator.
 }
 public enum EndType
 {

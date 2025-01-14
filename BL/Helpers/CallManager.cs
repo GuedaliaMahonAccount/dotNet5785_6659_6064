@@ -321,12 +321,63 @@ namespace Helpers
         }
 
         /// <summary>
-        ///
+        /// Updates the call type of all open calls whose deadlines are within the specified risk range.
         ///</summary>
-        public static void UpdateRiskCall(DateTime oldClock, DateTime newClock, TimeSpan RiskRange)
+        public static void UpdateRiskCall(DateTime oldClock, DateTime newClock, TimeSpan riskRange)
         {
+            // Retrieve all calls from the DAL
+            var allCalls = s_dal.Call.ReadAll().ToList();
 
+            foreach (var call in allCalls)
+            {
+                if (call.DeadLine.HasValue)
+                {
+                    // Calculate the remaining time until the deadline
+                    var timeLeft = call.DeadLine.Value - newClock;
+
+                    if (timeLeft <= riskRange)
+                    {
+                        // Calls within the risk range
+                        switch (call.CallType)
+                        {
+                            case DO.CallType.Open:
+                                // Update Open calls to OpenAtRisk
+                                var updatedOpenCall = call with { CallType = DO.CallType.OpenAtRisk };
+                                s_dal.Call.Update(updatedOpenCall);
+                                break;
+
+                            case DO.CallType.InTreatment:
+                                // Update InTreatment calls to InTreatmentAtRisk
+                                var updatedInTreatmentCall = call with { CallType = DO.CallType.InTreatmentAtRisk };
+                                s_dal.Call.Update(updatedInTreatmentCall);
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        // Calls outside the risk range
+                        switch (call.CallType)
+                        {
+                            case DO.CallType.OpenAtRisk:
+                                // Revert OpenAtRisk calls to Open
+                                var revertedOpenCall = call with { CallType = DO.CallType.Open };
+                                s_dal.Call.Update(revertedOpenCall);
+                                break;
+
+                            case DO.CallType.InTreatmentAtRisk:
+                                // Revert InTreatmentAtRisk calls to InTreatment
+                                var revertedInTreatmentCall = call with { CallType = DO.CallType.InTreatment };
+                                s_dal.Call.Update(revertedInTreatmentCall);
+                                break;
+                        }
+                    }
+                }
+            }
+
+            // Notify observers about the updated call list
+            Observers.NotifyListUpdated();
         }
+
 
         /// <summary>
         /// Converts a DO.Call object to a BO.Call object.

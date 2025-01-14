@@ -101,7 +101,7 @@ namespace PL
         {
             int maxYearRange = MaxYearRange;
 
-            TimeSpan riskTimeSpan = TimeSpan.FromDays(maxYearRange * 365);
+            TimeSpan riskTimeSpan = TimeSpan.FromDays(maxYearRange);
 
             s_bl.Admin.SetRiskTime(riskTimeSpan);
         }

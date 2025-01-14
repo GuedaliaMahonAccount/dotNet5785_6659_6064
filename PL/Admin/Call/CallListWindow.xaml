@@ -59,7 +59,7 @@
                         <DataTemplate>
                             <TextBlock Text="{Binding Status}"
                                FontSize="16"
-                               Foreground="{Binding Status, Converter={StaticResource CallTypeToColorConverter}}" />
+                               Foreground="{Binding CallType, Converter={StaticResource CallTypeToColorConverter}}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>

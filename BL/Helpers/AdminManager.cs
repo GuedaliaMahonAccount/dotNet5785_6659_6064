@@ -52,9 +52,9 @@ internal static class AdminManager //stage 4
         var oldClock = s_dal.Config.Clock; //stage 4
         s_dal.Config.Clock = newClock; //stage 4
 
-        CallManager.UpdateExpiredCalls();
         //VolunteerManager.PeriodicVolunteersUpdates(oldClock, newClock);
         CallManager.UpdateRiskCall(oldClock, newClock, RiskRange);
+        CallManager.UpdateExpiredCalls();
 
         //Calling all the observers of clock update
         ClockUpdatedObservers?.Invoke(); //prepared for stage 5

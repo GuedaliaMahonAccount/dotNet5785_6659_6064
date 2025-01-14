@@ -55,7 +55,7 @@ namespace PL.Call
         /// </summary>
         private void queryCallList()
             => CallList = (Type == BO.CallType.None) ?
-                           s_bl?.Call.GetCallList()! : s_bl?.Call.GetCallList(Type, BO.CallSortField.CallType)!;
+                           s_bl?.Call.GetCallList()! : s_bl?.Call.GetCallList(Type)!;
 
         /// <summary>
         /// Observer callback - refreshes call list when data changes
