@@ -372,7 +372,7 @@ namespace BlImplementation
 
             // Filter calls to include only open ones (or "open in risk")
             var openCalls = callsDO
-                .Where(call => call.CallType is ((int)DO.CallType.Open) or (DO.CallType)(int)DO.CallType.OpenAtRisk)
+                .Where(call => call.CallType == DO.CallType.Open || call.CallType == DO.CallType.OpenAtRisk)
                 .Select(call => new BO.OpenCallInList
                 {
                     Id = call.Id,

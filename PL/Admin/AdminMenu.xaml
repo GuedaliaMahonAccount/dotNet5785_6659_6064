@@ -47,7 +47,7 @@
 
         <!-- Max Year Without Activity -->
         <StackPanel Grid.Column="0" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="20">
-            <TextBlock Text="Max years without activity:" FontSize="16" Foreground="White" Margin="0,0,0,10" />
+            <TextBlock Text="Set risk time for call to expire (Day)" FontSize="16" Foreground="White" Margin="0,0,0,10" />
             <StackPanel Orientation="Horizontal">
                 <TextBox Text="{Binding MaxYearRange, UpdateSourceTrigger=PropertyChanged}" Width="60" Height="30" 
                          TextAlignment="Center" FontSize="14" Background="White" Margin="0,0,10,0" />

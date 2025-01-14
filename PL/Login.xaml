@@ -36,24 +36,32 @@
                      FontSize="12" FontWeight="Bold" Foreground="Gray" 
                      Background="Transparent" BorderThickness="0" IsReadOnly="True"/>
         </StackPanel>
-        
+
+        <!-- Label for UserName -->
+        <TextBlock Text="Enter Name" 
+                   FontSize="18" FontWeight="Bold" Foreground="Black" 
+                   Margin="6,0,0,0" VerticalAlignment="Bottom" Grid.Column="1" Grid.Row="0" />
 
         <!-- UserName TextBox -->
-        <TextBox Name="NameTextBox" HorizontalAlignment="Stretch" VerticalAlignment="Top" TextWrapping="Wrap" Text="Enter Name" 
+        <TextBox Name="NameTextBox" HorizontalAlignment="Stretch" VerticalAlignment="Top" 
                  FontSize="30" FontWeight="Bold" Foreground="Black"
-                 GotFocus="TextBox_GotFocus" LostFocus="TextBox_LostFocus" Grid.Column="1" Grid.Row="1" Margin="6,0"
-                 Height="50"/>
+                 GotFocus="TextBox_GotFocus" LostFocus="TextBox_LostFocus" 
+                 Grid.Column="1" Grid.Row="1" Margin="6,0" Height="50"/>
+
+        <!-- Label for Password -->
+        <TextBlock Text="Enter Password" 
+                   FontSize="18" FontWeight="Bold" Foreground="Black" 
+                   Margin="6,0,0,0" VerticalAlignment="Bottom" Grid.Column="1" Grid.Row="1" />
 
         <!-- Password PasswordBox -->
         <PasswordBox Name="PasswordTextBox" HorizontalAlignment="Stretch" VerticalAlignment="Top" 
                      FontSize="30" FontWeight="Bold" Foreground="Black"
-                     GotFocus="PasswordBox_GotFocus" LostFocus="PasswordBox_LostFocus" Grid.Column="1" Grid.Row="2" Margin="6,0"
-                     Height="50"/>
+                     GotFocus="PasswordBox_GotFocus" LostFocus="PasswordBox_LostFocus" 
+                     Grid.Column="1" Grid.Row="2" Margin="6,0" Height="50"/>
 
         <!-- Login Button -->
         <Button Content="Login" HorizontalAlignment="Stretch" VerticalAlignment="Center" Height="50"
                 FontSize="30" FontWeight="Bold" Foreground="White" Background="Green"
                 Click="LoginButton_Click" Grid.Column="1" Grid.Row="3" Margin="6,0"/>
     </Grid>
-    
 </Window>
