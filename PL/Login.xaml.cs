@@ -44,7 +44,7 @@ namespace PL
         private void TextBox_GotFocus(object sender, RoutedEventArgs e)
         {
             var textBox = sender as TextBox;
-            if (textBox != null && textBox.Text == "Enter Name")
+            if (textBox != null && textBox.Text == "Enter Id")
             {
                 textBox.Text = string.Empty;
             }
@@ -55,9 +55,9 @@ namespace PL
             var textBox = sender as TextBox;
             if (textBox != null && string.IsNullOrEmpty(textBox.Text))
             {
-                if (textBox.Name == "NameTextBox")
+                if (textBox.Name == "IdTextBox")
                 {
-                    textBox.Text = "Enter Name";
+                    textBox.Text = "Enter Id";
                 }
             }
         }
@@ -82,7 +82,7 @@ namespace PL
 
         private void LoginButton_Click(object sender, RoutedEventArgs e)
         {
-            string name = NameTextBox.Text;
+            string volunteerId = IdTextBox.Text;
             string encryptedPassword = EncryptionHelper.Encrypt(PasswordTextBox.Password);
 
             int AdminId = 322766064;
@@ -91,24 +91,23 @@ namespace PL
             {
                 BO.Volunteer adminVolunteer = s_bl.Volunteer.GetVolunteerDetails(AdminId);
 
-                if (adminVolunteer != null && adminVolunteer.Name == name && adminVolunteer.Password == encryptedPassword)
+                if (adminVolunteer != null && adminVolunteer.Id == int.Parse(volunteerId) && adminVolunteer.Password == encryptedPassword)
                 {
                     AdminMenu adminMenu = new AdminMenu();
                     adminMenu.Show();
                 }
                 else
                 {
-                    int GeneralVolunteerID= s_bl.Volunteer.FindVolunteerID(name);
-                    BO.Volunteer GeneralVolunteer = s_bl.Volunteer.GetVolunteerDetails(GeneralVolunteerID);
+                    BO.Volunteer GeneralVolunteer = s_bl.Volunteer.GetVolunteerDetails(int.Parse(volunteerId));
 
-                    if (GeneralVolunteer != null && GeneralVolunteer.Name == name && GeneralVolunteer.Password == encryptedPassword)
+                    if (GeneralVolunteer != null && GeneralVolunteer.Id == int.Parse(volunteerId) && GeneralVolunteer.Password == encryptedPassword)
                     {
-                        MainUserWindow volunteerMenu = new MainUserWindow(GeneralVolunteerID);
+                        MainUserWindow volunteerMenu = new MainUserWindow(int.Parse(volunteerId));
                         volunteerMenu.Show();
                     }
                     else
                     {
-                        MessageBox.Show("Invalid name or password", "Login Failed", MessageBoxButton.OK, MessageBoxImage.Error);
+                        MessageBox.Show("Invalid Id or password", "Login Failed", MessageBoxButton.OK, MessageBoxImage.Error);
                     }
                 }
             }
@@ -117,9 +116,6 @@ namespace PL
                 MessageBox.Show($"An error occurred: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
-
-
-
 
         public class EncryptionHelper
         {
@@ -141,8 +137,5 @@ namespace PL
                 return Convert.ToBase64String(ms.ToArray());
             }
         }
-
-
-
     }
 }
