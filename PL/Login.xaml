@@ -11,13 +11,13 @@
         Closing="Window_Closing">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="538*"/>
+            <RowDefinition Height="546*"/>
             <RowDefinition Height="29*"/>
-            <RowDefinition Height="50*"/>
-            <RowDefinition Height="24*"/>
-            <RowDefinition Height="64*"/>
-            <RowDefinition Height="69*"/>
-            <RowDefinition Height="10*"/>
+            <RowDefinition Height="48*"/>
+            <RowDefinition Height="29*"/>
+            <RowDefinition Height="48*"/>
+            <RowDefinition Height="71*"/>
+            <RowDefinition Height="8*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="579*"/>
@@ -30,7 +30,7 @@
         </Grid.Background>
 
         <!-- Admin and User Text -->
-        <StackPanel Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="180,10,10,0" Grid.Column="2" Grid.Row="0" Height="32" Width="152">
+        <StackPanel Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="180,10,0,0" Grid.Column="2" Grid.Row="0" Height="32" Width="152">
             <TextBox Text="322766064, aaaaAAAA1111" 
                      FontSize="12" FontWeight="Bold" Foreground="Gray" 
                      Background="Transparent" BorderThickness="0" IsReadOnly="True" Width="207"/>
@@ -40,30 +40,28 @@
         </StackPanel>
 
         <!-- Label for ID -->
-        <TextBlock Text="Enter ID" 
+        <TextBlock Text="ID" 
                    FontSize="18" FontWeight="Bold" Foreground="Black" 
-                   Margin="28,0,0,10" VerticalAlignment="Bottom" Grid.Column="1" Height="20" Grid.RowSpan="2" />
+                   Margin="28,0,0,0" VerticalAlignment="Center" Grid.Column="1" Height="20" Grid.Row="1" />
 
         <!-- ID TextBox -->
         <TextBox Name="IdTextBox" 
                  FontSize="25" FontWeight="Bold" Foreground="Black"
-                 GotFocus="TextBox_GotFocus" LostFocus="TextBox_LostFocus" 
-                 Grid.Column="1" Margin="28,28,0,1" Grid.RowSpan="2" Grid.Row="1"/>
+                 Grid.Column="1" Margin="28,3,0,7" Grid.Row="2"/>
 
         <!-- Label for Password -->
-        <TextBlock Text="Enter Password" 
+        <TextBlock Text="Password" 
                    FontSize="18" FontWeight="Bold" Foreground="Black" 
                    Margin="28,0,0,0" VerticalAlignment="Center" Grid.Column="1" Grid.Row="3" Height="21"/>
 
         <!-- Password PasswordBox -->
         <PasswordBox Name="PasswordTextBox" VerticalAlignment="Center" 
                      FontSize="25" FontWeight="Bold" Foreground="Black"
-                     GotFocus="PasswordBox_GotFocus" LostFocus="PasswordBox_LostFocus" 
-                     Grid.Column="1" Grid.Row="4" Margin="28,0,0,0" Height="50"/>
+                     Grid.Column="1" Grid.Row="4" Margin="28,0,0,0" Height="39"/>
 
         <!-- Login Button -->
-        <Button Content="Login" VerticalAlignment="Top" Height="50"
+        <Button Content="Login" VerticalAlignment="Top" Height="45"
                 FontSize="30" FontWeight="Bold" Foreground="White" Background="Green"
-                Click="LoginButton_Click" Grid.Column="1" Grid.Row="5" Margin="28,5,0,0"/>
+                Click="LoginButton_Click" Grid.Column="1" Grid.Row="5" Margin="28,10,0,0"/>
     </Grid>
 </Window>

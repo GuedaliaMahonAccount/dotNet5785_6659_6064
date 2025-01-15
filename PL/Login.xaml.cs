@@ -41,44 +41,7 @@ namespace PL
             }
         }
 
-        private void TextBox_GotFocus(object sender, RoutedEventArgs e)
-        {
-            var textBox = sender as TextBox;
-            if (textBox != null && textBox.Text == "Enter Id")
-            {
-                textBox.Text = string.Empty;
-            }
-        }
-
-        private void TextBox_LostFocus(object sender, RoutedEventArgs e)
-        {
-            var textBox = sender as TextBox;
-            if (textBox != null && string.IsNullOrEmpty(textBox.Text))
-            {
-                if (textBox.Name == "IdTextBox")
-                {
-                    textBox.Text = "Enter Id";
-                }
-            }
-        }
-
-        private void PasswordBox_GotFocus(object sender, RoutedEventArgs e)
-        {
-            var passwordBox = sender as PasswordBox;
-            if (passwordBox != null && passwordBox.Password == "Enter Password")
-            {
-                passwordBox.Password = string.Empty;
-            }
-        }
-
-        private void PasswordBox_LostFocus(object sender, RoutedEventArgs e)
-        {
-            var passwordBox = sender as PasswordBox;
-            if (passwordBox != null && string.IsNullOrEmpty(passwordBox.Password))
-            {
-                passwordBox.Password = "Enter Password";
-            }
-        }
+      
 
         private void LoginButton_Click(object sender, RoutedEventArgs e)
         {
