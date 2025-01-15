@@ -15,6 +15,7 @@ internal static class AdminManager //stage 4
     #region Stage 5
     internal static event Action? ConfigUpdatedObservers; //prepared for stage 5 - for config update observers
     internal static event Action? ClockUpdatedObservers; //prepared for stage 5 - for clock update observers
+
     #endregion Stage 5
 
     #region Stage 4
@@ -27,7 +28,12 @@ internal static class AdminManager //stage 4
         set
         {
             s_dal.Config.RiskRange = value;
-            ConfigUpdatedObservers?.Invoke(); // stage 5
+
+            // Update clock logic based on the new risk range
+            updateClock(Now); // Pass the current clock value
+
+            // Notify all observers about the configuration update
+            ConfigUpdatedObservers?.Invoke();
         }
     }
 

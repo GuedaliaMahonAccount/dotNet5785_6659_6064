@@ -1,16 +1,18 @@
-﻿using System.Windows;
+﻿using System;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Threading;
+using BO;
 
 namespace PL
 {
-    /// <summary>
-    /// Interaction logic for AdminMenu.xaml
-    /// </summary>
-
     public partial class AdminMenu : Window
     {
         static readonly BlApi.IBl s_bl = BlApi.Factory.Get();
+        private DispatcherTimer _timer = new DispatcherTimer();
 
         public DateTime CurrentTime
         {
@@ -25,25 +27,86 @@ namespace PL
             get { return (int)GetValue(MaxYearRangeProperty); }
             set { SetValue(MaxYearRangeProperty, value); }
         }
-
         public static readonly DependencyProperty MaxYearRangeProperty =
             DependencyProperty.Register("MaxYearRange", typeof(int), typeof(AdminMenu), new PropertyMetadata(0));
+
+        public ObservableCollection<KeyValuePair<string, int>> CallQuantities { get; set; } = new ObservableCollection<KeyValuePair<string, int>>();
+        public ICommand NavigateToCallListCommand { get; private set; }
 
         public AdminMenu()
         {
             InitializeComponent();
+            CallQuantities = new ObservableCollection<KeyValuePair<string, int>>();
+            InitializeTimer();
+            NavigateToCallListCommand = new RelayCommand<string>(NavigateToCallList);
+            DataContext = this;  // Set this after initializing all properties
+            LoadCallQuantities();  // Load the data after setting DataContext
+        }
+
+        private void LoadCallQuantities()
+        {
+            try
+            {
+                int[] quantities = s_bl.Call.GetCallQuantities();
+                CallQuantities.Clear();
+                foreach (BO.CallType callType in Enum.GetValues(typeof(BO.CallType)))
+                {
+                    //if (callType != BO.CallType.None)
+                    {
+                        CallQuantities.Add(new KeyValuePair<string, int>(
+                            callType.ToString(),
+                            quantities[(int)callType]));
+                    }
+                }
+
+                // Debug: Vérifiez que la collection est remplie
+                Debug.WriteLine($"CallQuantities count: {CallQuantities.Count}");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error loading call quantities: {ex.Message}", "Error",
+                               MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void NavigateToCallList(string callTypeStr)
+        {
+            if (Enum.TryParse(callTypeStr, out BO.CallType callType))
+            {
+                new Call.CallListWindow(callType).Show();
+            }
+        }
+
+        private void InitializeTimer()
+        {
+            _timer.Interval = TimeSpan.FromSeconds(1);
+            _timer.Tick += (s, e) => CurrentTime = DateTime.Now;
+            _timer.Start();
         }
 
         private void clockObserver()
         {
-            CurrentTime = s_bl.Admin.GetCurrentTime();
+            try
+            {
+                CurrentTime = s_bl.Admin.GetCurrentTime();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in clockObserver: {ex.Message}");
+            }
         }
 
         private void configObserver()
         {
-            TimeSpan riskTime = s_bl.Admin.GetRiskTime();
-            int years = (int)(riskTime.TotalDays / 365);
-            MaxYearRange = years;
+            try
+            {
+                TimeSpan riskTime = s_bl.Admin.GetRiskTime();
+                MaxYearRange = (int)(riskTime.TotalDays );
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in configObserver: {ex.Message}");
+            }
         }
 
         private void btnAddOneMinute_Click(object sender, RoutedEventArgs e)
@@ -73,42 +136,42 @@ namespace PL
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            CurrentTime = s_bl.Admin.GetCurrentTime();
+            try
+            {
+                CurrentTime = s_bl.Admin.GetCurrentTime();
+                TimeSpan riskTime = s_bl.Admin.GetRiskTime();
+                MaxYearRange = (int)(riskTime.TotalDays);
 
-            TimeSpan riskTime = s_bl.Admin.GetRiskTime();
-            MaxYearRange = (int)(riskTime.TotalDays / 365);
-
-            s_bl.Admin.AddClockObserver(clockObserver);
-
-            s_bl.Admin.AddConfigObserver(configObserver);
+                s_bl.Admin.AddClockObserver(clockObserver);
+                s_bl.Admin.AddConfigObserver(configObserver);
+                s_bl.Call.AddObserver(LoadCallQuantities);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error during Window_Loaded: {ex.Message}");
+            }
         }
 
         private void Window_Closed(object sender, EventArgs e)
         {
             s_bl.Admin.RemoveClockObserver(clockObserver);
             s_bl.Admin.RemoveConfigObserver(configObserver);
-
-            //foreach (Window window in Application.Current.Windows)
-            //{
-            //    if (window != this)
-            //    {
-            //        window.Close();
-            //    }
-            //}
+            s_bl.Call.RemoveObserver(LoadCallQuantities);
+            _timer?.Stop();
         }
 
         private void btnUpdateMaxYearRange_Click(object sender, RoutedEventArgs e)
         {
-            int maxYearRange = MaxYearRange;
-
-            TimeSpan riskTimeSpan = TimeSpan.FromDays(maxYearRange);
-
-            s_bl.Admin.SetRiskTime(riskTimeSpan);
-        }
-
-        private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
-        {
-
+            try
+            {
+                TimeSpan riskTimeSpan = TimeSpan.FromDays(MaxYearRange);
+                s_bl.Admin.SetRiskTime(riskTimeSpan);
+                MessageBox.Show("Risk time updated successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Failed to update risk time: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void BtnHandleVolunteer_Click(object sender, RoutedEventArgs e)
@@ -118,9 +181,8 @@ namespace PL
 
         private void BtnHandleCall_Click(object sender, RoutedEventArgs e)
         {
-            new Call.CallListWindow().Show();
+            new Call.CallListWindow(BO.CallType.None).Show();
         }
-
 
         private void btnResetDB_Click(object sender, RoutedEventArgs e)
         {
@@ -157,7 +219,6 @@ namespace PL
                 Mouse.OverrideCursor = Cursors.Wait;
 
                 s_bl.Admin.InitializeDatabase();
-
                 MessageBox.Show("Database initialized successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)
@@ -170,21 +231,38 @@ namespace PL
             }
         }
 
-
-
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             var result = MessageBox.Show("Are you sure you want to close this window?",
                                          "Confirm Close",
                                          MessageBoxButton.YesNo,
                                          MessageBoxImage.Question);
-
             if (result == MessageBoxResult.No)
             {
                 e.Cancel = true;
             }
         }
+
+        public class RelayCommand<T> : ICommand
+        {
+            private readonly Action<T> _execute;
+            private readonly Predicate<T> _canExecute;
+
+            public RelayCommand(Action<T> execute, Predicate<T> canExecute = null)
+            {
+                _execute = execute ?? throw new ArgumentNullException(nameof(execute));
+                _canExecute = canExecute;
+            }
+
+            public bool CanExecute(object parameter) => _canExecute?.Invoke((T)parameter) ?? true;
+
+            public void Execute(object parameter) => _execute((T)parameter);
+
+            public event EventHandler CanExecuteChanged
+            {
+                add => CommandManager.RequerySuggested += value;
+                remove => CommandManager.RequerySuggested -= value;
+            }
+        }
     }
-
-
 }

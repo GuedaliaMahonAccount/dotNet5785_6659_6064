@@ -215,30 +215,33 @@ namespace DalTest
                 callTypes[i] = (CallType)s_rand.Next(Enum.GetValues(typeof(CallType)).Length);
             }
 
-
             DateTime end = DateTime.Now;
             DateTime start = end.AddDays(-30);
 
-            //in case that it s not exactly 50 data
             int minLength = new[] { descriptions.Length, addresses.Length, latitudes.Length, longitudes.Length }.Min();
+
             for (int i = 0; i < minLength; i++)
             {
-                // Generate a random start date within the last 30 days
                 var startTime = start
-                    .AddDays(s_rand.Next(0, 30))            // Random days between 30 days ago and today
-                    .AddHours(s_rand.Next(0, 24))          // Random hours
-                    .AddMinutes(s_rand.Next(0, 60))        // Random minutes
-                    .AddSeconds(s_rand.Next(0, 60));       // Random seconds
+                    .AddDays(s_rand.Next(0, 30))
+                    .AddHours(s_rand.Next(0, 24))
+                    .AddMinutes(s_rand.Next(0, 60))
+                    .AddSeconds(s_rand.Next(0, 60));
 
-                // Generate a random deadline between 30 and 60 days after the start date
                 DateTime? deadline = s_rand.NextDouble() < 0.5
-                    ? (DateTime?)startTime
-                        .AddDays(s_rand.Next(30, 60))      // Random days between 30 and 60 days after startTime
-                        .AddHours(s_rand.Next(0, 24))      // Random hours
-                        .AddMinutes(s_rand.Next(0, 60))    // Random minutes
-                        .AddSeconds(s_rand.Next(0, 60))    // Random seconds
+                    ? (DateTime?)startTime.AddDays(s_rand.Next(30, 60))
                     : null;
 
+                // Fix the remaining time to 0 for specific statuses
+                TimeSpan? leftTime = null;
+                if (callTypes[i] == CallType.Completed || callTypes[i] == CallType.SelfCanceled || callTypes[i] == CallType.Expired)
+                {
+                    leftTime = TimeSpan.Zero; // Force remaining time to 0
+                }
+                else if (deadline.HasValue)
+                {
+                    leftTime = deadline.Value - DateTime.Now; // Calculate remaining time
+                }
 
                 int callId = s_dal.Config.NextCallId;
 
@@ -268,75 +271,40 @@ namespace DalTest
             Volunteer[] shuffledVolunteers = volunteers.OrderBy(_ => s_rand.Next()).ToArray();
             int totalVolunteers = shuffledVolunteers.Length;
 
-            // Create an enumerator for the calls to iterate over them
-            using var callEnumerator = calls.GetEnumerator();
-            bool hasMoreCalls = callEnumerator.MoveNext();
-
-            for (int i = 0; i < totalVolunteers && hasMoreCalls; i++)
+            // Assign volunteers to calls
+            foreach (var call in calls)
             {
-                Volunteer volunteer = shuffledVolunteers[i];
-
-                // Get the current call
-                Call call = callEnumerator.Current;
-
-                // Skip calls that do not require an assignment
-                if (call.CallType == CallType.Open ||
-                    call.CallType == CallType.OpenAtRisk)
-                {
-                    // Move to the next call and continue
-                    hasMoreCalls = callEnumerator.MoveNext();
+                // Skip calls that should not be assigned
+                if (call.CallType == CallType.None)
                     continue;
-                }
 
-                // Ensure calls with 'InTreatment' or 'InTreatmentAtRisk' have an assignment
-                if (call.CallType == CallType.InTreatment || call.CallType == CallType.InTreatmentAtRisk)
+                // Assign a volunteer randomly
+                var volunteer = shuffledVolunteers[s_rand.Next(totalVolunteers)];
+
+                // Generate a random start time within a reasonable range
+                DateTime startTime = call.StartTime.AddHours(s_rand.Next(1, 24));
+                DateTime? endTime = null;
+                EndType? endType = null;
+
+                // Randomly determine the end type and end time for some calls
+                if (s_rand.NextDouble() < 0.5)
                 {
-                    // Generate a random start time within a reasonable range
-                    DateTime startTime = call.StartTime.AddHours(s_rand.Next(1, Math.Max(1, 24)));
-                    DateTime? endTime = null;
-                    EndType? endType = null;
-
-                    // Randomly determine the end type and end time
-                    double outcomeChance = s_rand.NextDouble();
-                    if (outcomeChance < 0.3)
-                    {
-                        // Completed call
-                        endTime = startTime.AddHours(s_rand.Next(1, 72));
-                        endType = EndType.Completed;
-                    }
-                    else if (outcomeChance < 0.5)
-                    {
-                        // Call self-canceled
-                        endTime = startTime.AddHours(s_rand.Next(1, 48));
-                        endType = EndType.SelfCanceled;
-                    }
-                    else if (outcomeChance < 0.7)
-                    {
-                        // Call admin-canceled
-                        endTime = startTime.AddHours(s_rand.Next(1, 48));
-                        endType = EndType.AdminCanceled;
-                    }
-                    else
-                    {
-                        // Call expired without resolution
-                        endType = EndType.Expired;
-                    }
-
-                    // Create the assignment
-                    var assignment = new Assignment
-                    {
-                        Id = s_dal.Config.NextAssignmentId,
-                        CallId = call.Id,
-                        VolunteerId = volunteer.Id,
-                        StartTime = startTime,
-                        EndTime = endTime,
-                        EndType = endType
-                    };
-
-                    // Save the assignment in the database
-                    s_dal.Assignment.Create(assignment);
-                    hasMoreCalls = callEnumerator.MoveNext();
+                    endTime = startTime.AddHours(s_rand.Next(1, 72)); // Random end time
+                    endType = (EndType)s_rand.Next(Enum.GetValues(typeof(EndType)).Length);
                 }
+
+                // Create and save the assignment
+                var assignment = new Assignment
+                {
+                    Id = s_dal.Config.NextAssignmentId,
+                    CallId = call.Id,
+                    VolunteerId = volunteer.Id,
+                    StartTime = startTime,
+                    EndTime = endTime,
+                    EndType = endType
+                };
+
+                s_dal.Assignment.Create(assignment);
             }
         }
 

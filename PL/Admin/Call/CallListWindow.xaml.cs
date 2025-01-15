@@ -1,90 +1,98 @@
-﻿using BO;
-using System.Globalization;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Input;
-using System.Windows.Media;
+﻿    using BO;
+    using System;
+    using System.Collections.ObjectModel;
+    using System.Globalization;
+    using System.Windows;
+    using System.Windows.Controls;
+    using System.Windows.Data;
+    using System.Windows.Input;
+    using System.Windows.Media;
 
-namespace PL.Call
-{
-    /// <summary>
-    /// Interaction logic for CallListWindow.xaml
-    /// </summary> 
-    public partial class CallListWindow : Window
+    namespace PL.Call
     {
-        // Static reference to business logic layer
-        static readonly BlApi.IBl s_bl = BlApi.Factory.Get();
-
-        // Property for list of calls displayed in UI
-        public IEnumerable<BO.CallInList> CallList
+        /// <summary>
+        /// Interaction logic for CallListWindow.xaml
+        /// </summary>
+        public partial class CallListWindow : Window
         {
-            get { return (IEnumerable<BO.CallInList>)GetValue(CallInListProperty); }
-            set { SetValue(CallInListProperty, value); }
-        }
+            // Static reference to business logic layer
+            static readonly BlApi.IBl s_bl = BlApi.Factory.Get();
 
-        // Dependency property for CallList
-        public static readonly DependencyProperty CallInListProperty =
-            DependencyProperty.Register("CallList", typeof(IEnumerable<BO.CallInList>),
-            typeof(CallListWindow), new PropertyMetadata(null));
+            // Observable collection for binding the list of calls
+            public ObservableCollection<BO.CallInList> CallList { get; set; } = new ObservableCollection<BO.CallInList>();
 
-        // Property for filtering calls by type
-        public BO.CallType Type { get; set; } = BO.CallType.None;
+            // Collection for call type filter
+            public ObservableCollection<BO.CallType> CallTypeCollection { get; } = new ObservableCollection<BO.CallType>((BO.CallType[])Enum.GetValues(typeof(BO.CallType)));
 
-        // Property for tracking selected call in list
-        public BO.CallInList? SelectedCall { get; set; }
+            // Property for the selected call type filter
+            public BO.CallType Type { get; set; }
 
-        /// <summary>
-        /// Constructor - initializes window and loads initial call list
-        /// </summary>
-        public CallListWindow()
-        {
-            InitializeComponent();
-        }
+            // Property for tracking the selected call in the list
+            public BO.CallInList? SelectedCall { get; set; }
 
-        /// <summary>
-        /// Handler for call type filter selection change
-        /// </summary>
-        private void CbCallTypeSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            queryCallList();
-        }
+            /// <summary>
+            /// Default constructor - initializes the window with no filter (CallType.None)
+            /// </summary>
+            public CallListWindow() : this(BO.CallType.None) { }
 
-        /// <summary>
-        /// Queries and updates the list of calls based on current filter
-        /// </summary>
-        private void queryCallList()
-            => CallList = (Type == BO.CallType.None) ?
-                           s_bl?.Call.GetCallList()! : s_bl?.Call.GetCallList(Type)!;
-
-        /// <summary>
-        /// Observer callback - refreshes call list when data changes
-        /// </summary>
-        private void callListObserver()
-            => queryCallList();
-
-        /// <summary>
-        /// Window load handler - sets up observer and loads initial data
-        /// </summary>
-        private void Window_Loaded(object sender, RoutedEventArgs e)
-            => s_bl.Call.AddObserver(callListObserver);
-
-        /// <summary>
-        /// Window close handler - removes observer
-        /// </summary>
-        private void Window_Closed(object sender, EventArgs e)
-        {
-            s_bl.Call.RemoveObserver(callListObserver);
-        }
-
-        /// <summary>
-        /// Double click handler for call list items - opens call details window
-        /// </summary>
-        private void lsvCallList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-            if (SelectedCall != null)
+            /// <summary>
+            /// Constructor - initializes the window with a specific call type filter
+            /// </summary>
+            /// <param name="callType">The call type to filter the list by</param>
+            public CallListWindow(BO.CallType callType)
             {
-                if (SelectedCall.CallId.HasValue)
+                InitializeComponent();
+                Type = callType;
+                DataContext = this; // Bind the data context to the current instance
+                queryCallList();    // Load the initial call list
+            }
+
+            /// <summary>
+            /// Event handler for the call type filter ComboBox selection change
+            /// </summary>
+            private void CbCallTypeSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)
+            {
+                queryCallList();
+            }
+
+            /// <summary>
+            /// Queries and updates the list of calls based on the selected call type filter
+            /// </summary>
+            private void queryCallList()
+            {
+                CallList.Clear();
+                var filteredCalls = Type == BO.CallType.None
+                    ? s_bl.Call.GetCallList()
+                    : s_bl.Call.GetCallList(Type);
+
+                foreach (var call in filteredCalls)
+                {
+                    CallList.Add(call);
+                }
+            }
+
+            /// <summary>
+            /// Event handler for the window's Loaded event - adds an observer for refreshing the call list
+            /// </summary>
+            private void Window_Loaded(object sender, RoutedEventArgs e)
+            {
+                s_bl.Call.AddObserver(queryCallList);
+            }
+
+            /// <summary>
+            /// Event handler for the window's Closed event - removes the observer to avoid memory leaks
+            /// </summary>
+            private void Window_Closed(object sender, EventArgs e)
+            {
+                s_bl.Call.RemoveObserver(queryCallList);
+            }
+
+            /// <summary>
+            /// Event handler for double-clicking an item in the call list - opens the CallWindow for the selected call
+            /// </summary>
+            private void lsvCallList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+            {
+                if (SelectedCall?.CallId != null)
                 {
                     new CallWindow(SelectedCall.CallId.Value).Show();
                 }
@@ -93,88 +101,72 @@ namespace PL.Call
                     MessageBox.Show("Selected call does not have a valid ID.");
                 }
             }
-        }
 
-        /// <summary>
-        /// Handler for add call button click - opens new call window
-        /// </summary>
-        private void AddCallButton_Click(object sender, RoutedEventArgs e)
-        {
-            new CallWindow().Show();
-        }
-    }
-
-    /// <summary>
-    /// Converts TimeSpan values to human readable strings
-    /// </summary>
-    public class TimeSpanToLabeledStringConverter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            if (value is TimeSpan timeSpan)
+            /// <summary>
+            /// Event handler for clicking the "Add Call" button - opens a new CallWindow for adding a call
+            /// </summary>
+            private void AddCallButton_Click(object sender, RoutedEventArgs e)
             {
-                var parts = new List<string>();
-
-                if (timeSpan.Days > 0)
-                    parts.Add($"{timeSpan.Days} days");
-
-                if (timeSpan.Hours > 0)
-                    parts.Add($"{timeSpan.Hours} hours");
-
-                if (timeSpan.Minutes > 0)
-                    parts.Add($"{timeSpan.Minutes} minutes");
-
-                if (timeSpan.Seconds > 0)
-                    parts.Add($"{timeSpan.Seconds} seconds");
-
-                if (parts.Count == 0)
-                    return "0";
-
-                return string.Join(", ", parts);
+                new CallWindow().Show();
             }
-
-
-            return ""; // If the value is null or not a TimeSpan
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        public class TimeSpanToLabeledStringConverter : IValueConverter
         {
-            throw new NotImplementedException();
-        }
-    }
-
-    /// <summary>
-    /// enum colors converter
-    /// </summary>
-    public class CallTypeToColorConverter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            if (value is BO.CallType callType)
+            public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
             {
-                // Map CallType values to colors
-                return callType switch
+                if (value is TimeSpan timeSpan)
                 {
-                    BO.CallType.None => Brushes.Gray,
-                    BO.CallType.Open => Brushes.Green,
-                    BO.CallType.InTreatment => Brushes.Blue,
-                    BO.CallType.Completed => Brushes.DarkGreen,
-                    BO.CallType.Expired => Brushes.OrangeRed,
-                    BO.CallType.SelfCanceled => Brushes.Orange,
-                    BO.CallType.AdminCanceled => Brushes.Red,
-                    BO.CallType.OpenAtRisk => Brushes.Yellow,
-                    BO.CallType.InTreatmentAtRisk => Brushes.Gold,
-                    _ => Brushes.Black
-                };
+                    var parts = new List<string>();
 
+                    if (timeSpan.Days > 0)
+                        parts.Add($"{timeSpan.Days} days");
+                    if (timeSpan.Hours > 0)
+                        parts.Add($"{timeSpan.Hours} hours");
+                    if (timeSpan.Minutes > 0)
+                        parts.Add($"{timeSpan.Minutes} minutes");
+                    if (timeSpan.Seconds > 0)
+                        parts.Add($"{timeSpan.Seconds} seconds");
+
+                    return parts.Count > 0 ? string.Join(", ", parts) : "0";
+                }
+
+                return string.Empty; // If value is not a TimeSpan
             }
 
-            return Brushes.Black; // Default color
+            public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+            {
+                throw new NotImplementedException();
+            }
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        public class CallTypeToColorConverter : IValueConverter
         {
-            throw new NotImplementedException();
+            public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+            {
+                if (value is BO.CallType callType)
+                {
+                    return callType switch
+                    {
+                        BO.CallType.None => Brushes.Gray,
+                        BO.CallType.Open => Brushes.Green,
+                        BO.CallType.InTreatment => Brushes.Blue,
+                        BO.CallType.Completed => Brushes.DarkGreen,
+                        BO.CallType.Expired => Brushes.OrangeRed,
+                        BO.CallType.SelfCanceled => Brushes.Orange,
+                        BO.CallType.AdminCanceled => Brushes.Red,
+                        BO.CallType.OpenAtRisk => Brushes.Yellow,
+                        BO.CallType.InTreatmentAtRisk => Brushes.Gold,
+                        _ => Brushes.Black
+                    };
+                }
+
+                return Brushes.Black; // Default color for unknown types
+            }
+
+            public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+            {
+                throw new NotImplementedException();
+            }
         }
     }
-}

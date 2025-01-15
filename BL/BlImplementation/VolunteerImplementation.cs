@@ -259,6 +259,11 @@ internal class VolunteerImplementation : IVolunteer
             CurrentCallId = assignments.Where(call => call.VolunteerId == v.Id).Select(call => call.CallId).FirstOrDefault(),
             CurrentCallType = assignments.Where(call => call.VolunteerId == v.Id).Select(call =>
             {
+                if (call.EndType == null)
+                {
+                    return BO.CallType.None; // Default value when EndType is null
+                }
+
                 switch ((BO.EndType)call.EndType)
                 {
                     case BO.EndType.Completed:

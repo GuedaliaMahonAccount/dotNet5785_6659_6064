@@ -260,12 +260,22 @@ namespace BlImplementation
                 CallId = c.Id,
                 CallType = (BO.CallType)c.CallType,
                 StartTime = c.StartTime,
-                LeftTimeToExpire = c.DeadLine.HasValue ? c.DeadLine.Value - DateTime.Now : null,
-                LastVolunteerName = assignments.Where(a => a.CallId == c.Id).OrderByDescending(a => a.EndTime).Select(a => _dal.Volunteer.Read(a.VolunteerId).Name).FirstOrDefault(),
-                LeftTimeTocomplete = c.DeadLine.HasValue ? c.DeadLine.Value - DateTime.Now : null,
+                LeftTimeTocomplete =
+        c.CallType == DO.CallType.Completed ||
+        c.CallType == DO.CallType.SelfCanceled ||
+        c.CallType == DO.CallType.Expired ||
+        c.CallType == DO.CallType.AdminCanceled
+        ? TimeSpan.Zero
+        : (c.DeadLine.HasValue ? c.DeadLine.Value - DateTime.Now : (TimeSpan?)null),
+                LastVolunteerName = assignments
+        .Where(a => a.CallId == c.Id)
+        .OrderByDescending(a => a.EndTime)
+        .Select(a => _dal.Volunteer.Read(a.VolunteerId).Name)
+        .FirstOrDefault(),
                 Status = (BO.CallType)c.CallType,
                 AssignmentCount = assignments.Count(a => a.CallId == c.Id)
             });
+
         }
 
         /// <summary>
@@ -561,7 +571,7 @@ namespace BlImplementation
 
 
 
-       public IEnumerable<BO.Call> CallHistoryByVolunteerId(int volunteerId)
+        public IEnumerable<BO.Call> CallHistoryByVolunteerId(int volunteerId)
         {
             IEnumerable<int> callIds = GetCallIdsByVolunteer(volunteerId);
 

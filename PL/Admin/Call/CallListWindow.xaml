@@ -7,77 +7,65 @@
         mc:Ignorable="d"
         Title="CallListWindow" Height="600" Width="800"
         Loaded="Window_Loaded"
-        Closed="Window_Closed"
-        DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}">
-    
+        Closed="Window_Closed">
+
     <Window.Resources>
         <local:TimeSpanToLabeledStringConverter x:Key="TimeSpanToLabeledStringConverter" />
         <local:CallTypeToColorConverter x:Key="CallTypeToColorConverter" />
     </Window.Resources>
 
-    <!--External Grid-->
     <Grid>
-
-        <!-- Background Image -->
         <Grid.Background>
-            <ImageBrush ImageSource="../../Assets/background1.jpeg" Stretch="UniformToFill"/>
+            <ImageBrush ImageSource="../../Assets/background1.jpeg" Stretch="UniformToFill" />
         </Grid.Background>
 
         <Grid.RowDefinitions>
-            <RowDefinition Height="40*"/>
-            <RowDefinition Height="500*"/>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="40*" />
+            <RowDefinition Height="500*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <!--Internal, Upper Grid-->
-        <Grid HorizontalAlignment="Stretch" Height="Auto" Grid.Row="0" VerticalAlignment="Stretch" Width="Auto">
+
+        <!-- Filter Section -->
+        <Grid HorizontalAlignment="Stretch" Grid.Row="0">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            <Label Content="Label" Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
-            <ComboBox ItemsSource="{Binding Source={StaticResource CallTypeCollectionKey}}"
+            <Label Content="Filter Calls By Type:" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center" />
+            <ComboBox ItemsSource="{Binding CallTypeCollection}"
                       SelectedValue="{Binding Type, Mode=TwoWay}"
                       SelectionChanged="CbCallTypeSelector_SelectionChanged"
-                      Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                      Grid.Column="1" HorizontalAlignment="Left" Width="150" />
         </Grid>
 
-        <!-- DataGrid -->
+        <!-- DataGrid for Calls -->
         <DataGrid Grid.Row="1" ItemsSource="{Binding CallList}"
                   IsReadOnly="True" AutoGenerateColumns="False"
                   EnableRowVirtualization="True"
                   RowDetailsVisibilityMode="VisibleWhenSelected"
                   SelectedItem="{Binding SelectedCall}"
                   MouseDoubleClick="lsvCallList_MouseDoubleClick">
-            <!-- DataGrid.Columns -->
             <DataGrid.Columns>
-                <!-- Id Column -->
-                <DataGridTextColumn Binding="{Binding CallId}" Header="Id" Width="Auto"/>
-
-                <!-- CallType (Status) Column -->
+                <DataGridTextColumn Binding="{Binding CallId}" Header="Id" Width="Auto" />
                 <DataGridTemplateColumn Header="Status" Width="Auto">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding Status}"
-                               FontSize="16"
-                               Foreground="{Binding CallType, Converter={StaticResource CallTypeToColorConverter}}" />
+                            <TextBlock Text="{Binding Status}" FontSize="16"
+                                       Foreground="{Binding CallType, Converter={StaticResource CallTypeToColorConverter}}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-
-                <!-- Left Time to Expire Column -->
-                <DataGridTemplateColumn Header="Last volunteer name" Width="Auto">
+                <DataGridTemplateColumn Header="Last Volunteer Name" Width="Auto">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding LastVolunteerName}" FontSize="16"/>
+                            <TextBlock Text="{Binding LastVolunteerName}" FontSize="16" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-
-                <!-- Left Time to Complete Column -->
                 <DataGridTemplateColumn Header="Left Time to Complete" Width="Auto">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding LeftTimeTocomplete, Converter={StaticResource TimeSpanToLabeledStringConverter}}" FontSize="16"/>
+                            <TextBlock Text="{Binding LeftTimeTocomplete, Converter={StaticResource TimeSpanToLabeledStringConverter}}" FontSize="16" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
@@ -85,7 +73,6 @@
         </DataGrid>
 
         <!-- Add Button -->
-        <Button Content="Add" Grid.Row="2" HorizontalAlignment="Center" Height="50" Width="100" Click="AddCallButton_Click"/>
-
+        <Button Content="Add Call" Grid.Row="2" HorizontalAlignment="Center" Height="50" Width="100" Click="AddCallButton_Click" />
     </Grid>
 </Window>
