@@ -90,6 +90,8 @@ namespace BlImplementation
             };
 
             _dal.Assignment.Update(updatedAssignment);
+            CallManager.Observers.NotifyItemUpdated(assignmentId);
+            CallManager.Observers.NotifyListUpdated();
         }
 
         /// <summary>
@@ -119,6 +121,8 @@ namespace BlImplementation
             };
 
             _dal.Assignment.Update(updatedAssignment);
+            CallManager.Observers.NotifyItemUpdated(assignmentId);
+            CallManager.Observers.NotifyListUpdated();
         }
 
         /// <summary>
