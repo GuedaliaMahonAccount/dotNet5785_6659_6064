@@ -275,8 +275,14 @@ namespace DalTest
             foreach (var call in calls)
             {
                 // Skip calls that should not be assigned
-                if (call.CallType == CallType.None)
-                    continue;
+                if (call.CallType == CallType.None ||
+                    call.CallType == CallType.Open ||
+                    call.CallType == CallType.OpenAtRisk ||
+                    call.CallType == CallType.AdminCanceled ||
+                    call.CallType == CallType.SelfCanceled)
+                {
+                    continue; // Skip these calls
+                }
 
                 // Assign a volunteer randomly
                 var volunteer = shuffledVolunteers[s_rand.Next(totalVolunteers)];
