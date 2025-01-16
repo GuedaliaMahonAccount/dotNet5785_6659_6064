@@ -38,8 +38,11 @@ namespace PL.Volunteer
             VolunteerList = _allVolunteers;
         }
 
+
+        private bool _isWindowLoaded = false;
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            _isWindowLoaded = true; // Indicate that the window has fully loaded
             s_bl.Volunteer.AddObserver(() =>
             {
                 _allVolunteers = s_bl.Volunteer.GetVolunteersList();
@@ -130,6 +133,53 @@ namespace PL.Volunteer
                                 .ToList();
             }
         }
+
+        private void CheckBox_IsActiveChanged(object sender, RoutedEventArgs e)
+        {
+            // Ensure the window is fully loaded before processing the event
+            if (!_isWindowLoaded)
+                return;
+
+            // Check if the event is triggered by user interaction
+            if (sender is CheckBox checkBox && checkBox.IsFocused) // IsFocused ensures it's user interaction
+            {
+                if (checkBox.DataContext is BO.VolunteerInList volunteerInList)
+                {
+                    try
+                    {
+                        {
+                            // Retrieve the full Volunteer object using the ID
+                            BO.Volunteer volunteer = s_bl.Volunteer.GetVolunteerDetails(volunteerInList.Id);
+
+                            // Update the IsActive property
+                            volunteer.IsActive = checkBox.IsChecked ?? false;
+
+                            // Send the updated volunteer back to the backend
+                            s_bl.Volunteer.UpdateVolunteer(volunteer.Id, volunteer);
+
+                            MessageBox.Show($"Volunteer '{volunteer.Name}' active status updated to '{volunteer.IsActive}'.",
+                                            "Status Updated", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                            // Refresh the volunteer list
+                            _allVolunteers = s_bl.Volunteer.GetVolunteersList();
+                            VolunteerList = _allVolunteers;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Failed to update active status for volunteer '{volunteerInList.Name}': {ex.Message}",
+                                        "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+
+                        // Revert the checkbox state to its original value
+                        checkBox.IsChecked = volunteerInList.IsActive;
+                    }
+                }
+
+            }
+
+        }
+
+
     }
 
     public class CallTypeToColorConverter : IValueConverter

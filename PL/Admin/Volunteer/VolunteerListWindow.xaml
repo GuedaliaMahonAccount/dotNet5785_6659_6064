@@ -95,10 +95,13 @@
                 <DataGridTemplateColumn Header="Is Active" Width="Auto">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <CheckBox IsEnabled="False" IsChecked="{Binding Path=IsActive}" />
+                            <CheckBox IsChecked="{Binding IsActive, Mode=TwoWay, UpdateSourceTrigger=Explicit}"
+          Checked="CheckBox_IsActiveChanged"
+          Unchecked="CheckBox_IsActiveChanged" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
+
 
                 <DataGridTemplateColumn Header="Actions" Width="Auto">
                     <DataGridTemplateColumn.CellTemplate>
