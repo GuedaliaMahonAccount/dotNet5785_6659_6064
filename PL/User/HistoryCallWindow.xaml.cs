@@ -78,74 +78,8 @@ namespace PL.User
         }
 
         /// <summary>
-        /// Filters the call list based on user selection.
+        /// Filters the call list by call type.
         /// </summary>
-        private void ApplyFilter()
-        {
-            // Ask the user what they want to filter by
-            var filterOption = MessageBox.Show("Filter by:\nYes - Date\nNo - Call Type", "Filter Options", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
-
-            if (filterOption == MessageBoxResult.Yes)
-            {
-                // Filter by date
-                FilterByDate();
-            }
-            else if (filterOption == MessageBoxResult.No)
-            {
-                // Filter by call type
-                FilterByCallType();
-            }
-        }
-
-        /// <summary>
-        /// Filters the call list by date.
-        /// </summary>
-        private void FilterByDate()
-        {
-            var datePickerDialog = new Window
-            {
-                Title = "Filter by Date",
-                Width = 300,
-                Height = 200,
-                WindowStartupLocation = WindowStartupLocation.CenterScreen
-            };
-
-            var stackPanel = new StackPanel { Margin = new Thickness(10) };
-            var datePicker = new DatePicker
-            {
-                SelectedDate = DateTime.Now
-            };
-
-            var okButton = new Button
-            {
-                Content = "OK",
-                Width = 100,
-                Margin = new Thickness(0, 10, 0, 0),
-                HorizontalAlignment = HorizontalAlignment.Center
-            };
-
-            okButton.Click += (sender, e) =>
-            {
-                var selectedDate = datePicker.SelectedDate;
-                if (selectedDate.HasValue)
-                {
-                    var filteredCalls = _callDetails.Where(call => ((dynamic)call).StartTime.Date == selectedDate.Value.Date).ToList();
-                    CallsDataGrid.ItemsSource = filteredCalls;
-                }
-                else
-                {
-                    MessageBox.Show("Invalid date selected.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
-                datePickerDialog.Close();
-            };
-
-            stackPanel.Children.Add(datePicker);
-            stackPanel.Children.Add(okButton);
-            datePickerDialog.Content = stackPanel;
-
-            datePickerDialog.ShowDialog();
-        }
-
         /// <summary>
         /// Filters the call list by call type.
         /// </summary>
@@ -158,15 +92,26 @@ namespace PL.User
             {
                 Title = "Filter by Call Type",
                 Width = 300,
-                Height = 200,
+                Height = 250,
                 WindowStartupLocation = WindowStartupLocation.CenterScreen
             };
 
             var stackPanel = new StackPanel { Margin = new Thickness(10) };
+
+            // Add a title TextBlock
+            var titleTextBlock = new TextBlock
+            {
+                Text = "Filter by Call Type",
+                FontSize = 16,
+                FontWeight = FontWeights.Bold,
+                Margin = new Thickness(0, 20, 0, 20),
+                HorizontalAlignment = HorizontalAlignment.Center
+            };
+
             var comboBox = new ComboBox
             {
                 ItemsSource = callTypes,
-                SelectedIndex = 0 // Default selection
+                SelectedIndex = 0 
             };
 
             var okButton = new Button
@@ -180,26 +125,38 @@ namespace PL.User
             okButton.Click += (sender, e) =>
             {
                 var selectedCallTypeString = comboBox.SelectedItem as string;
-                
-                if (!string.IsNullOrEmpty(selectedCallTypeString) && Enum.TryParse(selectedCallTypeString, out CallType selectedCallType))
+
+                if (!string.IsNullOrEmpty(selectedCallTypeString))
                 {
-                    // Filter by the selected call type
-                    var filteredCalls = _callDetails.Where(call => ((dynamic)call).Status == selectedCallType).ToList();
-                    CallsDataGrid.ItemsSource = filteredCalls;
-                }
-                else
-                {
-                    MessageBox.Show("Invalid call type selected.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    if (selectedCallTypeString == "None")
+                    {
+                        // No filtering, display all calls
+                        CallsDataGrid.ItemsSource = _callDetails;
+                    }
+                    else if (Enum.TryParse(selectedCallTypeString, out CallType selectedCallType))
+                    {
+                        // Filter by the selected call type
+                        var filteredCalls = _callDetails.Where(call => ((dynamic)call).Status == selectedCallType).ToList();
+                        CallsDataGrid.ItemsSource = filteredCalls;
+                    }
+                    else
+                    {
+                        MessageBox.Show("Invalid call type selected.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
                 }
                 dialog.Close();
             };
 
+            stackPanel.Children.Add(titleTextBlock);
             stackPanel.Children.Add(comboBox);
             stackPanel.Children.Add(okButton);
+
             dialog.Content = stackPanel;
 
-            dialog.ShowDialog(); // Show the dialog
+            dialog.ShowDialog();
         }
+
+
 
 
         /// <summary>
@@ -207,7 +164,7 @@ namespace PL.User
         /// </summary>
         private void FilterButton_Click(object sender, RoutedEventArgs e)
         {
-            ApplyFilter();
+            FilterByCallType();
         }
 
         private void ResetFilterButton_Click(object sender, RoutedEventArgs e)
@@ -218,11 +175,9 @@ namespace PL.User
         /// <summary>
         /// Resets the filter and displays all calls.
         /// </summary>
-
         private void ResetFilter()
         {
             CallsDataGrid.ItemsSource = _callDetails;
         }
-
     }
 }

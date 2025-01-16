@@ -70,6 +70,15 @@ namespace PL.Volunteer
         {
             if (sender is Button button && button.Tag is int volunteerId)
             {
+                if (volunteerId == 322766064)
+                {
+                    MessageBox.Show("The admin cannot be deleted",
+                                    "Error",
+                                    MessageBoxButton.OK,
+                                    MessageBoxImage.Error);
+                    return; 
+                }
+
                 var result = MessageBox.Show("Are you sure you want to delete this volunteer?",
                                              "Confirm Delete",
                                              MessageBoxButton.YesNo,
@@ -92,6 +101,7 @@ namespace PL.Volunteer
                 }
             }
         }
+
 
         private void CbVolunteerTypeSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
