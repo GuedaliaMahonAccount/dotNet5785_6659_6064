@@ -207,7 +207,7 @@ namespace Helpers
                 return null;
             }
         }
-        private static double CalculateDistance(double lat1, double lon1, double lat2, double lon2)
+        public static double CalculateDistance(double lat1, double lon1, double lat2, double lon2)
         {
             var R = 6371; // Rayon de la Terre en km
             var dLat = ToRad(lat2 - lat1);

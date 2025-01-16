@@ -597,5 +597,17 @@ namespace BlImplementation
             return callIds;
         }
 
+
+        public double _CalculateDistance(int callId, int volunteerId)
+        {
+            BO.Call _call = GetCallDetails(callId);
+            DO.Volunteer _volunteer = _dal.Volunteer.Read(volunteerId);
+
+            double volunteerLatitude = _volunteer.Latitude ?? throw new System.ArgumentNullException(nameof(_volunteer.Latitude));
+            double volunteerLongitude = _volunteer.Longitude ?? throw new System.ArgumentNullException(nameof(_volunteer.Longitude));
+            double callLatitude = _call.Latitude ?? throw new System.ArgumentNullException(nameof(_call.Latitude));
+            double callLongitude = _call.Longitude ?? throw new System.ArgumentNullException(nameof(_call.Longitude));
+            return CallManager.CalculateDistance(volunteerLatitude, volunteerLongitude, callLatitude, callLongitude);
+        }
     }
 }

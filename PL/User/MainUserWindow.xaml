@@ -39,7 +39,6 @@
             <Setter Property="Background" Value="#FFB71C1C" />
         </Style>
 
-        <!-- Add this new style for ListView items -->
         <Style x:Key="ListViewItemStyle" TargetType="ListViewItem">
             <Setter Property="Foreground" Value="White" />
             <Setter Property="Template">
@@ -116,13 +115,10 @@
                                     <GridViewColumn Header="Description" Width="300">
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
-                                                <TextBlock Text="{Binding GeneralDescription}" 
-                                                         TextWrapping="Wrap" 
-                                                         Foreground="White" />
+                                                <TextBlock Text="{Binding GeneralDescription}" TextWrapping="Wrap" Foreground="White" />
                                             </DataTemplate>
                                         </GridViewColumn.CellTemplate>
                                     </GridViewColumn>
-
                                     <GridViewColumn Header="Actions" Width="210">
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
@@ -140,6 +136,19 @@
                                             </DataTemplate>
                                         </GridViewColumn.CellTemplate>
                                     </GridViewColumn>
+
+                                    <GridViewColumn Header="Distance" Width="100">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock>
+                                                    <TextBlock.Text>
+                                                        <Binding Path="Distance" StringFormat="{}{0:0} km" />
+                                                    </TextBlock.Text>
+                                                </TextBlock>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+
                                 </GridView>
                             </ListView.View>
 

@@ -17,7 +17,6 @@ namespace PL.User
 
         public RelayCommand ShowDescriptionCommand { get; }
 
-
         public static readonly DependencyProperty CallListProperty =
             DependencyProperty.Register("CallList", typeof(IEnumerable<BO.Call>),
             typeof(ChoiceCallWindow), new PropertyMetadata(null));
@@ -69,9 +68,14 @@ namespace PL.User
                     .Select(call => call.CallId)
                     .ToList();
 
-                // Fetch full details for each call using GetCallDetails
+                // Fetch full details for each call and calculate distance
                 CallList = callIds
-                    .Select(callId => s_bl.Call.GetCallDetails(callId.Value))
+                    .Select(callId =>
+                    {
+                        var call = s_bl.Call.GetCallDetails(callId.Value);
+                        double distance = s_bl.Call._CalculateDistance(callId.Value, _volunteerId);
+                        return call;
+                    })
                     .ToList();
             }
             catch (Exception ex)
@@ -79,6 +83,8 @@ namespace PL.User
                 MessageBox.Show($"Failed to load calls: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+
+
 
         private void CallListObserver()
         {

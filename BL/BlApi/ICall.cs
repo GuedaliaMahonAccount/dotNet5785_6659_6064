@@ -16,6 +16,9 @@ namespace BlApi
         void selectionCall(int volunteerId, int callId);
         IEnumerable<BO.Call> CallHistoryByVolunteerId(int volunteerId);
         int GetAssignmentIdByCallId(int callId, int volunteerId);
+        public double _CalculateDistance(int callId, int volunteerId);
+
+
     }
 
 }
