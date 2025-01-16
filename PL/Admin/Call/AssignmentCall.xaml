@@ -1,7 +1,9 @@
 ﻿<Window x:Class="PL.Call.AssignmentCall"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Assignments for Call" Height="450" Width="800"
+        Title="Assignments for Call" 
+        Icon="../Assets/icon.png"
+        Height="450" Width="800"
         DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}">
     <Grid>
         <!-- Background -->

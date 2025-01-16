@@ -1,7 +1,9 @@
 ﻿<Window x:Class="PL.MainUserWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Main User Window" Height="800" Width="1200">
+        Title="Main User Window" 
+        Icon="../Assets/icon.png"
+        Height="800" Width="1200">
 
     <Window.Resources>
         <Style x:Key="StyledButton" TargetType="Button">
@@ -90,82 +92,69 @@
                 <!-- Modified Current calls list -->
                 <GroupBox Header="Current Calls" Margin="10" Foreground="White" Background="#AA333333">
                     <Grid>
-                        <ListView ItemsSource="{Binding CurrentCalls}" 
-                                Margin="5" 
-                                VerticalAlignment="Stretch" 
-                                HorizontalAlignment="Stretch"
-                                ItemContainerStyle="{StaticResource ListViewItemStyle}"
-                                Background="Transparent">
-                            <ListView.View>
-                                <GridView>
-                                    <GridViewColumn Header="Call ID">
-                                        <GridViewColumn.CellTemplate>
-                                            <DataTemplate>
-                                                <TextBlock Text="{Binding CallId}" Foreground="White" />
-                                            </DataTemplate>
-                                        </GridViewColumn.CellTemplate>
-                                    </GridViewColumn>
-                                    <GridViewColumn Header="Status">
-                                        <GridViewColumn.CellTemplate>
-                                            <DataTemplate>
-                                                <TextBlock Text="{Binding Status}" Foreground="White" />
-                                            </DataTemplate>
-                                        </GridViewColumn.CellTemplate>
-                                    </GridViewColumn>
-                                    <GridViewColumn Header="Description" Width="300">
-                                        <GridViewColumn.CellTemplate>
-                                            <DataTemplate>
-                                                <TextBlock Text="{Binding GeneralDescription}" TextWrapping="Wrap" Foreground="White" />
-                                            </DataTemplate>
-                                        </GridViewColumn.CellTemplate>
-                                    </GridViewColumn>
-                                    <GridViewColumn Header="Actions" Width="210">
-                                        <GridViewColumn.CellTemplate>
-                                            <DataTemplate>
-                                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                                    <Button Content="Complete" 
-                                                            Command="{Binding DataContext.CompleteCallCommand, RelativeSource={RelativeSource AncestorType=Window}}" 
-                                                            CommandParameter="{Binding}" 
-                                                            Style="{StaticResource StyledButton}" />
-                                                    <Button Content="Cancel" 
-                                                            Command="{Binding DataContext.CancelCallCommand, RelativeSource={RelativeSource AncestorType=Window}}" 
-                                                            CommandParameter="{Binding}" 
-                                                            Style="{StaticResource CancelButtonStyle}" 
-                                                            Margin="5,0,0,0" />
-                                                </StackPanel>
-                                            </DataTemplate>
-                                        </GridViewColumn.CellTemplate>
-                                    </GridViewColumn>
-
-                                    <GridViewColumn Header="Distance" Width="100">
-                                        <GridViewColumn.CellTemplate>
-                                            <DataTemplate>
-                                                <TextBlock>
-                                                    <TextBlock.Text>
-                                                        <Binding Path="Distance" StringFormat="{}{0:0} km" />
-                                                    </TextBlock.Text>
-                                                </TextBlock>
-                                            </DataTemplate>
-                                        </GridViewColumn.CellTemplate>
-                                    </GridViewColumn>
-
-                                </GridView>
-                            </ListView.View>
-
-                            <ListView.Template>
-                                <ControlTemplate>
-                                    <Grid>
-                                        <ItemsPresenter />
-                                        <TextBlock Text="No current calls"
-                                                   Foreground="White"
-                                                   FontSize="16"
-                                                   HorizontalAlignment="Center"
-                                                   VerticalAlignment="Center"
-                                                   Visibility="{Binding CurrentCalls.Count, Converter={StaticResource CountToVisibilityConverter}}"/>
-                                    </Grid>
-                                </ControlTemplate>
-                            </ListView.Template>
-                        </ListView>
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <ListView ItemsSource="{Binding CurrentCalls}" 
+                      Margin="5" 
+                      VerticalAlignment="Stretch" 
+                      HorizontalAlignment="Stretch"
+                      ItemContainerStyle="{StaticResource ListViewItemStyle}"
+                      Background="Transparent"
+                      MaxHeight="300">
+                                <ListView.View>
+                                    <GridView>
+                                        <GridViewColumn Header="Call ID">
+                                            <GridViewColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <TextBlock Text="{Binding CallId}" Foreground="White" />
+                                                </DataTemplate>
+                                            </GridViewColumn.CellTemplate>
+                                        </GridViewColumn>
+                                        <GridViewColumn Header="Status">
+                                            <GridViewColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <TextBlock Text="{Binding Status}" Foreground="White" />
+                                                </DataTemplate>
+                                            </GridViewColumn.CellTemplate>
+                                        </GridViewColumn>
+                                        <GridViewColumn Header="Description" Width="300">
+                                            <GridViewColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <TextBlock Text="{Binding GeneralDescription}" TextWrapping="Wrap" Foreground="White" />
+                                                </DataTemplate>
+                                            </GridViewColumn.CellTemplate>
+                                        </GridViewColumn>
+                                        <GridViewColumn Header="Actions" Width="210">
+                                            <GridViewColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                                        <Button Content="Complete" 
+                                                Command="{Binding DataContext.CompleteCallCommand, RelativeSource={RelativeSource AncestorType=Window}}" 
+                                                CommandParameter="{Binding}" 
+                                                Style="{StaticResource StyledButton}" />
+                                                        <Button Content="Cancel" 
+                                                Command="{Binding DataContext.CancelCallCommand, RelativeSource={RelativeSource AncestorType=Window}}" 
+                                                CommandParameter="{Binding}" 
+                                                Style="{StaticResource CancelButtonStyle}" 
+                                                Margin="5,0,0,0" />
+                                                    </StackPanel>
+                                                </DataTemplate>
+                                            </GridViewColumn.CellTemplate>
+                                        </GridViewColumn>
+                                        <GridViewColumn Header="Distance" Width="100">
+                                            <GridViewColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <TextBlock>
+                                                        <TextBlock.Text>
+                                                            <Binding Path="Distance" StringFormat="{}{0:0} km" />
+                                                        </TextBlock.Text>
+                                                    </TextBlock>
+                                                </DataTemplate>
+                                            </GridViewColumn.CellTemplate>
+                                        </GridViewColumn>
+                                    </GridView>
+                                </ListView.View>
+                            </ListView>
+                        </ScrollViewer>
                     </Grid>
                 </GroupBox>
 

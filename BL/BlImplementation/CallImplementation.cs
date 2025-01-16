@@ -458,7 +458,12 @@ namespace BlImplementation
 
             _dal.Assignment.Create(newAssignment);
 
-            var updatedCall = callDO with { CallType = DO.CallType.InTreatment };
+            // Update the call type based on its current state
+            var updatedCallType = callDO.CallType == DO.CallType.OpenAtRisk
+                ? DO.CallType.InTreatmentAtRisk
+                : DO.CallType.InTreatment;
+
+            var updatedCall = callDO with { CallType = updatedCallType };
 
             _dal.Call.Update(updatedCall);
 

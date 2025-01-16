@@ -576,7 +576,7 @@ internal class VolunteerImplementation : IVolunteer
                     _dal.Volunteer.Read(volunteerId).Longitude,
                     callData.Latitude,
                     callData.Longitude),
-                Status = BO.CallType.InTreatment // Example status; adjust as necessary
+                Status = (BO.CallType)callData.CallType
             };
 
             currentCalls.Add(callInProgress);
