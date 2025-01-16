@@ -577,18 +577,34 @@ namespace BlImplementation
 
         public IEnumerable<BO.Call> CallHistoryByVolunteerId(int volunteerId)
         {
-            IEnumerable<int> callIds = GetCallIdsByVolunteer(volunteerId);
-
-            List<BO.Call> callHistory = new List<BO.Call>();
-
-            foreach (int callId in callIds)
+            try
             {
-                BO.Call callDetails = GetCallDetails(callId);
+                // Fetch all assignments for the volunteer
+                var assignments = _dal.Assignment.ReadAll()
+                    .Where(a => a.VolunteerId == volunteerId)
+                    .Select(a => a.CallId);
 
-                callHistory.Add(callDetails);
+                // Retrieve all calls associated with the volunteer's assignments
+                var calls = _dal.Call.ReadAll()
+                    .Where(c => assignments.Contains(c.Id))
+                    .Select(c => new BO.Call
+                    {
+                        Id = c.Id,
+                        CallType = (BO.CallType)c.CallType,
+                        StartTime = c.StartTime,
+                        Description = c.Description,
+                        DeadLine = c.DeadLine,
+                        Address = c.Address
+                    });
+
+                return calls;
             }
-            return callHistory;
+            catch (Exception ex)
+            {
+                throw new Exception("Failed to retrieve call history.", ex);
+            }
         }
+
 
         public IEnumerable<int> GetCallIdsByVolunteer(int volunteerId)
         {

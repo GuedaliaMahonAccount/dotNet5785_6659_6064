@@ -52,6 +52,7 @@ namespace PL.User
         {
             try
             {
+                // Fetch call history for the specified volunteer
                 var callDetails = s_bl.Call.CallHistoryByVolunteerId(volunteerId);
 
                 if (callDetails == null || !callDetails.Any())
@@ -60,14 +61,16 @@ namespace PL.User
                 }
                 else
                 {
+                    // Format the date and time for better readability
                     _callDetails = callDetails.Select(call => new
                     {
                         Id = call.Id,
-                        StartTime = call.StartTime,
+                        StartTime = call.StartTime.ToString("yyyy-MM-dd HH:mm"), // Clear date and time format
                         Description = call.Description,
                         Status = call.CallType
                     });
 
+                    // Update the DataGrid's data source
                     CallsDataGrid.ItemsSource = _callDetails;
                 }
             }
