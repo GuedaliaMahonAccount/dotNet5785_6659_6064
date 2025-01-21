@@ -8,12 +8,10 @@
     {
         // Starting ID for call-related operations
         const int startCallId = 1;
-        [MethodImpl(MethodImplOptions.Synchronized)]
         static int nextCallId = startCallId;
         /// <summary>
         /// Gets the next unique call ID.
         /// </summary>
-        [MethodImpl(MethodImplOptions.Synchronized)]
         internal static int NextCallId
         {
             get => nextCallId++;
@@ -21,13 +19,11 @@
 
         // Starting ID for assignment-related operations
         const int startAssignmentId = 1;
-        [MethodImpl(MethodImplOptions.Synchronized)]
         static int nextAssignmentId = startAssignmentId;
 
         /// <summary>
         /// Gets the next unique assignment ID.
         /// </summary>
-        [MethodImpl(MethodImplOptions.Synchronized)]
         internal static int NextAssignmentId
         {
             get => nextAssignmentId++;
@@ -36,13 +32,11 @@
         /// <summary>
         /// System clock representing the current time in the application.
         /// </summary>
-        [MethodImpl(MethodImplOptions.Synchronized)]
         internal static DateTime Clock { get; set; } = DateTime.Now;
 
         /// <summary>
         /// Defines the time range for risk assessment operations. 1 hour before the dead line, it become risky
         /// </summary>
-        [MethodImpl(MethodImplOptions.Synchronized)]
         internal static TimeSpan RiskRange { get; set; } = TimeSpan.FromHours(1);
 
         /// <summary>
@@ -50,7 +44,6 @@
         /// Resets the call and assignment IDs, sets the clock to the current time,
         /// and initializes the risk range to a default of 1 hours.
         /// </summary>
-        [MethodImpl(MethodImplOptions.Synchronized)]
         internal static void Reset()
         {
             nextCallId = startCallId;
