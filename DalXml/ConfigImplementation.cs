@@ -10,10 +10,24 @@
     {
 
         // Gets the next unique call ID.
-        public int NextCallId => Config.NextCallId;
+        public int NextCallId
+        {
+            [MethodImpl(MethodImplOptions.Synchronized)]
+            get
+            {
+                return Config.NextCallId;
+            }
+        }
 
         // Gets the next unique assignment ID.
-        public int NextAssignmentId => Config.NextAssignmentId;
+        public int NextAssignmentId
+        {
+            [MethodImpl(MethodImplOptions.Synchronized)]
+            get
+            {
+                return Config.NextAssignmentId;
+            }
+        }
 
         // Gets or sets the system clock representing the current time in the application.
         public DateTime Clock
