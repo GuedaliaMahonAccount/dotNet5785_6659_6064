@@ -35,14 +35,38 @@ namespace PL.Call
         {
             ButtonText = id == 0 ? "Add" : "Update";
 
-
-            // Initialize CurrentCall based on whether an id is provided
             CurrentCall = id == 0
-                ? new BO.Call() // New Call
-                : s_bl.Call.GetCallDetails(id); // Fetch existing Call from BL
+                ? new BO.Call()
+                : s_bl.Call.GetCallDetails(id);
 
             InitializeComponent();
+
+            Loaded += CallWindow_Loaded;
+            Closed += CallWindow_Closed;
         }
+
+        private void CallWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            s_bl.Call.AddObserver(UpdateCallData);
+        }
+
+        private void CallWindow_Closed(object sender, EventArgs e)
+        {
+            s_bl.Call.RemoveObserver(UpdateCallData);
+        }
+
+        private void UpdateCallData()
+        {
+            if (CurrentCall?.Id != null)
+            {
+                var updatedCall = s_bl.Call.GetCallDetails(CurrentCall.Id);
+                if (updatedCall != null)
+                {
+                    CurrentCall = updatedCall;
+                }
+            }
+        }
+
 
 
         // Event handler for Add/Update button

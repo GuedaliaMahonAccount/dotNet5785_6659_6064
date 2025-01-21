@@ -59,7 +59,32 @@ namespace PL.Volunteer
                 : s_bl.Volunteer.GetVolunteerDetails(id); // Fetch existing Volunteer from BL
 
             InitializeComponent();
+
+            // Attach event handlers for loading and closing
+            Loaded += VolunteerWindow_Loaded;
+            Closed += VolunteerWindow_Closed;
         }
+
+        private void VolunteerWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            s_bl.Volunteer.AddObserver(UpdateVolunteerData);
+        }
+        private void VolunteerWindow_Closed(object sender, EventArgs e)
+        {
+            s_bl.Volunteer.RemoveObserver(UpdateVolunteerData);
+        }
+        private void UpdateVolunteerData()
+        {
+            if (CurrentVolunteer?.Id != null)
+            {
+                var updatedVolunteer = s_bl.Volunteer.GetVolunteerDetails(CurrentVolunteer.Id);
+                if (updatedVolunteer != null)
+                {
+                    CurrentVolunteer = updatedVolunteer;
+                }
+            }
+        }
+
 
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
