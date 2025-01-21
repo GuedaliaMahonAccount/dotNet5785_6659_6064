@@ -161,7 +161,7 @@
                 <Border Background="#AA333333" Margin="10" Padding="10" VerticalAlignment="Center" HorizontalAlignment="Center">
                     <StackPanel Orientation="Horizontal">
                         <Button Content="View History" Click="ViewHistory_Click" Style="{StaticResource StyledButton}" Margin="5" Width="100"/>
-                        <Button Content="Choose Call" Click="ChooseCall_Click" Style="{StaticResource StyledButton}" Margin="5" Width="100"/>
+                        <Button Content="Choose Call" Click="ChooseCall_Click" Style="{StaticResource StyledButton}" Margin="5" Width="100" Visibility="{Binding CurrentCalls.Count, Converter={StaticResource CountToVisibilityConverter}}" />
                     </StackPanel>
                 </Border>
             </StackPanel>
