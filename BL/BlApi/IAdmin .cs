@@ -10,6 +10,8 @@ namespace BlApi
         void ResetDB();
         void InitializeDB();
 
+        void StartSimulator(int interval); 
+        void StopSimulator();
 
         #region Stage 5
         void AddConfigObserver(Action configObserver);

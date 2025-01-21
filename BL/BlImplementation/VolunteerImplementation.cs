@@ -117,7 +117,7 @@ internal class VolunteerImplementation : IVolunteer
                 EstimatedCompletionTime = activeAssignment.EndTime,
                 AssignmentStartTime = activeAssignment.StartTime,
                 Distance = VolunteerManager.CalculateDistance(volunteerData.Latitude, volunteerData.Longitude, callData.Latitude, callData.Longitude),
-                Status = BO.CallType.InTreatment 
+                Status = BO.CallType.InTreatment
             };
 
             // Assign the call in progress to the volunteer
@@ -298,6 +298,7 @@ internal class VolunteerImplementation : IVolunteer
     /// </exception>
     public void UpdateVolunteer(int requesterId, BO.Volunteer updatedVolunteer)
     {
+        AdminManager.ThrowOnSimulatorIsRunning();
         var currentVolunteer = _dal.Volunteer.Read(updatedVolunteer.Id);
 
         // Validate that the requester is either the volunteer themselves or an admin
@@ -400,7 +401,7 @@ internal class VolunteerImplementation : IVolunteer
     /// </exception>
     public void DeleteVolunteer(int volunteerId)
     {
-
+        AdminManager.ThrowOnSimulatorIsRunning();
         // Check if the volunteer exists
         var volunteer = _dal.Volunteer.Read(volunteerId);
         if (volunteer == null)
@@ -436,6 +437,7 @@ internal class VolunteerImplementation : IVolunteer
     /// </exception>
     public void AddVolunteer(BO.Volunteer volunteer)
     {
+        AdminManager.ThrowOnSimulatorIsRunning();
         // Check for null values
         if (volunteer == null)
             throw new BlNullPropertyException("Volunteer object cannot be null.");
@@ -543,7 +545,7 @@ internal class VolunteerImplementation : IVolunteer
         }
     }
 
-   
+
 
     /// <summary>
     /// Retrieves all current calls assigned to a volunteer.

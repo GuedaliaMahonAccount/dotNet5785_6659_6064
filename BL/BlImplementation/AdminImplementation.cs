@@ -10,6 +10,7 @@ namespace BlImplementation
 
         public void UpdateClock(TimeUnit timeUnit)
         {
+            AdminManager.ThrowOnSimulatorIsRunning();
             DateTime newClock;
 
             switch (timeUnit)
@@ -64,6 +65,7 @@ namespace BlImplementation
 
         public void SetRiskTime(TimeSpan riskTimeSpan)
         {
+            AdminManager.ThrowOnSimulatorIsRunning();
             AdminManager.RiskRange = riskTimeSpan;
         }
 
@@ -80,5 +82,14 @@ namespace BlImplementation
         public void RemoveConfigObserver(Action configObserver) =>
                     AdminManager.ConfigUpdatedObservers -= configObserver;
 
+
+        public void StartSimulator(int interval)  
+        {
+            AdminManager.ThrowOnSimulatorIsRunning();  
+            AdminManager.Start(interval); 
+        }
+
+        public void StopSimulator()
+    => AdminManager.Stop(); //stage 7
     }
 }
