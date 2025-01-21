@@ -9,6 +9,8 @@ using System.Text;
 
 internal class VolunteerImplementation : IVolunteer
 {
+    [MethodImpl(MethodImplOptions.Synchronized)]
+
     public void Create(Volunteer item)
     {
         // Check if the volunteer with the same ID already exists
