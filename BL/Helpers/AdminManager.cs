@@ -1,6 +1,7 @@
 ﻿using BlImplementation;
 using BO;
 using DalApi;
+using System.Runtime.CompilerServices;
 namespace Helpers;
 
 /// <summary>
@@ -53,13 +54,14 @@ internal static class AdminManager //stage 4
         // }).Start(); // stage 7 as above
     }
 
+    private static Task? _periodicTask = null;
     private static void updateClock(DateTime newClock) // prepared for stage 7 as DRY to eliminate needless repetition
     {
         var oldClock = s_dal.Config.Clock; //stage 4
         s_dal.Config.Clock = newClock; //stage 4
 
-        //VolunteerManager.PeriodicVolunteersUpdates(oldClock, newClock);
-        CallManager.UpdateRiskCall(oldClock, newClock, RiskRange);
+        if (_periodicTask is null || _periodicTask.IsCompleted) //stage 7
+            _periodicTask = Task.Run(() => CallManager.UpdateRiskCall(oldClock, newClock, RiskRange));
         CallManager.UpdateExpiredCalls();
 
         //Calling all the observers of clock update
@@ -68,11 +70,54 @@ internal static class AdminManager //stage 4
     #endregion Stage 4
 
     #region Stage 7 base
-    internal static readonly object blMutex = new();
-    private static Thread? s_thread;
-    private static int s_interval { get; set; } = 1; //in minutes by second    
-    private static volatile bool s_stop = false;
     private static readonly object mutex = new();
+    /// <summary>    
+    /// Mutex to use from BL methods to get mutual exclusion while the simulator is running
+    /// </summary>
+    internal static readonly object BlMutex = new(); // BlMutex = s_dal; // This field is actually the same as s_dal - it is defined for readability of locks
+    /// <summary>
+    /// The thread of the simulator
+    /// </summary>
+    private static volatile Thread? s_thread;
+    /// <summary>
+    /// The Interval for clock updating
+    /// in minutes by second (default value is 1, will be set on Start())    
+    /// </summary>
+    private static int s_interval { get; set; } = 1;
+    /// <summary>
+    /// The flag that signs whether simulator is running
+    /// 
+    private static volatile bool s_stop = false;
+
+
+    [MethodImpl(MethodImplOptions.Synchronized)] //stage 7                                                 
+    public static void ThrowOnSimulatorIsRunning()
+    {
+        if (s_thread is not null)
+            throw new BO.BLTemporaryNotAvailableException("Cannot perform the operation since Simulator is running");
+    }
+
+    internal static void ResetDB() //stage 7
+    {
+        lock (BlMutex)
+        {
+            s_dal.ResetDB();
+            AdminManager.UpdateClock(AdminManager.Now);
+            AdminManager.RiskRange = AdminManager.RiskRange;
+        }
+    }
+
+    internal static void InitializeDB()
+    {
+        lock (BlMutex)
+        {
+            DalTest.Initialization.Do();
+            AdminManager.UpdateClock(AdminManager.Now);
+            AdminManager.RiskRange = AdminManager.RiskRange;
+        }
+    }
+
+
 
     internal static void Start(int interval)
     {
@@ -96,6 +141,7 @@ internal static class AdminManager //stage 4
                 s_thread = null;
             }
     }
+    private static Task? _simulateTask = null; // Add this line
 
     private static void clockRunner()
     {
@@ -103,15 +149,12 @@ internal static class AdminManager //stage 4
         {
             UpdateClock(Now.AddMinutes(s_interval));
 
-            #region Stage 7
             //TO_DO:
             //Add calls here to any logic simulation that was required in stage 7
             //for example: course registration simulation
-            //StudentManager.SimulateCourseRegistrationAndGrade(); //stage 7
-
-            //etc...
-            #endregion Stage 7
-
+            //etc…
+            if (_simulateTask is null || _simulateTask.IsCompleted)//stage 7
+                _simulateTask = Task.Run(() => StudentManager.SimulateCourseRegistrationAndGrade());
             try
             {
                 Thread.Sleep(1000); // 1 second
@@ -119,5 +162,6 @@ internal static class AdminManager //stage 4
             catch (ThreadInterruptedException) { }
         }
     }
+
     #endregion Stage 7 base
 }

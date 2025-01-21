@@ -7,8 +7,8 @@ namespace BlApi
         void UpdateClock(BO.TimeUnit timeUnit);
         TimeSpan GetRiskTime();
         void SetRiskTime(TimeSpan riskTimeSpan);
-        void ResetDatabase();
-        void InitializeDatabase();
+        void ResetDB();
+        void InitializeDB();
 
 
         #region Stage 5

@@ -49,19 +49,18 @@ namespace BlImplementation
             return AdminManager.RiskRange;
         }
 
-        public void InitializeDatabase()
+        public void InitializeDB() 
         {
-            ResetDatabase();
-            DalTest.Initialization.Do();
-            AdminManager.UpdateClock(AdminManager.Now);
-            AdminManager.RiskRange = AdminManager.RiskRange;
+            AdminManager.ThrowOnSimulatorIsRunning();  
+            AdminManager.InitializeDB(); 
         }
 
-        public void ResetDatabase()
+        public void ResetDB() 
         {
-            _dal.ResetDB();
-            AdminManager.RiskRange = AdminManager.RiskRange;
+            AdminManager.ThrowOnSimulatorIsRunning();  
+            AdminManager.ResetDB(); 
         }
+
 
         public void SetRiskTime(TimeSpan riskTimeSpan)
         {
