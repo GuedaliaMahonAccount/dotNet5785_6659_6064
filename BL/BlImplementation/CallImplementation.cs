@@ -443,9 +443,15 @@ namespace BlImplementation
             var volunteerDO = _dal.Volunteer.Read(volunteerId)
                 ?? throw new BlDoesNotExistException($"No volunteer found with ID: {volunteerId}");
 
-            var assignments = _dal.Assignment.ReadAll()
+            // Check if the volunteer already has an active call
+            var activeAssignments = _dal.Assignment.ReadAll()
+                .Where(a => a.VolunteerId == volunteerId && a.EndTime == null);
+            if (activeAssignments.Any())
+                throw new BlInvalidValueException("The volunteer already has an active call and cannot take another.");
+
+            var callAssignments = _dal.Assignment.ReadAll()
                 .Where(a => a.CallId == callId && a.EndTime == null);
-            if (assignments.Any())
+            if (callAssignments.Any())
                 throw new BlInvalidValueException("This call is already assigned to a volunteer and in progress.");
 
             if (callDO.DeadLine != null && callDO.DeadLine < DateTime.Now)

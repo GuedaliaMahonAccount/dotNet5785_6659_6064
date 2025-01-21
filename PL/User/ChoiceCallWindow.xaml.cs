@@ -23,6 +23,23 @@ namespace PL.User
 
         private readonly int _volunteerId;
 
+
+        private bool CanAssignCall()
+        {
+            try
+            {
+                var activeCalls = s_bl.Volunteer.GetCurrentCallsForVolunteer(_volunteerId);
+                // Close the window after successful assignment
+                this.Close();
+                return !activeCalls.Any();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Failed to check active calls: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return false;
+            }
+        }
+
         public ChoiceCallWindow(int volunteerId)
         {
             InitializeComponent();
@@ -40,23 +57,19 @@ namespace PL.User
 
             AssignCallCommand = new RelayCommand(param =>
             {
-                if (param != null)
+                if (param != null && CanAssignCall())
                 {
                     AssignCall((int)param);
                 }
                 else
                 {
-                    MessageBox.Show("Parameter is null");
+                    MessageBox.Show("You already have an active call and cannot assign a new one.", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
             });
 
-            // Initial query to populate the call list
             queryCallList();
-
-            // Add an observer to automatically refresh the list
             s_bl.Call.AddObserver(CallListObserver);
         }
-
         private void queryCallList()
         {
             try
