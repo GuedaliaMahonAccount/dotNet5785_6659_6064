@@ -1,6 +1,7 @@
 ﻿namespace Dal
 {
     using DalApi;
+    using System.Runtime.CompilerServices;
 
     /// <summary>
     /// Implementation of IConfig interface, delegating properties and methods to the Config class.
@@ -10,26 +11,40 @@
 
 
         // Gets the next unique call ID.
-        [MethodImpl(MethodImplOptions.Synchronized)]
-        public int NextCallId => Config.NextCallId;
+        public int NextCallId
+        {
+            [MethodImpl(MethodImplOptions.Synchronized)]
+            get
+            {
+                return Config.NextCallId;
+            }
+        }
 
         // Gets the next unique assignment ID.
-        [MethodImpl(MethodImplOptions.Synchronized)]
-        public int NextAssignmentId => Config.NextAssignmentId;
+        public int NextAssignmentId
+        {
+            [MethodImpl(MethodImplOptions.Synchronized)]
+            get
+            {
+                return Config.NextAssignmentId;
+            }
+        }
 
         // Gets or sets the system clock representing the current time in the application.
-        [MethodImpl(MethodImplOptions.Synchronized)]
         public DateTime Clock
         {
+            [MethodImpl(MethodImplOptions.Synchronized)]
             get => Config.Clock;
+            [MethodImpl(MethodImplOptions.Synchronized)]
             set => Config.Clock = value;
         }
 
         // Gets or sets the time range for risk assessment operations.
-        [MethodImpl(MethodImplOptions.Synchronized)]
         public TimeSpan RiskRange
         {
+            [MethodImpl(MethodImplOptions.Synchronized)]
             get => Config.RiskRange;
+            [MethodImpl(MethodImplOptions.Synchronized)]
             set => Config.RiskRange = value;
         }
 
