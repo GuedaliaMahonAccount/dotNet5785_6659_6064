@@ -10,7 +10,6 @@ using System.Text;
 internal class VolunteerImplementation : IVolunteer
 {
     [MethodImpl(MethodImplOptions.Synchronized)]
-
     public void Create(Volunteer item)
     {
         // Check if the volunteer with the same ID already exists
@@ -23,18 +22,19 @@ internal class VolunteerImplementation : IVolunteer
         DataSource.Volunteers.Add(item);
     }
 
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public Volunteer? Read(int id)
     {
         // Look for the volunteer by ID and return it if found, otherwise return null
         return DataSource.Volunteers.FirstOrDefault(item => item.Id == id);
     }
-
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public Volunteer? Read(Func<Volunteer, bool> filter)
     {
         // Return the first volunteer that matches the filter, or null if none match
         return DataSource.Volunteers.FirstOrDefault(filter);
     }
-
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public IEnumerable<Volunteer> ReadAll(Func<Volunteer, bool>? filter = null)
     {
         // Create a copy of each item in the volunteer list
@@ -49,6 +49,7 @@ internal class VolunteerImplementation : IVolunteer
         return filter != null ? volunteerCopy.Where(filter) : volunteerCopy;
     }
     // Eli Amar  pas- Z8mQ7xW4rB
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public void Update(Volunteer item)
     {
         // Check if the volunteer exists
@@ -62,7 +63,7 @@ internal class VolunteerImplementation : IVolunteer
         DataSource.Volunteers.Remove(existingVolunteer);
         DataSource.Volunteers.Add(item);
     }
-
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public void Delete(int id)
     {
         // Check if the volunteer exists
@@ -75,11 +76,10 @@ internal class VolunteerImplementation : IVolunteer
         // Remove the volunteer from the list
         DataSource.Volunteers.Remove(volunteer);
     }
-
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public void DeleteAll()
     {
         // Clear the list of volunteers
         DataSource.Volunteers.Clear();
     }
-
 }

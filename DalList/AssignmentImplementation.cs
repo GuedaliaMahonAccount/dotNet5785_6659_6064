@@ -9,7 +9,6 @@ internal class AssignmentImplementation : IAssignment
 {
 
     [MethodImpl(MethodImplOptions.Synchronized)]
-
     public void Create(Assignment item)
     {
         // Check if the assignment with the same ID already exists
@@ -33,19 +32,19 @@ internal class AssignmentImplementation : IAssignment
         // Add the assignment if all checks pass
         DataSource.Assignments.Add(item);
     }
-
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public Assignment? Read(int id)
     {
         // Look for the assignment by ID and return it if found, otherwise return null
         return DataSource.Assignments.FirstOrDefault(item => item.Id == id);
     }
-
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public Assignment? Read(Func<Assignment, bool> filter)
     {
         // Return the first assignment that matches the filter, or null if none match
         return DataSource.Assignments.FirstOrDefault(filter);
     }
-
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public IEnumerable<Assignment> ReadAll(Func<Assignment, bool>? filter = null)
     {
         // Create a copy of the assignment list
@@ -56,7 +55,7 @@ internal class AssignmentImplementation : IAssignment
         // Apply the filter if provided, otherwise return all assignments
         return filter != null ? assignmentCopy.Where(filter) : assignmentCopy;
     }
-
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public void Update(Assignment item)
     {
         // Check if the assignment exists
@@ -70,7 +69,7 @@ internal class AssignmentImplementation : IAssignment
         DataSource.Assignments.Remove(existingAssignment);
         DataSource.Assignments.Add(item);
     }
-
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public void Delete(int id)
     {
         // Check if the assignment exists
@@ -83,7 +82,7 @@ internal class AssignmentImplementation : IAssignment
         // Remove the assignment from the list
         DataSource.Assignments.Remove(assignment);
     }
-
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public void DeleteAll()
     {
         // Clear the list of assignments

@@ -8,25 +8,24 @@ using System.Linq;
 internal class CallImplementation : ICall
 {
     [MethodImpl(MethodImplOptions.Synchronized)]
-
     public void Create(Call item)
     {
         // Add the call if ID is unique
         DataSource.Calls.Add(item);
     }
-
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public Call? Read(int id)
     {
         // Look for the call by ID and return it if found, otherwise return null
         return DataSource.Calls.FirstOrDefault(item => item.Id == id);
     }
-
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public Call? Read(Func<Call, bool> filter)
     {
         // Return the first call that matches the filter, or null if none match
         return DataSource.Calls.FirstOrDefault(filter);
     }
-
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public IEnumerable<Call> ReadAll(Func<Call, bool>? filter = null)
     {
         // Create a copy of each item in the call list
@@ -37,7 +36,7 @@ internal class CallImplementation : ICall
         // Apply the filter if provided, otherwise return all calls
         return filter != null ? callCopy.Where(filter) : callCopy;
     }
-
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public void Update(Call item)
     {
         // Check if the call exists
@@ -51,7 +50,7 @@ internal class CallImplementation : ICall
         DataSource.Calls.Remove(existingCall);
         DataSource.Calls.Add(item);
     }
-
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public void Delete(int id)
     {
         // Check if the call exists
@@ -64,7 +63,7 @@ internal class CallImplementation : ICall
         // Remove the call from the list
         DataSource.Calls.Remove(call);
     }
-
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public void DeleteAll()
     {
         // Clear the list of calls
