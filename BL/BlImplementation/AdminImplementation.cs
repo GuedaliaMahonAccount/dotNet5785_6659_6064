@@ -82,5 +82,14 @@ namespace BlImplementation
         public void RemoveConfigObserver(Action configObserver) =>
                     AdminManager.ConfigUpdatedObservers -= configObserver;
 
+
+        public void StartSimulator(int interval)  
+        {
+            AdminManager.ThrowOnSimulatorIsRunning();  
+            AdminManager.Start(interval); 
+        }
+
+        public void StopSimulator()
+    => AdminManager.Stop(); //stage 7
     }
 }
