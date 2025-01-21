@@ -6,6 +6,8 @@
     /// </summary>
     internal static class Config
     {
+        [MethodImpl(MethodImplOptions.Synchronized)]
+
         // Starting ID for call-related operations
         const int startCallId = 1;
         static int nextCallId = startCallId;

@@ -7,6 +7,8 @@ using System.Linq;
 
 internal class CallImplementation : ICall
 {
+    [MethodImpl(MethodImplOptions.Synchronized)]
+
     public void Create(Call item)
     {
         // Add the call if ID is unique

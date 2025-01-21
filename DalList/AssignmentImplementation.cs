@@ -7,6 +7,9 @@ using System.Linq;
 
 internal class AssignmentImplementation : IAssignment
 {
+
+    [MethodImpl(MethodImplOptions.Synchronized)]
+
     public void Create(Assignment item)
     {
         // Check if the assignment with the same ID already exists

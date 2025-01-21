@@ -7,6 +7,8 @@
     /// </summary>
     internal class ConfigImplementation : IConfig
     {
+        [MethodImpl(MethodImplOptions.Synchronized)]
+
 
         // Gets the next unique call ID.
         public int NextCallId => Config.NextCallId;
