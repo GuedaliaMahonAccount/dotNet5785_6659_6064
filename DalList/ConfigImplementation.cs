@@ -7,16 +7,18 @@
     /// </summary>
     internal class ConfigImplementation : IConfig
     {
-        [MethodImpl(MethodImplOptions.Synchronized)]
 
 
         // Gets the next unique call ID.
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public int NextCallId => Config.NextCallId;
 
         // Gets the next unique assignment ID.
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public int NextAssignmentId => Config.NextAssignmentId;
 
         // Gets or sets the system clock representing the current time in the application.
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public DateTime Clock
         {
             get => Config.Clock;
@@ -24,6 +26,7 @@
         }
 
         // Gets or sets the time range for risk assessment operations.
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public TimeSpan RiskRange
         {
             get => Config.RiskRange;
@@ -31,6 +34,7 @@
         }
 
         // Resets all configuration variables to their initial values.
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public void Reset()
         {
             Config.Reset();

@@ -4,7 +4,6 @@
 
     sealed internal class DalList : IDal
     {// Properties initialized with appropriate implementations
-        [MethodImpl(MethodImplOptions.Synchronized)]
 
         public static IDal Instance { get; } = new DalList();
         private DalList() { }
