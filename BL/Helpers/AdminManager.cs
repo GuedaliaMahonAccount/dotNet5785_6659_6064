@@ -129,7 +129,7 @@ internal static class AdminManager //stage 4
         {
             s_interval = interval;
             s_stop = false;
-            s_thread = new(clockRunner) { Name = "ClockRunner" };
+           // s_thread = new(clockRunner) { Name = "ClockRunner" };
             s_thread.Start();
         }
     }
@@ -146,27 +146,27 @@ internal static class AdminManager //stage 4
             s_thread = null;
         }
     }
-    private static Task? _simulateTask = null; // Add this line
+    private static Task? _simulateTask = null; 
 
-    private static void clockRunner()
-    {
-        while (!s_stop)
-        {
-            UpdateClock(Now.AddMinutes(s_interval));
+    //private static void clockRunner()
+    //{
+    //    while (!s_stop)
+    //    {
+    //        UpdateClock(Now.AddMinutes(s_interval));
 
-            //TO_DO:
-            //Add calls here to any logic simulation that was required in stage 7
-            //for example: course registration simulation
-            //etc…
-            if (_simulateTask is null || _simulateTask.IsCompleted)//stage 7
-                _simulateTask = Task.Run(() =>;// VolunteerManager.Simulate.....());
-            try
-            {
-                Thread.Sleep(1000); // 1 second
-            }
-            catch (ThreadInterruptedException) { }
-        }
-    }
+    //        //TO_DO:
+    //        //Add calls here to any logic simulation that was required in stage 7
+    //        //for example: course registration simulation
+    //        //etc…
+    //        if (_simulateTask is null || _simulateTask.IsCompleted)//stage 7
+    //            _simulateTask = Task.Run(() =>;// VolunteerManager.Simulate.....());
+    //        try
+    //        {
+    //            Thread.Sleep(1000); // 1 second
+    //        }
+    //        catch (ThreadInterruptedException) { }
+    //    }
+    //}
 
 
    

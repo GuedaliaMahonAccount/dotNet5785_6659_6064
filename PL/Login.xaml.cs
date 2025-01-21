@@ -17,7 +17,7 @@ namespace PL
         public Login()
         {
             InitializeComponent();
-            s_bl.Admin.InitializeDatabase();
+            s_bl.Admin.InitializeDB();
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
