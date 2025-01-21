@@ -1,11 +1,13 @@
 ﻿using DalApi;
 using DO;
+using System.Runtime.CompilerServices;
 using System.Xml.Linq;
 
 namespace Dal;
 
 internal class AssignmentImplementation : IAssignment
 {
+    [MethodImpl(MethodImplOptions.Synchronized)]
     private static Assignment getAssignment(XElement a)
     {
         return new Assignment
@@ -19,6 +21,7 @@ internal class AssignmentImplementation : IAssignment
         };
     }
 
+    [MethodImpl(MethodImplOptions.Synchronized)]
     private static XElement createAssignmentElement(Assignment a)
     {
         return new XElement("Assignment",
@@ -31,6 +34,7 @@ internal class AssignmentImplementation : IAssignment
         );
     }
 
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public void Create(Assignment item)
     {
         XElement assignmentsRootElem = XMLTools.LoadListFromXMLElement(Config.s_assignment_xml);
@@ -45,6 +49,7 @@ internal class AssignmentImplementation : IAssignment
         XMLTools.SaveListToXMLElement(assignmentsRootElem, Config.s_assignment_xml);
     }
 
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public void Delete(int id)
     {
         XElement assignmentsRootElem = XMLTools.LoadListFromXMLElement(Config.s_assignment_xml);
@@ -57,6 +62,7 @@ internal class AssignmentImplementation : IAssignment
         XMLTools.SaveListToXMLElement(assignmentsRootElem, Config.s_assignment_xml);
     }
 
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public void DeleteAll()
     {
         // Create an empty root element with the correct name
@@ -66,6 +72,7 @@ internal class AssignmentImplementation : IAssignment
         XMLTools.SaveListToXMLElement(assignmentsRootElem, Config.s_assignment_xml);
     }
 
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public Assignment Read(int id)
     {
         XElement assignmentsRootElem = XMLTools.LoadListFromXMLElement(Config.s_assignment_xml);
@@ -79,6 +86,7 @@ internal class AssignmentImplementation : IAssignment
         return getAssignment(assignmentElem);
     }
 
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public Assignment? Read(Func<Assignment, bool> filter)
     {
         return XMLTools.LoadListFromXMLElement(Config.s_assignment_xml)
@@ -87,6 +95,7 @@ internal class AssignmentImplementation : IAssignment
             .FirstOrDefault(filter);
     }
 
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public IEnumerable<Assignment> ReadAll(Func<Assignment, bool>? filter = null)
     {
         var assignments = XMLTools.LoadListFromXMLElement(Config.s_assignment_xml)
@@ -96,6 +105,7 @@ internal class AssignmentImplementation : IAssignment
         return filter == null ? assignments : assignments.Where(filter);
     }
 
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public void Update(Assignment item)
     {
         XElement assignmentsRootElem = XMLTools.LoadListFromXMLElement(Config.s_assignment_xml);

@@ -1,5 +1,6 @@
 ﻿using DalApi;
 using DO;
+using System.Runtime.CompilerServices;
 using System.Xml.Serialization;
 
 namespace Dal;
@@ -7,6 +8,7 @@ namespace Dal;
 internal class CallImplementation : ICall
 {
 
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public void Create(Call item)
     {
         List<Call> calls = XMLTools.LoadListFromXMLSerializer<Call>(Config.s_call_xml);
@@ -16,6 +18,7 @@ internal class CallImplementation : ICall
         XMLTools.SaveListToXMLSerializer(calls, Config.s_call_xml);
     }
 
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public void Delete(int id)
     {
         List<Call> calls = XMLTools.LoadListFromXMLSerializer<Call>(Config.s_call_xml);
@@ -24,12 +27,14 @@ internal class CallImplementation : ICall
         XMLTools.SaveListToXMLSerializer(calls, Config.s_call_xml);
     }
 
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public void DeleteAll()
     {
         List<Call> calls = new(); // Create an empty list
         XMLTools.SaveListToXMLSerializer(calls, Config.s_call_xml); // Overwrite with an empty list
     }
 
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public Call Read(int id)
     {
         List<Call> calls = XMLTools.LoadListFromXMLSerializer<Call>(Config.s_call_xml);
@@ -39,18 +44,21 @@ internal class CallImplementation : ICall
         return call;
     }
 
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public Call? Read(Func<Call, bool> filter)
     {
         List<Call> calls = XMLTools.LoadListFromXMLSerializer<Call>(Config.s_call_xml);
         return calls.FirstOrDefault(filter);
     }
 
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public IEnumerable<Call> ReadAll(Func<Call, bool>? filter = null)
     {
         List<Call> calls = XMLTools.LoadListFromXMLSerializer<Call>(Config.s_call_xml);
         return filter == null ? calls : calls.Where(filter);
     }
 
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public void Update(Call item)
     {
         List<Call> calls = XMLTools.LoadListFromXMLSerializer<Call>(Config.s_call_xml);
