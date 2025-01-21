@@ -119,49 +119,60 @@ internal static class AdminManager //stage 4
 
 
 
+  
+
+
+    [MethodImpl(MethodImplOptions.Synchronized)] //stage 7                                                
     internal static void Start(int interval)
     {
-        lock (mutex)
-            if (s_thread == null)
-            {
-                s_interval = interval;
-                s_stop = false;
-                s_thread = new Thread(clockRunner);
-                s_thread.Start();
-            }
-    }
-
-    internal static void Stop()
-    {
-        lock (mutex)
-            if (s_thread != null)
-            {
-                s_stop = true;
-                s_thread?.Interrupt();
-                s_thread = null;
-            }
-    }
-    private static Task? _simulateTask = null; // Add this line
-
-    private static void clockRunner()
-    {
-        while (!s_stop)
+        if (s_thread is null)
         {
-            UpdateClock(Now.AddMinutes(s_interval));
-
-            //TO_DO:
-            //Add calls here to any logic simulation that was required in stage 7
-            //for example: course registration simulation
-            //etc…
-            if (_simulateTask is null || _simulateTask.IsCompleted)//stage 7
-                _simulateTask = Task.Run(() => StudentManager.SimulateCourseRegistrationAndGrade());
-            try
-            {
-                Thread.Sleep(1000); // 1 second
-            }
-            catch (ThreadInterruptedException) { }
+            s_interval = interval;
+            s_stop = false;
+           // s_thread = new(clockRunner) { Name = "ClockRunner" };
+            s_thread.Start();
         }
     }
+
+
+    [MethodImpl(MethodImplOptions.Synchronized)] //stage 7                                                
+    internal static void Stop()
+    {
+        if (s_thread is not null)
+        {
+            s_stop = true;
+            s_thread.Interrupt(); //awake a sleeping thread
+            s_thread.Name = "ClockRunner stopped";
+            s_thread = null;
+        }
+    }
+    private static Task? _simulateTask = null; 
+
+    //private static void clockRunner()
+    //{
+    //    while (!s_stop)
+    //    {
+    //        UpdateClock(Now.AddMinutes(s_interval));
+
+    //        //TO_DO:
+    //        //Add calls here to any logic simulation that was required in stage 7
+    //        //for example: course registration simulation
+    //        //etc…
+    //        if (_simulateTask is null || _simulateTask.IsCompleted)//stage 7
+    //            _simulateTask = Task.Run(() =>;// VolunteerManager.Simulate.....());
+    //        try
+    //        {
+    //            Thread.Sleep(1000); // 1 second
+    //        }
+    //        catch (ThreadInterruptedException) { }
+    //    }
+    //}
+
+
+   
+
+   
+
 
     #endregion Stage 7 base
 }

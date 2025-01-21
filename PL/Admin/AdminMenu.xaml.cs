@@ -197,7 +197,7 @@ namespace PL
                         window.Close();
                 }
 
-                s_bl.Admin.ResetDatabase();
+                s_bl.Admin.InitializeDB();
                 MessageBox.Show("Database reset successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)
@@ -218,7 +218,7 @@ namespace PL
             {
                 Mouse.OverrideCursor = Cursors.Wait;
 
-                s_bl.Admin.InitializeDatabase();
+                s_bl.Admin.InitializeDB();
                 MessageBox.Show("Database initialized successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)
