@@ -119,27 +119,32 @@ internal static class AdminManager //stage 4
 
 
 
+  
+
+
+    [MethodImpl(MethodImplOptions.Synchronized)] //stage 7                                                
     internal static void Start(int interval)
     {
-        lock (mutex)
-            if (s_thread == null)
-            {
-                s_interval = interval;
-                s_stop = false;
-                s_thread = new Thread(clockRunner);
-                s_thread.Start();
-            }
+        if (s_thread is null)
+        {
+            s_interval = interval;
+            s_stop = false;
+            s_thread = new(clockRunner) { Name = "ClockRunner" };
+            s_thread.Start();
+        }
     }
 
+
+    [MethodImpl(MethodImplOptions.Synchronized)] //stage 7                                                
     internal static void Stop()
     {
-        lock (mutex)
-            if (s_thread != null)
-            {
-                s_stop = true;
-                s_thread?.Interrupt();
-                s_thread = null;
-            }
+        if (s_thread is not null)
+        {
+            s_stop = true;
+            s_thread.Interrupt(); //awake a sleeping thread
+            s_thread.Name = "ClockRunner stopped";
+            s_thread = null;
+        }
     }
     private static Task? _simulateTask = null; // Add this line
 
@@ -154,7 +159,7 @@ internal static class AdminManager //stage 4
             //for example: course registration simulation
             //etc…
             if (_simulateTask is null || _simulateTask.IsCompleted)//stage 7
-                _simulateTask = Task.Run(() => StudentManager.SimulateCourseRegistrationAndGrade());
+                _simulateTask = Task.Run(() =>;// VolunteerManager.Simulate.....());
             try
             {
                 Thread.Sleep(1000); // 1 second
@@ -162,6 +167,12 @@ internal static class AdminManager //stage 4
             catch (ThreadInterruptedException) { }
         }
     }
+
+
+   
+
+   
+
 
     #endregion Stage 7 base
 }
