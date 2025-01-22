@@ -10,7 +10,7 @@ using DO;
 internal class VolunteerImplementation : IVolunteer
 {
     private readonly DalApi.IDal _dal = DalApi.Factory.Get;
-
+    private static readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
 
     /// <summary>
     /// Authenticates a volunteer by verifying their username and password.
@@ -48,8 +48,6 @@ internal class VolunteerImplementation : IVolunteer
             return vol.Role.ToString();
         }
     }
-
-
 
     /// <summary>
     /// Retrieves the details of a specific volunteer, including general information and any current call in progress.
@@ -151,8 +149,6 @@ internal class VolunteerImplementation : IVolunteer
         }
 
     }
-
-
 
     /// <summary>
     /// Retrieves a list of volunteers filtered by call type and optionally sorted by specified fields.
@@ -308,81 +304,67 @@ internal class VolunteerImplementation : IVolunteer
     /// - The volunteer does not exist in the database.
     /// - Other unexpected errors occur during the update process.
     /// </exception>
-    public void UpdateVolunteer(int requesterId, BO.Volunteer updatedVolunteer)
+    /// <summary>
+    /// Updates the details of an existing volunteer in the system.
+    /// Validates the updated fields before saving.
+    /// </summary>
+    /// <param name="requesterId">The ID of the user (admin or the volunteer themselves) making the update request.</param>
+    /// <param name="updatedVolunteer">A <see cref="BO.Volunteer"/> object containing the updated volunteer details.</param>
+    /// <exception cref="BlInvalidValueException">
+    /// Thrown when:
+    /// - Validation for any field fails.
+    /// - The coordinates do not match the provided address.
+    /// - The volunteer does not exist in the database.
+    /// </exception>
+    public async Task UpdateVolunteerAsync(int requesterId, BO.Volunteer updatedVolunteer)
     {
-        AdminManager.ThrowOnSimulatorIsRunning();
-        lock (AdminManager.BlMutex)
+        await _semaphore.WaitAsync();
+        try
         {
-            var currentVolunteer = _dal.Volunteer.Read(updatedVolunteer.Id);
+            if (updatedVolunteer == null)
+                throw new BlNullPropertyException("Volunteer object cannot be null.");
 
-            // Validate that the requester is either the volunteer themselves or an admin
+            var existingVolunteer = _dal.Volunteer.Read(updatedVolunteer.Id);
+            if (existingVolunteer == null)
+                throw new BlDoesNotExistException($"Volunteer with ID {updatedVolunteer.Id} does not exist.");
+
+            // Validate the requester
             if (!VolunteerManager.IsRequesterAuthorizedToCancel(requesterId, updatedVolunteer.Id))
-            {
                 throw new LogicException("The requester is not authorized to update this volunteer.");
-            }
 
-            if (string.IsNullOrWhiteSpace(updatedVolunteer.Id.ToString()))
-                throw new BlNullPropertyException("Volunteer ID cannot be empty.");
-
+            // Validate updated fields
             if (string.IsNullOrWhiteSpace(updatedVolunteer.Name))
                 throw new BlNullPropertyException("Volunteer name cannot be empty.");
 
-            if (string.IsNullOrWhiteSpace(updatedVolunteer.Phone))
-                throw new BlNullPropertyException("Volunteer phone number cannot be empty.");
-
-            if (string.IsNullOrWhiteSpace(updatedVolunteer.Email))
-                throw new BlNullPropertyException("Volunteer email cannot be empty.");
-
-            if (string.IsNullOrWhiteSpace(updatedVolunteer.Password))
-                throw new BlNullPropertyException("Volunteer password cannot be empty.");
-
-            if (string.IsNullOrWhiteSpace(updatedVolunteer.Address))
-                throw new BlNullPropertyException("Volunteer address cannot be empty.");
-            if (!updatedVolunteer.Latitude.HasValue || string.IsNullOrWhiteSpace(updatedVolunteer.Latitude.ToString()))
-                throw new BlNullPropertyException("Volunteer Latitude cannot be empty.");
-
-            if (!updatedVolunteer.Longitude.HasValue || string.IsNullOrWhiteSpace(updatedVolunteer.Longitude.ToString()))
-                throw new BlNullPropertyException("Volunteer Longitude cannot be empty.");
-
-            // Check all fields
-            if (!VolunteerManager.ValidName(updatedVolunteer.Name)) // Validate name
+            if (!VolunteerManager.ValidName(updatedVolunteer.Name))
                 throw new BlInvalidValueException("Invalid name.");
 
-            if (!VolunteerManager.ValidPhone(updatedVolunteer.Phone)) // Validate phone
+            if (!VolunteerManager.ValidPhone(updatedVolunteer.Phone))
                 throw new BlInvalidValueException("Invalid phone number.");
 
-            if (!VolunteerManager.ValidPassword(updatedVolunteer.Password)) // Validate Password
-                throw new BlInvalidValueException("The password must be at least 8 characters long and must contain a capital letter, a lowercase letter, and one digit");
+            if (!VolunteerManager.ValidEmail(updatedVolunteer.Email))
+                throw new BlInvalidValueException("Invalid email address.");
 
-            if (!VolunteerManager.ValidEmail(updatedVolunteer.Email)) // Validate email
-                throw new BlInvalidValueException("Invalid email.");
+            if (!await VolunteerManager.ValidAddressAsync(updatedVolunteer.Address))
+                throw new BlInvalidValueException("Invalid address format.");
 
-            if (!VolunteerManager.ValidAddress(updatedVolunteer.Address)) // Validate address
-                throw new BlInvalidValueException("Invalid address, Please enter the address in this template: number, street , city ");
-
-            // Ensure coordinates are not null and valid
             if (!updatedVolunteer.Latitude.HasValue || !updatedVolunteer.Longitude.HasValue)
-                throw new BlNullPropertyException("Coordinates cannot be null.");
+                throw new BlNullPropertyException("Volunteer coordinates cannot be null.");
 
-            // Validate coordinates with partial address
-            var closestCoordinates = VolunteerManager.GetClosestCoordinates(updatedVolunteer.Address, updatedVolunteer.Latitude.Value, updatedVolunteer.Longitude.Value);
-            if (closestCoordinates == null)
-                throw new BlInvalidValueException("Coordinates do not match the address.");
+            if (!VolunteerManager.ValidPassword(updatedVolunteer.Password))
+                throw new BlInvalidValueException("Password must be at least 8 characters long, with a mix of uppercase, lowercase, and digits.");
 
+            // Encrypt the password if it has changed
             string encryptedPassword = AesEncryptionHelper.Encrypt(updatedVolunteer.Password);
-            updatedVolunteer.Password = encryptedPassword;
 
-            if (currentVolunteer == null)
-                throw new BlDoesNotExistException("Volunteer with the given ID does not exist.");
-
-            // Check which fields have changed
+            // Update fields in the DO.Volunteer object
             var updatedVolunteerDO = new DO.Volunteer
             {
                 Id = updatedVolunteer.Id,
                 Name = updatedVolunteer.Name,
                 Phone = updatedVolunteer.Phone,
                 Email = updatedVolunteer.Email,
-                Password = updatedVolunteer.Password,
+                Password = encryptedPassword,
                 Address = updatedVolunteer.Address,
                 Latitude = updatedVolunteer.Latitude.Value,
                 Longitude = updatedVolunteer.Longitude.Value,
@@ -390,16 +372,13 @@ internal class VolunteerImplementation : IVolunteer
                 IsActive = updatedVolunteer.IsActive
             };
 
-            // Only admin can change the role
-            if (requesterId != updatedVolunteer.Id && updatedVolunteerDO.Role != currentVolunteer.Role)
-            {
-                throw new LogicException("Only admin can change the role.");
-            }
-
-            // Update the volunteer in the database
+            // Save updates to the database
             _dal.Volunteer.Update(updatedVolunteerDO);
-            VolunteerManager.Observers.NotifyItemUpdated(updatedVolunteerDO.Id);
-            VolunteerManager.Observers.NotifyListUpdated();
+            VolunteerManager.Observers.NotifyItemUpdated(updatedVolunteer.Id);
+        }
+        finally
+        {
+            _semaphore.Release();
         }
     }
 
@@ -454,18 +433,28 @@ internal class VolunteerImplementation : IVolunteer
     /// - The coordinates are null or do not match the address.
     /// - Other unexpected errors occur during the addition process.
     /// </exception>
-    public void AddVolunteer(BO.Volunteer volunteer)
+    /// <summary>
+    /// Adds a new volunteer to the system. 
+    /// Validates all fields, ensures the data is consistent, and creates a new volunteer record in the database.
+    /// </summary>
+    /// <param name="volunteer">
+    /// A <see cref="BO.Volunteer"/> object containing the details of the volunteer to be added.
+    /// </param>
+    /// <exception cref="BlInvalidValueException">
+    /// Thrown when:
+    /// - The ID is invalid.
+    /// - The name, phone number, email, or address does not meet validation requirements.
+    /// - The coordinates are null or do not match the address.
+    /// - Other unexpected errors occur during the addition process.
+    /// </exception>
+    public async Task AddVolunteerAsync(BO.Volunteer volunteer)
     {
-        AdminManager.ThrowOnSimulatorIsRunning();
-
-        lock (AdminManager.BlMutex)
+        await _semaphore.WaitAsync();
+        try
         {
-            // Check for null values
+            // Validate the volunteer object
             if (volunteer == null)
                 throw new BlNullPropertyException("Volunteer object cannot be null.");
-
-            if (string.IsNullOrWhiteSpace(volunteer.Id.ToString()))
-                throw new BlNullPropertyException("Volunteer ID cannot be empty.");
 
             if (string.IsNullOrWhiteSpace(volunteer.Name))
                 throw new BlNullPropertyException("Volunteer name cannot be empty.");
@@ -482,17 +471,10 @@ internal class VolunteerImplementation : IVolunteer
             if (string.IsNullOrWhiteSpace(volunteer.Address))
                 throw new BlNullPropertyException("Volunteer address cannot be empty.");
 
-            if (!volunteer.Latitude.HasValue || string.IsNullOrWhiteSpace(volunteer.Latitude.ToString()))
-                throw new BlNullPropertyException("Volunteer Latitude cannot be empty.");
+            if (!volunteer.Latitude.HasValue || !volunteer.Longitude.HasValue)
+                throw new BlNullPropertyException("Volunteer coordinates cannot be null.");
 
-            if (!volunteer.Longitude.HasValue || string.IsNullOrWhiteSpace(volunteer.Longitude.ToString()))
-                throw new BlNullPropertyException("Volunteer Longitude cannot be empty.");
-
-
-            // Validate all fields
-            if (!VolunteerManager.ValidId(volunteer.Id.ToString()))
-                throw new BlInvalidValueException("Invalid ID.");
-
+            // Perform validation on individual fields
             if (!VolunteerManager.ValidName(volunteer.Name))
                 throw new BlInvalidValueException("Invalid name.");
 
@@ -500,61 +482,47 @@ internal class VolunteerImplementation : IVolunteer
                 throw new BlInvalidValueException("Invalid phone number.");
 
             if (!VolunteerManager.ValidEmail(volunteer.Email))
-                throw new BlInvalidValueException("Invalid email.");
+                throw new BlInvalidValueException("Invalid email address.");
 
             if (!VolunteerManager.ValidPassword(volunteer.Password))
-                throw new BlInvalidValueException("The password must be at least 8 characters long and must contain a capital letter, a lowercase letter, and one digit");
+                throw new BlInvalidValueException("Password must be at least 8 characters long, with a mix of uppercase, lowercase, and digits.");
 
-            if (!VolunteerManager.ValidAddress(volunteer.Address)) // Validate address
-                throw new BlInvalidValueException("Invalid address.");
+            if (!await VolunteerManager.ValidAddressAsync(volunteer.Address))
+                throw new BlInvalidValueException("Invalid address format. Please ensure the address is valid.");
 
-            if (!double.TryParse(volunteer.Latitude.ToString(), out double latitude))
-                throw new BlInvalidValueException("Invalid latitude value. Must be a valid number.");
-            if (!double.TryParse(volunteer.Longitude.ToString(), out double longitude))
-                throw new BlInvalidValueException("Invalid longitude value. Must be a valid number.");
-
-            // Ensure coordinates are not null and valid
-            if (!volunteer.Latitude.HasValue || !volunteer.Longitude.HasValue)
-                throw new BlNullPropertyException("Coordinates cannot be null.");
-
-            // Validate coordinates with partial address
-            var closestCoordinates = VolunteerManager.GetClosestCoordinates(volunteer.Address, volunteer.Latitude.Value, volunteer.Longitude.Value);
-            if (closestCoordinates == null)
-                throw new BlInvalidValueException("Coordinates do not match the address.");
+            // Encrypt the password
+            string encryptedPassword = AesEncryptionHelper.Encrypt(volunteer.Password);
 
             // Create a new DO.Volunteer object
             var newVolunteer = new DO.Volunteer
             {
                 Id = volunteer.Id,
                 Name = volunteer.Name,
-                Password = volunteer.Password,
                 Phone = volunteer.Phone,
                 Email = volunteer.Email,
+                Password = encryptedPassword,
                 Address = volunteer.Address,
                 Latitude = volunteer.Latitude.Value,
                 Longitude = volunteer.Longitude.Value,
-                Role = (DO.Role)volunteer.Role, // Convert BO.Role to DO.Role
+                Role = (DO.Role)volunteer.Role,
                 IsActive = volunteer.IsActive
             };
 
-            // Check if the volunteer already exists by ID
+            // Check if a volunteer with the same ID already exists
             var existingVolunteer = _dal.Volunteer.Read(volunteer.Id);
             if (existingVolunteer != null)
                 throw new BlInvalidValueException($"Volunteer with ID {volunteer.Id} already exists.");
 
-            try
-            {
-                // Attempt to add the volunteer to the database
-                _dal.Volunteer.Create(newVolunteer);
-                VolunteerManager.Observers.NotifyListUpdated();
-            }
-            catch (Exception ex)
-            {
-                // Catch and rethrow exceptions to the presentation layer
-                throw new LogicException("Failed to add volunteer.", ex);
-            }
+            // Save to database
+            _dal.Volunteer.Create(newVolunteer);
+            VolunteerManager.Observers.NotifyListUpdated();
+        }
+        finally
+        {
+            _semaphore.Release();
         }
     }
+
     private static bool IsEncrypted(string password)
     {
         try
@@ -567,8 +535,6 @@ internal class VolunteerImplementation : IVolunteer
             return false;
         }
     }
-
-
 
     /// <summary>
     /// Retrieves all current calls assigned to a volunteer.

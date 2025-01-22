@@ -129,7 +129,17 @@ namespace Helpers
         /// 
         /// 
         /// </summary>
-        public static List<(double latitude, double longitude)> GetCoordinatesFromAddress(string address)
+        /// <summary>
+        /// Retrieves coordinates from an address using LocationIQ API.
+        /// 
+        /// exemple of correct adress
+        /// "display_name": "מרכז אורן יצחק רגר, 185, Beer Sheva"
+        /// "lat": "31.27042089999999"
+        /// "lon": "34.7975837"
+        /// 
+        /// 
+        /// </summary>
+        public static async Task<List<(double latitude, double longitude)>> GetCoordinatesFromAddressAsync(string address)
         {
             if (string.IsNullOrWhiteSpace(address))
                 return null;
@@ -139,21 +149,14 @@ namespace Helpers
 
             try
             {
-                var request = WebRequest.Create(url);
-                request.Method = "GET";
-                using (var response = request.GetResponse())
-                using (var stream = response.GetResponseStream())
-                using (var reader = new StreamReader(stream))
+                using (var client = new HttpClient())
                 {
-                    var result = reader.ReadToEnd();
-
-                    // Parse JSON using System.Text.Json
-                    var json = JsonDocument.Parse(result);
+                    var response = await client.GetStringAsync(url);
+                    var json = JsonDocument.Parse(response);
                     var root = json.RootElement;
 
                     if (root.GetArrayLength() > 0)
                     {
-                        // Extract all coordinates
                         var coordinatesList = new List<(double latitude, double longitude)>();
                         foreach (var item in root.EnumerateArray())
                         {
@@ -172,9 +175,9 @@ namespace Helpers
                 return null;
             }
         }
-        public static bool ValidAddress(string address)
+        public static async Task<bool> ValidAddressAsync(string address)
         {
-            var coordinatesList = GetCoordinatesFromAddress(address);
+            var coordinatesList = await GetCoordinatesFromAddressAsync(address);
             return coordinatesList != null && coordinatesList.Count > 0; // If at least one result is returned, the address is valid.
         }
 

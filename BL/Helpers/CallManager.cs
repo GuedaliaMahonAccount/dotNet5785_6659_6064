@@ -103,7 +103,7 @@ namespace Helpers
         /// 
         /// 
         /// </summary>
-        public static List<(double latitude, double longitude)> GetCoordinatesFromAddress(string address)
+        public static async Task<List<(double latitude, double longitude)>> GetCoordinatesFromAddressAsync(string address)
         {
             if (string.IsNullOrWhiteSpace(address))
                 return null;
@@ -113,21 +113,14 @@ namespace Helpers
 
             try
             {
-                var request = WebRequest.Create(url);
-                request.Method = "GET";
-                using (var response = request.GetResponse())
-                using (var stream = response.GetResponseStream())
-                using (var reader = new StreamReader(stream))
+                using (var client = new HttpClient())
                 {
-                    var result = reader.ReadToEnd();
-
-                    // Parse JSON using System.Text.Json
-                    var json = JsonDocument.Parse(result);
+                    var response = await client.GetStringAsync(url);
+                    var json = JsonDocument.Parse(response);
                     var root = json.RootElement;
 
                     if (root.GetArrayLength() > 0)
                     {
-                        // Extract all coordinates
                         var coordinatesList = new List<(double latitude, double longitude)>();
                         foreach (var item in root.EnumerateArray())
                         {
@@ -146,11 +139,12 @@ namespace Helpers
                 return null;
             }
         }
-        public static bool ValidAddress(string address)
+        public static async Task<bool> ValidAddressAsync(string address)
         {
-            var coordinatesList = GetCoordinatesFromAddress(address);
+            var coordinatesList = await GetCoordinatesFromAddressAsync(address);
             return coordinatesList != null && coordinatesList.Count > 0; // If at least one result is returned, the address is valid.
         }
+
 
         /// <summary>
         /// new fonction to check coordinations
@@ -459,7 +453,7 @@ namespace Helpers
             private const int SmtpPort = 587;
             private const string SenderEmail = "guedalia.sebbah@gmail.com";
             private const string SenderPassword = "ujij qtrg kyrs cguv";
-            public static void SendEmail(string recipientEmail, string subject, string body)
+            public static async Task SendEmailAsync(string recipientEmail, string subject, string body)
             {
                 try
                 {
@@ -473,24 +467,22 @@ namespace Helpers
                             From = new MailAddress(SenderEmail),
                             Subject = subject,
                             Body = body,
-                            IsBodyHtml = true // Set to true if sending HTML emails
+                            IsBodyHtml = true
                         };
 
                         mailMessage.To.Add(recipientEmail);
 
-                        smtpClient.Send(mailMessage);
+                        await smtpClient.SendMailAsync(mailMessage);
                         Console.WriteLine($"Email sent to {recipientEmail} successfully.");
                     }
                 }
                 catch (SmtpException smtpEx)
                 {
                     Console.WriteLine($"SMTP error while sending email to {recipientEmail}: {smtpEx.Message}");
-                    Console.WriteLine($"Details: {smtpEx.StackTrace}");
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine($"General error while sending email to {recipientEmail}: {ex.Message}");
-                    Console.WriteLine($"Details: {ex.StackTrace}");
                 }
             }
 
@@ -501,14 +493,14 @@ namespace Helpers
         /// </summary>
         /// <param name="newCall">The new call to notify volunteers about.</param>
         /// <param name="radiusInKm">The radius within which volunteers will be notified.</param>
-        public static void NotifyNearbyVolunteers(BO.Call newCall, double radiusInKm = 5.0)
+        public static async Task NotifyNearbyVolunteersAsync(BO.Call newCall, double radiusInKm = 5.0)
         {
+            List<Task> emailTasks = new();
+
             lock (AdminManager.BlMutex)
             {
-                // Retrieve all volunteers
                 var volunteers = s_dal.Volunteer.ReadAll();
 
-                // Filter volunteers within the specified radius
                 var nearbyVolunteers = volunteers.Where(volunteer =>
                 {
                     if (volunteer.Latitude.HasValue && volunteer.Longitude.HasValue)
@@ -522,27 +514,28 @@ namespace Helpers
                     return false;
                 });
 
-                // Send notification email to each nearby volunteer
                 foreach (var volunteer in nearbyVolunteers)
                 {
                     if (!string.IsNullOrWhiteSpace(volunteer.Email))
                     {
                         string subject = "New Call Alert: Assistance Needed!";
                         string body = $@"
-                        <p>Dear {volunteer.Name},</p>
-                        <p>A new call for assistance has been added in your area:</p>
-                        <ul>
-                            <li><strong>Address:</strong> {newCall.Address}</li>
-                            <li><strong>Description:</strong> {newCall.Description}</li>
-                            <li><strong>Deadline:</strong> {newCall.DeadLine?.ToString("f") ?? "N/A"}</li>
-                        </ul>
-                        <p>If you can help, please log in to the system and volunteer for the call.</p>
-                        <p>Thank you for your support!</p>";
+                <p>Dear {volunteer.Name},</p>
+                <p>A new call for assistance has been added in your area:</p>
+                <ul>
+                    <li><strong>Address:</strong> {newCall.Address}</li>
+                    <li><strong>Description:</strong> {newCall.Description}</li>
+                    <li><strong>Deadline:</strong> {newCall.DeadLine?.ToString("f") ?? "N/A"}</li>
+                </ul>
+                <p>If you can help, please log in to the system and volunteer for the call.</p>
+                <p>Thank you for your support!</p>";
 
-                        EmailService.SendEmail(volunteer.Email, subject, body);
+                        emailTasks.Add(EmailService.SendEmailAsync(volunteer.Email, subject, body));
                     }
                 }
             }
+
+            await Task.WhenAll(emailTasks);
         }
 
 

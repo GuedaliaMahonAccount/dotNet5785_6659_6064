@@ -9,6 +9,8 @@ namespace BlImplementation
     internal class CallImplementation : BlApi.ICall
     {
         private readonly DalApi.IDal _dal = DalApi.Factory.Get;
+        private static readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
+
 
         /// <summary>
         /// Adds a new call to the system. 
@@ -19,10 +21,12 @@ namespace BlImplementation
         /// <exception cref="BlInvalidAddressException">Thrown when the address is empty or invalid.</exception>
         /// <exception cref="BlInvalidCoordinateException">Thrown when latitude and longitude are null or do not match the address.</exception>
         /// <exception cref="BlDoesNotExistException">Thrown when the call already exists in the system.</exception>
-        public void AddCall(BO.Call newCall)
+        public async Task AddCallAsync(BO.Call newCall)
         {
             AdminManager.ThrowOnSimulatorIsRunning();
-            lock (AdminManager.BlMutex)
+
+            await _semaphore.WaitAsync(); // Acquire the semaphore
+            try
             {
                 if (newCall == null)
                     throw new BlArgumentNullException("Call cannot be null.");
@@ -30,7 +34,8 @@ namespace BlImplementation
                 if (string.IsNullOrWhiteSpace(newCall.Address))
                     throw new BlInvalidAddressException("Address cannot be empty.");
 
-                if (!VolunteerManager.ValidAddress(newCall.Address)) // Validate address
+                // Call the asynchronous ValidAddressAsync method
+                if (!await VolunteerManager.ValidAddressAsync(newCall.Address))
                     throw new BlInvalidValueException("Invalid address.");
 
                 // Ensure coordinates are not null and valid
@@ -54,13 +59,17 @@ namespace BlImplementation
                     DeadLine: newCall.DeadLine
                 );
 
-                // Attempt to add the volunteer to the database
+                // Add the call to the database
                 _dal.Call.Create(callDO);
                 CallManager.Observers.NotifyListUpdated();
-
-                // Notify nearby volunteers
-                Helpers.CallManager.NotifyNearbyVolunteers(newCall);
             }
+            finally
+            {
+                _semaphore.Release(); // Release the semaphore
+            }
+
+            // Notify nearby volunteers asynchronously
+            await Helpers.CallManager.NotifyNearbyVolunteersAsync(newCall);
         }
 
         /// <summary>
@@ -526,10 +535,12 @@ namespace BlImplementation
         /// - The latitude and longitude are invalid or do not match the address.
         /// </exception>
         /// <exception cref="BlDoesNotExistException">Thrown when the call does not exist in the system.</exception>
-        public void UpdateCall(BO.Call call)
+        public async Task UpdateCallAsync(BO.Call call)
         {
             AdminManager.ThrowOnSimulatorIsRunning();
-            lock (AdminManager.BlMutex)
+
+            await _semaphore.WaitAsync(); // Acquire the semaphore
+            try
             {
                 if (call == null)
                     throw new BlArgumentNullException("Call cannot be null.");
@@ -540,7 +551,7 @@ namespace BlImplementation
                 if (call.StartTime >= call.DeadLine)
                     throw new BlInvalidValueException("The deadline must be later than the start time.");
 
-                if (!VolunteerManager.ValidAddress(call.Address)) // Validate address
+                if (!await VolunteerManager.ValidAddressAsync(call.Address))
                     throw new BlInvalidValueException("Invalid address.");
 
                 // Ensure coordinates are not null and valid
@@ -552,8 +563,6 @@ namespace BlImplementation
                 if (closestCoordinates == null)
                     throw new BlInvalidValueException("Coordinates do not match the address.");
 
-
-                // Convert BO.Call to DO.Call
                 var callDO = new DO.Call
                 (
                     Id: call.Id,
@@ -566,12 +575,18 @@ namespace BlImplementation
                     DeadLine: call.DeadLine
                 );
 
-                // Update the call using the DAL
+                // Update the call in the DAL
                 _dal.Call.Update(callDO);
-
                 CallManager.Observers.NotifyItemUpdated(callDO.Id);
                 CallManager.Observers.NotifyListUpdated();
             }
+            finally
+            {
+                _semaphore.Release(); // Release the semaphore
+            }
+
+            // Notify nearby volunteers asynchronously if needed
+            await Helpers.CallManager.NotifyNearbyVolunteersAsync(call);
         }
 
         /// <summary>
