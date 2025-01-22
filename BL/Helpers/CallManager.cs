@@ -544,5 +544,170 @@ namespace Helpers
                 }
             }
         }
+
+
+
+
+
+
+        ///simulator
+
+        private static readonly Random s_random = new();
+
+        /// <summary>
+        /// Simulates the routine activities of volunteers, including assigning calls and managing call statuses.
+        /// </summary>
+        public static void SimulateVolunteerActivity()
+        {
+            Thread.CurrentThread.Name = $"Simulator{Guid.NewGuid()}";
+
+            // Retrieve active volunteers as a concrete list
+            List<DO.Volunteer> activeVolunteers;
+            lock (AdminManager.BlMutex)
+            {
+                activeVolunteers = s_dal.Volunteer.ReadAll(v => v.IsActive).ToList();
+            }
+
+            LinkedList<int> updatedCallIds = new();
+
+            foreach (var volunteer in activeVolunteers)
+            {
+                // Check if the volunteer has an active call
+                var activeAssignment = GetActiveAssignmentForVolunteer(volunteer.Id);
+
+                if (activeAssignment == null)
+                {
+                    // Volunteer has no active call; consider assigning a new call with a probability of 20%
+                    if (s_random.NextDouble() < 0.2)
+                    {
+                        AssignRandomCallToVolunteer(volunteer.Id, updatedCallIds);
+                    }
+                }
+                else
+                {
+                    // Volunteer has an active call
+                    HandleActiveCall(volunteer, activeAssignment, updatedCallIds);
+                }
+            }
+
+            // Notify observers outside of the lock
+            foreach (int callId in updatedCallIds)
+            {
+                Observers.NotifyItemUpdated(callId);
+            }
+            Observers.NotifyListUpdated();
+        }
+
+        /// <summary>
+        /// Retrieves the active assignment for a volunteer.
+        /// </summary>
+        private static DO.Assignment GetActiveAssignmentForVolunteer(int volunteerId)
+        {
+            lock (AdminManager.BlMutex)
+            {
+                return s_dal.Assignment.ReadAll()
+                    .FirstOrDefault(a => a.VolunteerId == volunteerId && a.EndTime == null);
+            }
+        }
+
+        /// <summary>
+        /// Assigns a random call to a volunteer from the pool of available calls.
+        /// </summary>
+        private static void AssignRandomCallToVolunteer(int volunteerId, LinkedList<int> updatedCallIds)
+        {
+            // Retrieve open calls with valid coordinates
+            List<DO.Call> openCalls;
+            lock (AdminManager.BlMutex)
+            {
+                // Remove the HasValue check since Latitude and Longitude are non-nullable
+                openCalls = s_dal.Call.ReadAll(c =>
+                    (c.CallType == DO.CallType.Open || c.CallType == DO.CallType.OpenAtRisk) &&
+                    c.Latitude != 0 && c.Longitude != 0).ToList();
+
+            }
+
+            if (openCalls.Count > 0)
+            {
+                // Select a random call
+                var selectedCall = openCalls[s_random.Next(openCalls.Count)];
+
+                lock (AdminManager.BlMutex)
+                {
+                    // Create an assignment for the volunteer
+                    var newAssignment = new DO.Assignment
+                    (
+                        Id: s_dal.Config.NextAssignmentId,
+                        CallId: selectedCall.Id,
+                        VolunteerId: volunteerId,
+                        StartTime: DateTime.Now,
+                        EndTime: null,
+                        EndType: null
+                    );
+                    s_dal.Assignment.Create(newAssignment);
+
+                    // Update the call status
+                    var updatedCallType = selectedCall.CallType == DO.CallType.OpenAtRisk
+                        ? DO.CallType.InTreatmentAtRisk
+                        : DO.CallType.InTreatment;
+                    var updatedCall = selectedCall with { CallType = updatedCallType };
+                    s_dal.Call.Update(updatedCall);
+
+                    updatedCallIds.AddLast(selectedCall.Id);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Handles an active call for a volunteer, determining if the call is completed or canceled.
+        /// </summary>
+        private static void HandleActiveCall(DO.Volunteer volunteer, DO.Assignment activeAssignment, LinkedList<int> updatedCallIds)
+        {
+            var call = s_dal.Call.Read(activeAssignment.CallId);
+
+            // Determine if enough time has passed to complete the call
+            double distance = CalculateDistance(
+                volunteer.Latitude ?? 0, volunteer.Longitude ?? 0,
+                call.Latitude, call.Longitude);
+
+            TimeSpan estimatedDuration = TimeSpan.FromMinutes(distance / 5); // Assume 5 km/h travel
+            estimatedDuration += TimeSpan.FromMinutes(s_random.Next(10, 30)); // Add random buffer time
+
+            if (DateTime.Now - activeAssignment.StartTime >= estimatedDuration)
+            {
+                // Mark the call as completed
+                lock (AdminManager.BlMutex)
+                {
+                    var updatedAssignment = activeAssignment with
+                    {
+                        EndTime = DateTime.Now,
+                        EndType = DO.EndType.Completed
+                    };
+                    s_dal.Assignment.Update(updatedAssignment);
+
+                    var updatedCall = call with { CallType = DO.CallType.Completed };
+                    s_dal.Call.Update(updatedCall);
+
+                    updatedCallIds.AddLast(call.Id);
+                }
+            }
+            else if (s_random.NextDouble() < 0.1) // 10% probability of canceling the call
+            {
+                lock (AdminManager.BlMutex)
+                {
+                    var updatedAssignment = activeAssignment with
+                    {
+                        EndTime = DateTime.Now,
+                        EndType = DO.EndType.SelfCanceled
+                    };
+                    s_dal.Assignment.Update(updatedAssignment);
+
+                    var updatedCall = call with { CallType = DO.CallType.Open };
+                    s_dal.Call.Update(updatedCall);
+
+                    updatedCallIds.AddLast(call.Id);
+                }
+            }
+        }
+
     }
 }

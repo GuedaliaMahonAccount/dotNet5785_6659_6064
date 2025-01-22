@@ -154,12 +154,8 @@ internal static class AdminManager //stage 4
         {
             UpdateClock(Now.AddMinutes(s_interval));
 
-            //TO_DO:
-            //Add calls here to any logic simulation that was required in stage 7
-            //for example: course registration simulation
-            //etc…
             if (_simulateTask is null || _simulateTask.IsCompleted)//stage 7
-                _simulateTask = Task.Run(() => CallManager.SimulateCallAssignement());
+                _simulateTask = Task.Run(() => CallManager.SimulateVolunteerActivity());
             try
             {
                 Thread.Sleep(1000); // 1 second
