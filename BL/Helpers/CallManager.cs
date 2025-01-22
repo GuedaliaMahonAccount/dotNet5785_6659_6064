@@ -232,14 +232,17 @@ namespace Helpers
         /// <returns></returns>
         public static bool IsRequesterAuthorizedToCancel(int requesterId, int volunteerId)
         {
-            if (requesterId == volunteerId)
-                return true;
+            lock (AdminManager.BlMutex)
+            {
+                if (requesterId == volunteerId)
+                    return true;
 
-            var requester = s_dal.Volunteer.Read(requesterId);
-            if (requester != null && requester.Role == DO.Role.Admin)
-                return true;
+                var requester = s_dal.Volunteer.Read(requesterId);
+                if (requester != null && requester.Role == DO.Role.Admin)
+                    return true;
 
-            return false;
+                return false;
+            }
         }
 
 
@@ -249,63 +252,66 @@ namespace Helpers
         /// </summary>
         public static void UpdateExpiredCalls()
         {
-            var systemTime = DateTime.Now;
-
-            // Retrieve all calls from the DAL
-            var calls = s_dal.Call.ReadAll();
-
-            // Convert DO.Call to BO.Call
-            var boCalls = calls.Select(call => ConvertToBOCall(call)).ToList();
-
-            foreach (var call in boCalls)
+            lock (AdminManager.BlMutex)
             {
-                if (call.DeadLine.HasValue && call.DeadLine.Value < systemTime && !IsCallClosed(call))
+                var systemTime = DateTime.Now;
+
+                // Retrieve all calls from the DAL
+                var calls = s_dal.Call.ReadAll();
+
+                // Convert DO.Call to BO.Call
+                var boCalls = calls.Select(call => ConvertToBOCall(call)).ToList();
+
+                foreach (var call in boCalls)
                 {
-                    if (call.Assignments == null || !call.Assignments.Any())
+                    if (call.DeadLine.HasValue && call.DeadLine.Value < systemTime && !IsCallClosed(call))
                     {
-                        // Create a new assignment with "Expired Cancellation"
-                        var newAssignment = new BO.CallAssignInList
+                        if (call.Assignments == null || !call.Assignments.Any())
                         {
-                            VolunteerId = 0, // No volunteer
-                            VolunteerName = "System",
-                            StartTime = DateTime.MinValue,
-                            EndTime = systemTime,
-                            EndType = EndType.Expired
-                        };
-
-                        if (call.Assignments == null)
-                            call.Assignments = new List<BO.CallAssignInList>();
-
-                        call.Assignments.Add(newAssignment);
-                    }
-                    else
-                    {
-                        // Update existing assignment by creating a new object
-                        var openAssignment = call.Assignments.LastOrDefault(a => a.EndTime == null);
-                        if (openAssignment != null)
-                        {
-                            var updatedAssignment = new BO.CallAssignInList
+                            // Create a new assignment with "Expired Cancellation"
+                            var newAssignment = new BO.CallAssignInList
                             {
-                                VolunteerId = openAssignment.VolunteerId,
-                                VolunteerName = openAssignment.VolunteerName,
-                                StartTime = openAssignment.StartTime,
-                                EndTime = systemTime, // Updated EndTime
-                                EndType = EndType.Expired // Updated EndType
+                                VolunteerId = 0, // No volunteer
+                                VolunteerName = "System",
+                                StartTime = DateTime.MinValue,
+                                EndTime = systemTime,
+                                EndType = EndType.Expired
                             };
 
-                            // Replace the existing assignment in the list
-                            var index = call.Assignments.IndexOf(openAssignment);
-                            if (index >= 0)
+                            if (call.Assignments == null)
+                                call.Assignments = new List<BO.CallAssignInList>();
+
+                            call.Assignments.Add(newAssignment);
+                        }
+                        else
+                        {
+                            // Update existing assignment by creating a new object
+                            var openAssignment = call.Assignments.LastOrDefault(a => a.EndTime == null);
+                            if (openAssignment != null)
                             {
-                                call.Assignments[index] = updatedAssignment;
+                                var updatedAssignment = new BO.CallAssignInList
+                                {
+                                    VolunteerId = openAssignment.VolunteerId,
+                                    VolunteerName = openAssignment.VolunteerName,
+                                    StartTime = openAssignment.StartTime,
+                                    EndTime = systemTime, // Updated EndTime
+                                    EndType = EndType.Expired // Updated EndType
+                                };
+
+                                // Replace the existing assignment in the list
+                                var index = call.Assignments.IndexOf(openAssignment);
+                                if (index >= 0)
+                                {
+                                    call.Assignments[index] = updatedAssignment;
+                                }
                             }
                         }
-                    }
 
-                    // Update the call in the DAL
-                    var updatedDOCall = ConvertToDOCall(call);
-                    s_dal.Call.Update(updatedDOCall);
-                    Observers.NotifyListUpdated();
+                        // Update the call in the DAL
+                        var updatedDOCall = ConvertToDOCall(call);
+                        s_dal.Call.Update(updatedDOCall);
+                        Observers.NotifyListUpdated();
+                    }
                 }
             }
         }
@@ -325,57 +331,60 @@ namespace Helpers
         ///</summary>
         public static void UpdateRiskCall(DateTime oldClock, DateTime newClock, TimeSpan riskRange)
         {
-            // Retrieve all calls from the DAL
-            var allCalls = s_dal.Call.ReadAll().ToList();
-
-            foreach (var call in allCalls)
+            lock (AdminManager.BlMutex)
             {
-                if (call.DeadLine.HasValue)
+                // Retrieve all calls from the DAL
+                var allCalls = s_dal.Call.ReadAll().ToList();
+
+                foreach (var call in allCalls)
                 {
-                    // Calculate the remaining time until the deadline
-                    var timeLeft = call.DeadLine.Value - newClock;
-
-                    if (timeLeft <= riskRange)
+                    if (call.DeadLine.HasValue)
                     {
-                        // Calls within the risk range
-                        switch (call.CallType)
-                        {
-                            case DO.CallType.Open:
-                                // Update Open calls to OpenAtRisk
-                                var updatedOpenCall = call with { CallType = DO.CallType.OpenAtRisk };
-                                s_dal.Call.Update(updatedOpenCall);
-                                break;
+                        // Calculate the remaining time until the deadline
+                        var timeLeft = call.DeadLine.Value - newClock;
 
-                            case DO.CallType.InTreatment:
-                                // Update InTreatment calls to InTreatmentAtRisk
-                                var updatedInTreatmentCall = call with { CallType = DO.CallType.InTreatmentAtRisk };
-                                s_dal.Call.Update(updatedInTreatmentCall);
-                                break;
+                        if (timeLeft <= riskRange)
+                        {
+                            // Calls within the risk range
+                            switch (call.CallType)
+                            {
+                                case DO.CallType.Open:
+                                    // Update Open calls to OpenAtRisk
+                                    var updatedOpenCall = call with { CallType = DO.CallType.OpenAtRisk };
+                                    s_dal.Call.Update(updatedOpenCall);
+                                    break;
+
+                                case DO.CallType.InTreatment:
+                                    // Update InTreatment calls to InTreatmentAtRisk
+                                    var updatedInTreatmentCall = call with { CallType = DO.CallType.InTreatmentAtRisk };
+                                    s_dal.Call.Update(updatedInTreatmentCall);
+                                    break;
+                            }
                         }
-                    }
-                    else
-                    {
-                        // Calls outside the risk range
-                        switch (call.CallType)
+                        else
                         {
-                            case DO.CallType.OpenAtRisk:
-                                // Revert OpenAtRisk calls to Open
-                                var revertedOpenCall = call with { CallType = DO.CallType.Open };
-                                s_dal.Call.Update(revertedOpenCall);
-                                break;
+                            // Calls outside the risk range
+                            switch (call.CallType)
+                            {
+                                case DO.CallType.OpenAtRisk:
+                                    // Revert OpenAtRisk calls to Open
+                                    var revertedOpenCall = call with { CallType = DO.CallType.Open };
+                                    s_dal.Call.Update(revertedOpenCall);
+                                    break;
 
-                            case DO.CallType.InTreatmentAtRisk:
-                                // Revert InTreatmentAtRisk calls to InTreatment
-                                var revertedInTreatmentCall = call with { CallType = DO.CallType.InTreatment };
-                                s_dal.Call.Update(revertedInTreatmentCall);
-                                break;
+                                case DO.CallType.InTreatmentAtRisk:
+                                    // Revert InTreatmentAtRisk calls to InTreatment
+                                    var revertedInTreatmentCall = call with { CallType = DO.CallType.InTreatment };
+                                    s_dal.Call.Update(revertedInTreatmentCall);
+                                    break;
+                            }
                         }
                     }
                 }
-            }
 
-            // Notify observers about the updated call list
-            Observers.NotifyListUpdated();
+                // Notify observers about the updated call list
+                Observers.NotifyListUpdated();
+            }
         }
 
 
@@ -422,8 +431,8 @@ namespace Helpers
         /// </summary>
         internal static class EmailService
         {
-            private const string SmtpHost = "smtp.gmail.com"; 
-            private const int SmtpPort = 587; 
+            private const string SmtpHost = "smtp.gmail.com";
+            private const int SmtpPort = 587;
             private const string SenderEmail = "guedalia.sebbah@gmail.com";
             private const string SenderPassword = "ujij qtrg kyrs cguv";
             public static void SendEmail(string recipientEmail, string subject, string body)
@@ -470,30 +479,32 @@ namespace Helpers
         /// <param name="radiusInKm">The radius within which volunteers will be notified.</param>
         public static void NotifyNearbyVolunteers(BO.Call newCall, double radiusInKm = 5.0)
         {
-            // Retrieve all volunteers
-            var volunteers = s_dal.Volunteer.ReadAll();
-
-            // Filter volunteers within the specified radius
-            var nearbyVolunteers = volunteers.Where(volunteer =>
+            lock (AdminManager.BlMutex)
             {
-                if (volunteer.Latitude.HasValue && volunteer.Longitude.HasValue)
-                {
-                    double distance = CalculateDistance(
-                        newCall.Latitude.Value, newCall.Longitude.Value,
-                        volunteer.Latitude.Value, volunteer.Longitude.Value,
-                        (BO.DistanceType)volunteer.DistanceType);
-                    return distance <= radiusInKm;
-                }
-                return false;
-            });
+                // Retrieve all volunteers
+                var volunteers = s_dal.Volunteer.ReadAll();
 
-            // Send notification email to each nearby volunteer
-            foreach (var volunteer in nearbyVolunteers)
-            {
-                if (!string.IsNullOrWhiteSpace(volunteer.Email))
+                // Filter volunteers within the specified radius
+                var nearbyVolunteers = volunteers.Where(volunteer =>
                 {
-                    string subject = "New Call Alert: Assistance Needed!";
-                    string body = $@"
+                    if (volunteer.Latitude.HasValue && volunteer.Longitude.HasValue)
+                    {
+                        double distance = CalculateDistance(
+                            newCall.Latitude.Value, newCall.Longitude.Value,
+                            volunteer.Latitude.Value, volunteer.Longitude.Value,
+                            (BO.DistanceType)volunteer.DistanceType);
+                        return distance <= radiusInKm;
+                    }
+                    return false;
+                });
+
+                // Send notification email to each nearby volunteer
+                foreach (var volunteer in nearbyVolunteers)
+                {
+                    if (!string.IsNullOrWhiteSpace(volunteer.Email))
+                    {
+                        string subject = "New Call Alert: Assistance Needed!";
+                        string body = $@"
                         <p>Dear {volunteer.Name},</p>
                         <p>A new call for assistance has been added in your area:</p>
                         <ul>
@@ -504,7 +515,8 @@ namespace Helpers
                         <p>If you can help, please log in to the system and volunteer for the call.</p>
                         <p>Thank you for your support!</p>";
 
-                    EmailService.SendEmail(volunteer.Email, subject, body);
+                        EmailService.SendEmail(volunteer.Email, subject, body);
+                    }
                 }
             }
         }
