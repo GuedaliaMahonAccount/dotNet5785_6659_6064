@@ -12,7 +12,7 @@ namespace PL.Call
     {
         static readonly BlApi.IBl s_bl = BlApi.Factory.Get();
 
-        // depency properties for button text
+        // Dependency properties for button text
         string ButtonText
         {
             get => (string)GetValue(ButtonTextProperty);
@@ -20,7 +20,6 @@ namespace PL.Call
         }
         public static readonly DependencyProperty ButtonTextProperty =
             DependencyProperty.Register(nameof(ButtonText), typeof(string), typeof(CallWindow));
-
 
         // Dependency property for CurrentCall
         public BO.Call CurrentCall
@@ -31,7 +30,8 @@ namespace PL.Call
         public static readonly DependencyProperty CurrentCallProperty =
             DependencyProperty.Register(nameof(CurrentCall), typeof(BO.Call), typeof(CallWindow));
 
-        private volatile DispatcherOperation _updateCallDataOperation = null;
+        // Flag to prevent multiple updates
+        private volatile bool _isUpdating = false;
 
         public CallWindow(int id = 0)
         {
@@ -59,17 +59,29 @@ namespace PL.Call
 
         private void UpdateCallData()
         {
-            if (_updateCallDataOperation == null || _updateCallDataOperation.Status == DispatcherOperationStatus.Completed)
+            if (!_isUpdating)
             {
-                _updateCallDataOperation = Dispatcher.BeginInvoke(new Action(() =>
+                _isUpdating = true;
+                Dispatcher.BeginInvoke(new Action(() =>
                 {
-                    if (CurrentCall?.Id != null)
+                    try
                     {
-                        var updatedCall = s_bl.Call.GetCallDetails(CurrentCall.Id);
-                        if (updatedCall != null)
+                        if (CurrentCall?.Id != null)
                         {
-                            CurrentCall = updatedCall;
+                            var updatedCall = s_bl.Call.GetCallDetails(CurrentCall.Id);
+                            if (updatedCall != null)
+                            {
+                                CurrentCall = updatedCall;
+                            }
                         }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Error updating call data: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                    finally
+                    {
+                        _isUpdating = false; // Reset the flag after the operation is done
                     }
                 }));
             }
@@ -99,7 +111,7 @@ namespace PL.Call
             }
         }
 
-        // see all the assignement for this call
+        // See all the assignments for this call
         private void BtnViewAssignments_Click(object sender, RoutedEventArgs e)
         {
             try

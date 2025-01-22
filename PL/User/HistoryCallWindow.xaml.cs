@@ -27,8 +27,7 @@ namespace PL.User
             DependencyProperty.Register("Calls", typeof(IEnumerable<CallInList>),
                 typeof(HistoryCallWindow), new PropertyMetadata(null));
 
-        // DispatcherOperation for asynchronous updates
-        private volatile DispatcherOperation _updateCallDetailsOperation = null;
+        private volatile bool _isUpdating = false; 
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -54,9 +53,10 @@ namespace PL.User
         /// </summary>
         private void LoadCalls(int volunteerId)
         {
-            if (_updateCallDetailsOperation == null || _updateCallDetailsOperation.Status == DispatcherOperationStatus.Completed)
+            if (!_isUpdating)
             {
-                _updateCallDetailsOperation = Dispatcher.BeginInvoke(new Action(() =>
+                _isUpdating = true;
+                Dispatcher.BeginInvoke(new Action(() =>
                 {
                     try
                     {
@@ -85,6 +85,10 @@ namespace PL.User
                     catch (Exception ex)
                     {
                         MessageBox.Show($"An error occurred while loading calls: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                    finally
+                    {
+                        _isUpdating = false; // Reset the flag after the operation is done
                     }
                 }));
             }

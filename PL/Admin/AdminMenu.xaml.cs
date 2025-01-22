@@ -33,10 +33,10 @@ namespace PL
         public ObservableCollection<KeyValuePair<string, int>> CallQuantities { get; set; } = new ObservableCollection<KeyValuePair<string, int>>();
         public ICommand NavigateToCallListCommand { get; private set; }
 
-        // DispatcherOperation objects for asynchronous updates
-        private volatile DispatcherOperation _updateCallQuantitiesOperation = null;
-        private volatile DispatcherOperation _updateClockObserverOperation = null;
-        private volatile DispatcherOperation _updateConfigObserverOperation = null;
+        // Flags to prevent multiple updates
+        private volatile bool _isUpdatingCallQuantities = false;
+        private volatile bool _isUpdatingClockObserver = false;
+        private volatile bool _isUpdatingConfigObserver = false;
 
         public AdminMenu()
         {
@@ -50,9 +50,10 @@ namespace PL
 
         private void LoadCallQuantities()
         {
-            if (_updateCallQuantitiesOperation == null || _updateCallQuantitiesOperation.Status == DispatcherOperationStatus.Completed)
+            if (!_isUpdatingCallQuantities)
             {
-                _updateCallQuantitiesOperation = Dispatcher.BeginInvoke(new Action(() =>
+                _isUpdatingCallQuantities = true;
+                Dispatcher.BeginInvoke(new Action(() =>
                 {
                     try
                     {
@@ -76,6 +77,10 @@ namespace PL
                         MessageBox.Show($"Error loading call quantities: {ex.Message}", "Error",
                                        MessageBoxButton.OK, MessageBoxImage.Error);
                     }
+                    finally
+                    {
+                        _isUpdatingCallQuantities = false; // Reset the flag after the operation is done
+                    }
                 }));
             }
         }
@@ -97,9 +102,10 @@ namespace PL
 
         private void clockObserver()
         {
-            if (_updateClockObserverOperation == null || _updateClockObserverOperation.Status == DispatcherOperationStatus.Completed)
+            if (!_isUpdatingClockObserver)
             {
-                _updateClockObserverOperation = Dispatcher.BeginInvoke(new Action(() =>
+                _isUpdatingClockObserver = true;
+                Dispatcher.BeginInvoke(new Action(() =>
                 {
                     try
                     {
@@ -109,15 +115,20 @@ namespace PL
                     {
                         Console.WriteLine($"Error in clockObserver: {ex.Message}");
                     }
+                    finally
+                    {
+                        _isUpdatingClockObserver = false; // Reset the flag after the operation is done
+                    }
                 }));
             }
         }
 
         private void configObserver()
         {
-            if (_updateConfigObserverOperation == null || _updateConfigObserverOperation.Status == DispatcherOperationStatus.Completed)
+            if (!_isUpdatingConfigObserver)
             {
-                _updateConfigObserverOperation = Dispatcher.BeginInvoke(new Action(() =>
+                _isUpdatingConfigObserver = true;
+                Dispatcher.BeginInvoke(new Action(() =>
                 {
                     try
                     {
@@ -127,6 +138,10 @@ namespace PL
                     catch (Exception ex)
                     {
                         Console.WriteLine($"Error in configObserver: {ex.Message}");
+                    }
+                    finally
+                    {
+                        _isUpdatingConfigObserver = false; // Reset the flag after the operation is done
                     }
                 }));
             }

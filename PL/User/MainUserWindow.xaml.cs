@@ -26,8 +26,8 @@ namespace PL
 
         private readonly int _volunteerId;
 
-        // DispatcherOperation for asynchronous updates
-        private volatile DispatcherOperation _updateCurrentCallsOperation = null;
+        // Flag to prevent multiple updates
+        private volatile bool _isUpdating = false;
 
         public MainUserWindow(int volunteerId)
         {
@@ -54,9 +54,10 @@ namespace PL
         // Query all current calls for the user
         private void QueryCurrentCalls()
         {
-            if (_updateCurrentCallsOperation == null || _updateCurrentCallsOperation.Status == DispatcherOperationStatus.Completed)
+            if (!_isUpdating)
             {
-                _updateCurrentCallsOperation = Dispatcher.BeginInvoke(new Action(() =>
+                _isUpdating = true;
+                Dispatcher.BeginInvoke(new Action(() =>
                 {
                     try
                     {
@@ -73,6 +74,10 @@ namespace PL
                     {
                         MessageBox.Show($"Failed to load current calls: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     }
+                    finally
+                    {
+                        _isUpdating = false; // Reset the flag after the operation is done
+                    }
                 }));
             }
         }
@@ -80,11 +85,13 @@ namespace PL
         // Observer to refresh current calls on UI updates
         private void CallObserver()
         {
-            if (_updateCurrentCallsOperation == null || _updateCurrentCallsOperation.Status == DispatcherOperationStatus.Completed)
+            if (!_isUpdating)
             {
-                _updateCurrentCallsOperation = Dispatcher.BeginInvoke(new Action(() =>
+                _isUpdating = true;
+                Dispatcher.BeginInvoke(new Action(() =>
                 {
                     QueryCurrentCalls(); // Refresh current calls on the UI thread
+                    _isUpdating = false; // Reset the flag after the operation is done
                 }));
             }
         }

@@ -32,7 +32,8 @@ namespace PL.Volunteer
 
         public BO.VolunteerInList? SelectedVolunteer { get; set; }
 
-        private volatile DispatcherOperation _updateVolunteerListOperation = null;
+        // Flag to prevent multiple updates
+        private volatile bool _isUpdating = false;
 
         public VolunteerListWindow()
         {
@@ -47,12 +48,24 @@ namespace PL.Volunteer
             _isWindowLoaded = true; // Indicate that the window has fully loaded
             s_bl.Volunteer.AddObserver(() =>
             {
-                if (_updateVolunteerListOperation == null || _updateVolunteerListOperation.Status == DispatcherOperationStatus.Completed)
+                if (!_isUpdating)
                 {
-                    _updateVolunteerListOperation = Dispatcher.BeginInvoke(new Action(() =>
+                    _isUpdating = true;
+                    Dispatcher.BeginInvoke(new Action(() =>
                     {
-                        _allVolunteers = s_bl.Volunteer.GetVolunteersList();
-                        FilterVolunteersByName(TxtVolunteerNameFilter.Text);
+                        try
+                        {
+                            _allVolunteers = s_bl.Volunteer.GetVolunteersList();
+                            FilterVolunteersByName(TxtVolunteerNameFilter.Text);
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show($"Error updating volunteer list: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        }
+                        finally
+                        {
+                            _isUpdating = false; // Reset the flag after the operation is done
+                        }
                     }));
                 }
             });

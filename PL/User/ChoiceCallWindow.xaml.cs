@@ -27,8 +27,8 @@ namespace PL.User
 
         private readonly int _volunteerId;
 
-        // DispatcherOperation for asynchronous updates
-        private volatile DispatcherOperation _updateCallListOperation = null;
+        // Flag to prevent multiple updates
+        private volatile bool _isUpdating = false;
 
         private bool CanAssignCall()
         {
@@ -79,9 +79,10 @@ namespace PL.User
 
         private void queryCallList()
         {
-            if (_updateCallListOperation == null || _updateCallListOperation.Status == DispatcherOperationStatus.Completed)
+            if (!_isUpdating)
             {
-                _updateCallListOperation = Dispatcher.BeginInvoke(new Action(() =>
+                _isUpdating = true;
+                Dispatcher.BeginInvoke(new Action(() =>
                 {
                     try
                     {
@@ -108,17 +109,23 @@ namespace PL.User
                     {
                         MessageBox.Show($"Failed to load calls: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     }
+                    finally
+                    {
+                        _isUpdating = false; // Reset the flag after the operation is done
+                    }
                 }));
             }
         }
 
         private void CallListObserver()
         {
-            if (_updateCallListOperation == null || _updateCallListOperation.Status == DispatcherOperationStatus.Completed)
+            if (!_isUpdating)
             {
-                _updateCallListOperation = Dispatcher.BeginInvoke(new Action(() =>
+                _isUpdating = true;
+                Dispatcher.BeginInvoke(new Action(() =>
                 {
                     queryCallList(); // Refresh the call list on UI thread
+                    _isUpdating = false; // Reset the flag after the operation is done
                 }));
             }
         }
