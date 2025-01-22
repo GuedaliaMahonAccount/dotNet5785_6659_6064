@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Threading;
 using BO;
@@ -14,6 +16,7 @@ namespace PL
         static readonly BlApi.IBl s_bl = BlApi.Factory.Get();
         private DispatcherTimer _timer = new DispatcherTimer();
 
+        // Dependency Properties
         public DateTime CurrentTime
         {
             get { return (DateTime)GetValue(CurrentTimeProperty); }
@@ -29,6 +32,30 @@ namespace PL
         }
         public static readonly DependencyProperty MaxYearRangeProperty =
             DependencyProperty.Register("MaxYearRange", typeof(int), typeof(AdminMenu), new PropertyMetadata(0));
+
+        public int Interval
+        {
+            get { return (int)GetValue(IntervalProperty); }
+            set { SetValue(IntervalProperty, value); }
+        }
+        public static readonly DependencyProperty IntervalProperty =
+            DependencyProperty.Register("Interval", typeof(int), typeof(AdminMenu), new PropertyMetadata(1));
+
+        public bool IsSimulatorRunning
+        {
+            get { return (bool)GetValue(IsSimulatorRunningProperty); }
+            set { SetValue(IsSimulatorRunningProperty, value); }
+        }
+        public static readonly DependencyProperty IsSimulatorRunningProperty =
+            DependencyProperty.Register("IsSimulatorRunning", typeof(bool), typeof(AdminMenu), new PropertyMetadata(false));
+
+        public string SimulatorButtonText
+        {
+            get { return (string)GetValue(SimulatorButtonTextProperty); }
+            set { SetValue(SimulatorButtonTextProperty, value); }
+        }
+        public static readonly DependencyProperty SimulatorButtonTextProperty =
+            DependencyProperty.Register("SimulatorButtonText", typeof(string), typeof(AdminMenu), new PropertyMetadata("Start Simulator"));
 
         public ObservableCollection<KeyValuePair<string, int>> CallQuantities { get; set; } = new ObservableCollection<KeyValuePair<string, int>>();
         public ICommand NavigateToCallListCommand { get; private set; }
@@ -48,6 +75,22 @@ namespace PL
             LoadCallQuantities();  // Load the data after setting DataContext
         }
 
+        private void btnToggleSimulator_Click(object sender, RoutedEventArgs e)
+        {
+            if (IsSimulatorRunning)
+            {
+                s_bl.Admin.StopSimulator();
+                IsSimulatorRunning = false;
+                SimulatorButtonText = "Start Simulator";
+            }
+            else
+            {
+                s_bl.Admin.StartSimulator(Interval);
+                IsSimulatorRunning = true;
+                SimulatorButtonText = "Stop Simulator";
+            }
+        }
+
         private void LoadCallQuantities()
         {
             if (!_isUpdatingCallQuantities)
@@ -61,15 +104,12 @@ namespace PL
                         CallQuantities.Clear();
                         foreach (BO.CallType callType in Enum.GetValues(typeof(BO.CallType)))
                         {
-                            //if (callType != BO.CallType.None)
-                            {
-                                CallQuantities.Add(new KeyValuePair<string, int>(
-                                    callType.ToString(),
-                                    quantities[(int)callType]));
-                            }
+                            CallQuantities.Add(new KeyValuePair<string, int>(
+                                callType.ToString(),
+                                quantities[(int)callType]));
                         }
 
-                        // Debug: Vérifiez que la collection est remplie
+                        // Debug: Check if the collection is filled
                         Debug.WriteLine($"CallQuantities count: {CallQuantities.Count}");
                     }
                     catch (Exception ex)
@@ -271,6 +311,11 @@ namespace PL
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
+            if (IsSimulatorRunning)
+            {
+                s_bl.Admin.StopSimulator();
+            }
+
             var result = MessageBox.Show("Are you sure you want to close this window?",
                                          "Confirm Close",
                                          MessageBoxButton.YesNo,
@@ -301,6 +346,21 @@ namespace PL
                 add => CommandManager.RequerySuggested += value;
                 remove => CommandManager.RequerySuggested -= value;
             }
+        }
+    }
+
+    public class SimulatorRunningToBoolConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            bool isSimulatorRunning = (bool)value;
+            bool invert = parameter as string == "Invert";
+            return invert ? !isSimulatorRunning : isSimulatorRunning;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
         }
     }
 }
