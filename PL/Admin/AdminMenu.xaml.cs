@@ -33,6 +33,11 @@ namespace PL
         public ObservableCollection<KeyValuePair<string, int>> CallQuantities { get; set; } = new ObservableCollection<KeyValuePair<string, int>>();
         public ICommand NavigateToCallListCommand { get; private set; }
 
+        // DispatcherOperation objects for asynchronous updates
+        private volatile DispatcherOperation _updateCallQuantitiesOperation = null;
+        private volatile DispatcherOperation _updateClockObserverOperation = null;
+        private volatile DispatcherOperation _updateConfigObserverOperation = null;
+
         public AdminMenu()
         {
             InitializeComponent();
@@ -45,27 +50,33 @@ namespace PL
 
         private void LoadCallQuantities()
         {
-            try
+            if (_updateCallQuantitiesOperation == null || _updateCallQuantitiesOperation.Status == DispatcherOperationStatus.Completed)
             {
-                int[] quantities = s_bl.Call.GetCallQuantities();
-                CallQuantities.Clear();
-                foreach (BO.CallType callType in Enum.GetValues(typeof(BO.CallType)))
+                _updateCallQuantitiesOperation = Dispatcher.BeginInvoke(new Action(() =>
                 {
-                    //if (callType != BO.CallType.None)
+                    try
                     {
-                        CallQuantities.Add(new KeyValuePair<string, int>(
-                            callType.ToString(),
-                            quantities[(int)callType]));
-                    }
-                }
+                        int[] quantities = s_bl.Call.GetCallQuantities();
+                        CallQuantities.Clear();
+                        foreach (BO.CallType callType in Enum.GetValues(typeof(BO.CallType)))
+                        {
+                            //if (callType != BO.CallType.None)
+                            {
+                                CallQuantities.Add(new KeyValuePair<string, int>(
+                                    callType.ToString(),
+                                    quantities[(int)callType]));
+                            }
+                        }
 
-                // Debug: Vérifiez que la collection est remplie
-                Debug.WriteLine($"CallQuantities count: {CallQuantities.Count}");
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error loading call quantities: {ex.Message}", "Error",
-                               MessageBoxButton.OK, MessageBoxImage.Error);
+                        // Debug: Vérifiez que la collection est remplie
+                        Debug.WriteLine($"CallQuantities count: {CallQuantities.Count}");
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Error loading call quantities: {ex.Message}", "Error",
+                                       MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }));
             }
         }
 
@@ -86,26 +97,38 @@ namespace PL
 
         private void clockObserver()
         {
-            try
+            if (_updateClockObserverOperation == null || _updateClockObserverOperation.Status == DispatcherOperationStatus.Completed)
             {
-                CurrentTime = s_bl.Admin.GetCurrentTime();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error in clockObserver: {ex.Message}");
+                _updateClockObserverOperation = Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    try
+                    {
+                        CurrentTime = s_bl.Admin.GetCurrentTime();
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Error in clockObserver: {ex.Message}");
+                    }
+                }));
             }
         }
 
         private void configObserver()
         {
-            try
+            if (_updateConfigObserverOperation == null || _updateConfigObserverOperation.Status == DispatcherOperationStatus.Completed)
             {
-                TimeSpan riskTime = s_bl.Admin.GetRiskTime();
-                MaxYearRange = (int)(riskTime.TotalDays );
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error in configObserver: {ex.Message}");
+                _updateConfigObserverOperation = Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    try
+                    {
+                        TimeSpan riskTime = s_bl.Admin.GetRiskTime();
+                        MaxYearRange = (int)(riskTime.TotalDays);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Error in configObserver: {ex.Message}");
+                    }
+                }));
             }
         }
 

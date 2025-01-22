@@ -1,5 +1,9 @@
 ﻿using System.Windows;
 using System.Windows.Input;
+using System.Windows.Threading;
+using System.Collections.Generic;
+using System.Linq;
+using BO;
 
 namespace PL.User
 {
@@ -23,6 +27,8 @@ namespace PL.User
 
         private readonly int _volunteerId;
 
+        // DispatcherOperation for asynchronous updates
+        private volatile DispatcherOperation _updateCallListOperation = null;
 
         private bool CanAssignCall()
         {
@@ -70,43 +76,51 @@ namespace PL.User
             queryCallList();
             s_bl.Call.AddObserver(CallListObserver);
         }
+
         private void queryCallList()
         {
-            try
+            if (_updateCallListOperation == null || _updateCallListOperation.Status == DispatcherOperationStatus.Completed)
             {
-                // Fetch initial list of calls
-                var callIds = s_bl.Call.GetCallList()
-                    .Where(call => call.CallType == BO.CallType.Open
-                                   || call.CallType == BO.CallType.OpenAtRisk
-                                   || call.CallType == BO.CallType.AdminCanceled
-                                   || call.CallType == BO.CallType.SelfCanceled)
-                    .Select(call => call.CallId)
-                    .ToList();
-
-                // Fetch full details for each call and calculate distance
-                CallList = callIds
-                    .Select(callId =>
+                _updateCallListOperation = Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    try
                     {
-                        var call = s_bl.Call.GetCallDetails(callId.Value);
-                        double distance = s_bl.Call._CalculateDistance(callId.Value, _volunteerId);
-                        return call;
-                    })
-                    .ToList();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Failed to load calls: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        // Fetch initial list of calls
+                        var callIds = s_bl.Call.GetCallList()
+                            .Where(call => call.CallType == BO.CallType.Open
+                                           || call.CallType == BO.CallType.OpenAtRisk
+                                           || call.CallType == BO.CallType.AdminCanceled
+                                           || call.CallType == BO.CallType.SelfCanceled)
+                            .Select(call => call.CallId)
+                            .ToList();
+
+                        // Fetch full details for each call and calculate distance
+                        CallList = callIds
+                            .Select(callId =>
+                            {
+                                var call = s_bl.Call.GetCallDetails(callId.Value);
+                                double distance = s_bl.Call._CalculateDistance(callId.Value, _volunteerId);
+                                return call;
+                            })
+                            .ToList();
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Failed to load calls: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }));
             }
         }
 
-
-
         private void CallListObserver()
         {
-            Application.Current.Dispatcher.Invoke(() =>
+            if (_updateCallListOperation == null || _updateCallListOperation.Status == DispatcherOperationStatus.Completed)
             {
-                queryCallList(); // Refresh the call list on UI thread
-            });
+                _updateCallListOperation = Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    queryCallList(); // Refresh the call list on UI thread
+                }));
+            }
         }
 
         private void AssignCall(int callId)
@@ -115,7 +129,6 @@ namespace PL.User
             {
                 s_bl.Call.selectionCall(_volunteerId, callId);
                 MessageBox.Show($"Call {callId} successfully assigned to volunteer {_volunteerId}.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
-
             }
             catch (Exception ex)
             {

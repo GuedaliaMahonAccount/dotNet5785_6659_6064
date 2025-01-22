@@ -1,6 +1,7 @@
 ﻿using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
+using System.Windows.Threading;
 
 namespace PL.Call
 {
@@ -30,6 +31,7 @@ namespace PL.Call
         public static readonly DependencyProperty CurrentCallProperty =
             DependencyProperty.Register(nameof(CurrentCall), typeof(BO.Call), typeof(CallWindow));
 
+        private volatile DispatcherOperation _updateCallDataOperation = null;
 
         public CallWindow(int id = 0)
         {
@@ -57,17 +59,21 @@ namespace PL.Call
 
         private void UpdateCallData()
         {
-            if (CurrentCall?.Id != null)
+            if (_updateCallDataOperation == null || _updateCallDataOperation.Status == DispatcherOperationStatus.Completed)
             {
-                var updatedCall = s_bl.Call.GetCallDetails(CurrentCall.Id);
-                if (updatedCall != null)
+                _updateCallDataOperation = Dispatcher.BeginInvoke(new Action(() =>
                 {
-                    CurrentCall = updatedCall;
-                }
+                    if (CurrentCall?.Id != null)
+                    {
+                        var updatedCall = s_bl.Call.GetCallDetails(CurrentCall.Id);
+                        if (updatedCall != null)
+                        {
+                            CurrentCall = updatedCall;
+                        }
+                    }
+                }));
             }
         }
-
-
 
         // Event handler for Add/Update button
         private void BtnAddUpdate_Click(object sender, RoutedEventArgs e)
@@ -76,12 +82,12 @@ namespace PL.Call
             {
                 if (ButtonText == "Add")
                 {
-                    s_bl.Call.AddCall(CurrentCall); // Add new Call
+                    s_bl.Call.AddCallAsync(CurrentCall); // Add new Call
                     MessageBox.Show("Call added successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
                 else
                 {
-                    s_bl.Call.UpdateCall(CurrentCall); // Update existing Call
+                    s_bl.Call.UpdateCallAsync(CurrentCall); // Update existing Call
                     MessageBox.Show("Call updated successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
 
@@ -107,8 +113,6 @@ namespace PL.Call
                 MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
-
-
     }
 
     public class UpdateToReadOnlyConverter : IValueConverter
@@ -144,5 +148,4 @@ namespace PL.Call
             return value;
         }
     }
-
 }

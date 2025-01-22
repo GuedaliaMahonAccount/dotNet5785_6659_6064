@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
+using System.Windows.Threading;
 
 namespace PL.Volunteer
 {
@@ -47,6 +48,8 @@ namespace PL.Volunteer
         public static readonly DependencyProperty CurrentVolunteerProperty =
             DependencyProperty.Register(nameof(CurrentVolunteer), typeof(BO.Volunteer), typeof(VolunteerWindow));
 
+        private volatile DispatcherOperation _updateVolunteerDataOperation = null;
+
         public VolunteerWindow(int id = 0)
         {
             TogglePasswordVisibilityCommand = new RelayCommand(() => IsPasswordVisible = !IsPasswordVisible);
@@ -69,22 +72,29 @@ namespace PL.Volunteer
         {
             s_bl.Volunteer.AddObserver(UpdateVolunteerData);
         }
+
         private void VolunteerWindow_Closed(object sender, EventArgs e)
         {
             s_bl.Volunteer.RemoveObserver(UpdateVolunteerData);
         }
+
         private void UpdateVolunteerData()
         {
-            if (CurrentVolunteer?.Id != null)
+            if (_updateVolunteerDataOperation == null || _updateVolunteerDataOperation.Status == DispatcherOperationStatus.Completed)
             {
-                var updatedVolunteer = s_bl.Volunteer.GetVolunteerDetails(CurrentVolunteer.Id);
-                if (updatedVolunteer != null)
+                _updateVolunteerDataOperation = Dispatcher.BeginInvoke(new Action(() =>
                 {
-                    CurrentVolunteer = updatedVolunteer;
-                }
+                    if (CurrentVolunteer?.Id != null)
+                    {
+                        var updatedVolunteer = s_bl.Volunteer.GetVolunteerDetails(CurrentVolunteer.Id);
+                        if (updatedVolunteer != null)
+                        {
+                            CurrentVolunteer = updatedVolunteer;
+                        }
+                    }
+                }));
             }
         }
-
 
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
@@ -99,12 +109,12 @@ namespace PL.Volunteer
             {
                 if (ButtonText == "Add")
                 {
-                    s_bl.Volunteer.AddVolunteer(CurrentVolunteer); // Add new Volunteer
+                    s_bl.Volunteer.AddVolunteerAsync(CurrentVolunteer); // Add new Volunteer
                     MessageBox.Show("Volunteer added successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
                 else
                 {
-                    s_bl.Volunteer.UpdateVolunteer(CurrentVolunteer.Id, CurrentVolunteer); // Update existing Volunteer
+                    s_bl.Volunteer.UpdateVolunteerAsync(CurrentVolunteer.Id, CurrentVolunteer); // Update existing Volunteer
                     MessageBox.Show("Volunteer updated successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
 
@@ -128,9 +138,7 @@ namespace PL.Volunteer
             var currentCallWindow = new CurrentCallWindow(CurrentVolunteer.CurrentCall);
             currentCallWindow.ShowDialog();
         }
-
     }
-
 
     /// <summary>
     /// helpers
@@ -259,13 +267,11 @@ namespace PL.Volunteer
         }
     }
 
-
     // RelayCommand Implementation
     public class RelayCommand : ICommand
     {
         private readonly Action _execute;
         private readonly Func<bool> _canExecute;
-
 
         public RelayCommand(Action execute, Func<bool> canExecute = null)
         {

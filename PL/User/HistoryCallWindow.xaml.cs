@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Threading;
 using BO;
 
 namespace PL.User
@@ -25,6 +26,9 @@ namespace PL.User
         public static readonly DependencyProperty CallsProperty =
             DependencyProperty.Register("Calls", typeof(IEnumerable<CallInList>),
                 typeof(HistoryCallWindow), new PropertyMetadata(null));
+
+        // DispatcherOperation for asynchronous updates
+        private volatile DispatcherOperation _updateCallDetailsOperation = null;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -50,39 +54,42 @@ namespace PL.User
         /// </summary>
         private void LoadCalls(int volunteerId)
         {
-            try
+            if (_updateCallDetailsOperation == null || _updateCallDetailsOperation.Status == DispatcherOperationStatus.Completed)
             {
-                // Fetch call history for the specified volunteer
-                var callDetails = s_bl.Call.CallHistoryByVolunteerId(volunteerId);
-
-                if (callDetails == null || !callDetails.Any())
+                _updateCallDetailsOperation = Dispatcher.BeginInvoke(new Action(() =>
                 {
-                    MessageBox.Show("No calls found for the specified volunteer.", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
-                }
-                else
-                {
-                    // Format the date and time for better readability
-                    _callDetails = callDetails.Select(call => new
+                    try
                     {
-                        Id = call.Id,
-                        StartTime = call.StartTime.ToString("yyyy-MM-dd HH:mm"), // Clear date and time format
-                        Description = call.Description,
-                        Status = call.CallType
-                    });
+                        // Fetch call history for the specified volunteer
+                        var callDetails = s_bl.Call.CallHistoryByVolunteerId(volunteerId);
 
-                    // Update the DataGrid's data source
-                    CallsDataGrid.ItemsSource = _callDetails;
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"An error occurred while loading calls: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        if (callDetails == null || !callDetails.Any())
+                        {
+                            MessageBox.Show("No calls found for the specified volunteer.", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+                        }
+                        else
+                        {
+                            // Format the date and time for better readability
+                            _callDetails = callDetails.Select(call => new
+                            {
+                                Id = call.Id,
+                                StartTime = call.StartTime.ToString("yyyy-MM-dd HH:mm"), // Clear date and time format
+                                Description = call.Description,
+                                Status = call.CallType
+                            });
+
+                            // Update the DataGrid's data source
+                            CallsDataGrid.ItemsSource = _callDetails;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"An error occurred while loading calls: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }));
             }
         }
 
-        /// <summary>
-        /// Filters the call list by call type.
-        /// </summary>
         /// <summary>
         /// Filters the call list by call type.
         /// </summary>
@@ -114,7 +121,7 @@ namespace PL.User
             var comboBox = new ComboBox
             {
                 ItemsSource = callTypes,
-                SelectedIndex = 0 
+                SelectedIndex = 0
             };
 
             var okButton = new Button
@@ -158,9 +165,6 @@ namespace PL.User
 
             dialog.ShowDialog();
         }
-
-
-
 
         /// <summary>
         /// Handler for the Filter button click event.

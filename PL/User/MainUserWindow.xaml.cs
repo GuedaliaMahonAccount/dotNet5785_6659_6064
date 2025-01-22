@@ -4,6 +4,8 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
+using System.Windows.Threading;
+using BO;
 
 namespace PL
 {
@@ -23,6 +25,9 @@ namespace PL
             typeof(MainUserWindow), new PropertyMetadata(new ObservableCollection<BO.CallInProgress>()));
 
         private readonly int _volunteerId;
+
+        // DispatcherOperation for asynchronous updates
+        private volatile DispatcherOperation _updateCurrentCallsOperation = null;
 
         public MainUserWindow(int volunteerId)
         {
@@ -49,30 +54,39 @@ namespace PL
         // Query all current calls for the user
         private void QueryCurrentCalls()
         {
-            try
+            if (_updateCurrentCallsOperation == null || _updateCurrentCallsOperation.Status == DispatcherOperationStatus.Completed)
             {
-                // Fetch all current calls from the backend
-                var calls = s_bl.Volunteer.GetCurrentCallsForVolunteer(_volunteerId);
-
-                CurrentCalls.Clear(); // Clear the existing list
-                foreach (var call in calls)
+                _updateCurrentCallsOperation = Dispatcher.BeginInvoke(new Action(() =>
                 {
-                    CurrentCalls.Add(call); // Add each call to the ObservableCollection
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Failed to load current calls: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    try
+                    {
+                        // Fetch all current calls from the backend
+                        var calls = s_bl.Volunteer.GetCurrentCallsForVolunteer(_volunteerId);
+
+                        CurrentCalls.Clear(); // Clear the existing list
+                        foreach (var call in calls)
+                        {
+                            CurrentCalls.Add(call); // Add each call to the ObservableCollection
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Failed to load current calls: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }));
             }
         }
 
         // Observer to refresh current calls on UI updates
         private void CallObserver()
         {
-            Application.Current.Dispatcher.Invoke(() =>
+            if (_updateCurrentCallsOperation == null || _updateCurrentCallsOperation.Status == DispatcherOperationStatus.Completed)
             {
-                QueryCurrentCalls(); // Refresh current calls on the UI thread
-            });
+                _updateCurrentCallsOperation = Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    QueryCurrentCalls(); // Refresh current calls on the UI thread
+                }));
+            }
         }
 
         public ICommand CompleteCallCommand => new RelayCommand(CompleteCall);
@@ -115,7 +129,6 @@ namespace PL
             }
         }
 
-
         // Open the history window
         private void ViewHistory_Click(object sender, RoutedEventArgs e)
         {
@@ -137,7 +150,6 @@ namespace PL
             s_bl.Call.RemoveObserver(CallObserver); // Remove observer to prevent memory leaks
         }
     }
-
 
     public class CountToVisibilityConverter : IValueConverter
     {

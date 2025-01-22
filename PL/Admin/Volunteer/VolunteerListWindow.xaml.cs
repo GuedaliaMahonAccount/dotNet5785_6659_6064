@@ -8,6 +8,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Threading;
 
 namespace PL.Volunteer
 {
@@ -31,6 +32,8 @@ namespace PL.Volunteer
 
         public BO.VolunteerInList? SelectedVolunteer { get; set; }
 
+        private volatile DispatcherOperation _updateVolunteerListOperation = null;
+
         public VolunteerListWindow()
         {
             InitializeComponent();
@@ -38,15 +41,20 @@ namespace PL.Volunteer
             VolunteerList = _allVolunteers;
         }
 
-
         private bool _isWindowLoaded = false;
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             _isWindowLoaded = true; // Indicate that the window has fully loaded
             s_bl.Volunteer.AddObserver(() =>
             {
-                _allVolunteers = s_bl.Volunteer.GetVolunteersList();
-                FilterVolunteersByName(TxtVolunteerNameFilter.Text);
+                if (_updateVolunteerListOperation == null || _updateVolunteerListOperation.Status == DispatcherOperationStatus.Completed)
+                {
+                    _updateVolunteerListOperation = Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        _allVolunteers = s_bl.Volunteer.GetVolunteersList();
+                        FilterVolunteersByName(TxtVolunteerNameFilter.Text);
+                    }));
+                }
             });
         }
 
@@ -76,7 +84,7 @@ namespace PL.Volunteer
                                     "Error",
                                     MessageBoxButton.OK,
                                     MessageBoxImage.Error);
-                    return; 
+                    return;
                 }
 
                 var result = MessageBox.Show("Are you sure you want to delete this volunteer?",
@@ -101,7 +109,6 @@ namespace PL.Volunteer
                 }
             }
         }
-
 
         private void CbVolunteerTypeSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -165,7 +172,7 @@ namespace PL.Volunteer
                             volunteer.IsActive = checkBox.IsChecked ?? false;
 
                             // Send the updated volunteer back to the backend
-                            s_bl.Volunteer.UpdateVolunteer(volunteer.Id, volunteer);
+                            s_bl.Volunteer.UpdateVolunteerAsync(volunteer.Id, volunteer);
 
                             MessageBox.Show($"Volunteer '{volunteer.Name}' active status updated to '{volunteer.IsActive}'.",
                                             "Status Updated", MessageBoxButton.OK, MessageBoxImage.Information);
@@ -184,12 +191,8 @@ namespace PL.Volunteer
                         checkBox.IsChecked = volunteerInList.IsActive;
                     }
                 }
-
             }
-
         }
-
-
     }
 
     public class CallTypeToColorConverter : IValueConverter
