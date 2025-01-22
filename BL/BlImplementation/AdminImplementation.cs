@@ -10,9 +10,9 @@ namespace BlImplementation
 
         public void UpdateClock(TimeUnit timeUnit)
         {
+            AdminManager.ThrowOnSimulatorIsRunning();
             lock (AdminManager.BlMutex)
             {
-                AdminManager.ThrowOnSimulatorIsRunning();
                 DateTime newClock;
 
                 switch (timeUnit)
@@ -44,47 +44,35 @@ namespace BlImplementation
         public DateTime GetCurrentTime()
         {
             lock (AdminManager.BlMutex)
-            {
-                // No try-catch, throw the exception directly
                 return AdminManager.Now;
-            }
         }
 
         public TimeSpan GetRiskTime()
         {
             lock (AdminManager.BlMutex)
-            {
-                // No try-catch, throw the exception directly
                 return AdminManager.RiskRange;
-            }
         }
 
         public void InitializeDB() 
         {
+            AdminManager.ThrowOnSimulatorIsRunning();
             lock (AdminManager.BlMutex)
-            {
-                AdminManager.ThrowOnSimulatorIsRunning();
                 AdminManager.InitializeDB();
-            }
         }
 
         public void ResetDB() 
         {
+            AdminManager.ThrowOnSimulatorIsRunning();
             lock (AdminManager.BlMutex)
-            {
-                AdminManager.ThrowOnSimulatorIsRunning();
                 AdminManager.ResetDB();
-            }
         }
 
 
         public void SetRiskTime(TimeSpan riskTimeSpan)
         {
+            AdminManager.ThrowOnSimulatorIsRunning();
             lock (AdminManager.BlMutex)
-            {
-                AdminManager.ThrowOnSimulatorIsRunning();
                 AdminManager.RiskRange = riskTimeSpan;
-            }
         }
 
 
@@ -94,51 +82,40 @@ namespace BlImplementation
         public void AddClockObserver(Action clockObserver)
         {
             lock (AdminManager.BlMutex)
-            {
                 AdminManager.ClockUpdatedObservers += clockObserver;
-            }
         }
 
         public void RemoveClockObserver(Action clockObserver)
         {
             lock (AdminManager.BlMutex)
-            {
                 AdminManager.ClockUpdatedObservers -= clockObserver;
-            }
         }
 
         public void AddConfigObserver(Action configObserver)
         {
             lock (AdminManager.BlMutex)
-            {
                 AdminManager.ConfigUpdatedObservers += configObserver;
-            }
         }
 
         public void RemoveConfigObserver(Action configObserver)
         {
             lock (AdminManager.BlMutex)
-            {
                 AdminManager.ConfigUpdatedObservers -= configObserver;
-            }
         }
 
 
         public void StartSimulator(int interval)  
         {
+            AdminManager.ThrowOnSimulatorIsRunning();
             lock (AdminManager.BlMutex)
-            {
-                AdminManager.ThrowOnSimulatorIsRunning();
-                AdminManager.Start(interval);
-            }
+                            AdminManager.Start(interval);
+            
         }
 
         public void StopSimulator()
         {
             lock (AdminManager.BlMutex)
-            {
                 AdminManager.Stop();
-            }
         }
     }
 }

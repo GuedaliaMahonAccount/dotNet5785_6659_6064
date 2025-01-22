@@ -59,7 +59,7 @@ namespace Helpers
             // Check if name contains only letters and spaces
             return Regex.IsMatch(name, @"^[A-Za-z\u0590-\u05FF\s]+$");
         }
-       
+
         public static bool ValidPhone(string phone)
         {
             if (string.IsNullOrEmpty(phone))
@@ -259,12 +259,13 @@ namespace Helpers
         {
             if (requesterId == volunteerId)
                 return true;
-
-            var requester = s_dal.Volunteer.Read(requesterId);
-            if (requester != null && requester.Role == DO.Role.Admin)
-                return true;
-
-            return false;
+            lock (AdminManager.BlMutex)
+            {
+                var requester = s_dal.Volunteer.Read(requesterId);
+                if (requester != null && requester.Role == DO.Role.Admin)
+                    return true;
+            }
+                return false;
         }
 
 
@@ -385,7 +386,7 @@ namespace Helpers
 
         private static bool IsBase64String(string str)
         {
-            if (string.IsNullOrEmpty(str) || str.Length % 4 != 0||str.Length <= 20)
+            if (string.IsNullOrEmpty(str) || str.Length % 4 != 0 || str.Length <= 20)
                 return false;
 
             try

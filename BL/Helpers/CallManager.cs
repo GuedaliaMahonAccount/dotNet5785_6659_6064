@@ -232,17 +232,16 @@ namespace Helpers
         /// <returns></returns>
         public static bool IsRequesterAuthorizedToCancel(int requesterId, int volunteerId)
         {
+            if (requesterId == volunteerId)
+                return true;
             lock (AdminManager.BlMutex)
             {
-                if (requesterId == volunteerId)
-                    return true;
-
                 var requester = s_dal.Volunteer.Read(requesterId);
                 if (requester != null && requester.Role == DO.Role.Admin)
                     return true;
-
-                return false;
             }
+            return false;
+
         }
 
 
@@ -252,10 +251,10 @@ namespace Helpers
         /// </summary>
         public static void UpdateExpiredCalls()
         {
+            var systemTime = DateTime.Now;
+
             lock (AdminManager.BlMutex)
             {
-                var systemTime = DateTime.Now;
-
                 // Retrieve all calls from the DAL
                 var calls = s_dal.Call.ReadAll();
 
@@ -310,10 +309,10 @@ namespace Helpers
                         // Update the call in the DAL
                         var updatedDOCall = ConvertToDOCall(call);
                         s_dal.Call.Update(updatedDOCall);
-                        Observers.NotifyListUpdated();
                     }
                 }
             }
+            Observers.NotifyListUpdated();
         }
 
         /// <summary>

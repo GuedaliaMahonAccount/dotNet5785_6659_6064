@@ -21,9 +21,9 @@ namespace BlImplementation
         /// <exception cref="BlDoesNotExistException">Thrown when the call already exists in the system.</exception>
         public void AddCall(BO.Call newCall)
         {
+            AdminManager.ThrowOnSimulatorIsRunning();
             lock (AdminManager.BlMutex)
             {
-                AdminManager.ThrowOnSimulatorIsRunning();
                 if (newCall == null)
                     throw new BlArgumentNullException("Call cannot be null.");
 
@@ -74,9 +74,9 @@ namespace BlImplementation
         /// <exception cref="BlInvalidValueException">Thrown when the assignment is already completed or expired.</exception>
         public void CancelCall(int requesterId, int assignmentId)
         {
+            AdminManager.ThrowOnSimulatorIsRunning();
             lock (AdminManager.BlMutex)
             {
-                AdminManager.ThrowOnSimulatorIsRunning();
                 var assignmentDO = _dal.Assignment.Read(assignmentId)
                     ?? throw new BlDoesNotExistException($"No assignment found with ID: {assignmentId}");
 
@@ -95,11 +95,10 @@ namespace BlImplementation
                     EndTime = DateTime.Now,
                     EndType = cancellationType
                 };
-
                 _dal.Assignment.Update(updatedAssignment);
+            }
                 CallManager.Observers.NotifyItemUpdated(assignmentId);
                 CallManager.Observers.NotifyListUpdated();
-            }
         }
 
         /// <summary>
@@ -113,9 +112,9 @@ namespace BlImplementation
         /// <exception cref="BlInvalidValueException">Thrown when the assignment is already completed, canceled, or expired.</exception>
         public void CompleteCall(int volunteerId, int assignmentId)
         {
+            AdminManager.ThrowOnSimulatorIsRunning();
             lock (AdminManager.BlMutex)
             {
-                AdminManager.ThrowOnSimulatorIsRunning();
                 var assignmentDO = _dal.Assignment.Read(assignmentId)
                     ?? throw new BlDoesNotExistException($"No assignment found with ID: {assignmentId}");
 
@@ -132,9 +131,10 @@ namespace BlImplementation
                 };
 
                 _dal.Assignment.Update(updatedAssignment);
+            }
                 CallManager.Observers.NotifyItemUpdated(assignmentId);
                 CallManager.Observers.NotifyListUpdated();
-            }
+            
         }
 
         /// <summary>
@@ -147,9 +147,9 @@ namespace BlImplementation
         /// <exception cref="BlDeletionImpossibleException">Thrown when the call has been assigned to one or more volunteers.</exception>
         public void DeleteCall(int callId)
         {
+            AdminManager.ThrowOnSimulatorIsRunning();
             lock (AdminManager.BlMutex)
             {
-                AdminManager.ThrowOnSimulatorIsRunning();
                 var callDO = _dal.Call.Read(callId)
                     ?? throw new BlDoesNotExistException($"No call found with ID: {callId}");
 
@@ -163,8 +163,9 @@ namespace BlImplementation
                     throw new BlDeletionImpossibleException("Cannot delete a call that has been assigned to a volunteer.");
 
                 _dal.Call.Delete(callId);
-                CallManager.Observers.NotifyListUpdated();
             }
+                CallManager.Observers.NotifyListUpdated();
+            
         }
 
         /// <summary>
@@ -370,6 +371,7 @@ namespace BlImplementation
                         })
                     .ToList();
 
+
                 // Apply optional call type filtering
                 if (callType != null)
                 {
@@ -432,7 +434,7 @@ namespace BlImplementation
                                     (BO.DistanceType)volunteer.DistanceType)
                     })
                     .ToList();
-
+            
                 // Apply optional call type filtering
                 if (callType != null)
                 {
@@ -462,9 +464,9 @@ namespace BlImplementation
         /// <exception cref="BlInvalidValueException">Thrown when the call is already assigned or expired.</exception>
         public void selectionCall(int volunteerId, int callId)
         {
+            AdminManager.ThrowOnSimulatorIsRunning();
             lock (AdminManager.BlMutex)
             {
-                AdminManager.ThrowOnSimulatorIsRunning();
                 var callDO = _dal.Call.Read(callId)
                     ?? throw new BlDoesNotExistException($"No call found with ID: {callId}");
 
@@ -506,9 +508,9 @@ namespace BlImplementation
 
                 _dal.Call.Update(updatedCall);
 
+            }
                 CallManager.Observers.NotifyItemUpdated(callId);
                 CallManager.Observers.NotifyListUpdated();
-            }
         }
 
         /// <summary>
@@ -526,9 +528,9 @@ namespace BlImplementation
         /// <exception cref="BlDoesNotExistException">Thrown when the call does not exist in the system.</exception>
         public void UpdateCall(BO.Call call)
         {
+            AdminManager.ThrowOnSimulatorIsRunning();
             lock (AdminManager.BlMutex)
             {
-                AdminManager.ThrowOnSimulatorIsRunning();
                 if (call == null)
                     throw new BlArgumentNullException("Call cannot be null.");
 
@@ -566,6 +568,7 @@ namespace BlImplementation
 
                 // Update the call using the DAL
                 _dal.Call.Update(callDO);
+
                 CallManager.Observers.NotifyItemUpdated(callDO.Id);
                 CallManager.Observers.NotifyListUpdated();
             }

@@ -29,15 +29,15 @@ internal class VolunteerImplementation : IVolunteer
     /// 
     public string Login(string username, string password)
     {
+        // Encrypt the provided password for comparison
+        string encryptedPassword = AesEncryptionHelper.Encrypt(password);
+
         lock (AdminManager.BlMutex)
         {
             // Retrieve all volunteers from the DAL
             var volunteersFromDal = _dal.Volunteer.ReadAll();
 
-            // Encrypt the provided password for comparison
-            string encryptedPassword = AesEncryptionHelper.Encrypt(password);
-
-            // Find the volunteer with matching username and encrypted password
+                       // Find the volunteer with matching username and encrypted password
             var vol = volunteersFromDal.FirstOrDefault(v => v.Name == username && v.Password == encryptedPassword);
 
             if (vol == null)
@@ -200,6 +200,7 @@ internal class VolunteerImplementation : IVolunteer
                 volunteersFromDal = volunteersFromDal.Where(v => v.IsActive == isActive.Value);
             }
 
+
             // Apply sorting based on the specified field
             if (sortByField.HasValue)
             {
@@ -309,9 +310,9 @@ internal class VolunteerImplementation : IVolunteer
     /// </exception>
     public void UpdateVolunteer(int requesterId, BO.Volunteer updatedVolunteer)
     {
+        AdminManager.ThrowOnSimulatorIsRunning();
         lock (AdminManager.BlMutex)
         {
-            AdminManager.ThrowOnSimulatorIsRunning();
             var currentVolunteer = _dal.Volunteer.Read(updatedVolunteer.Id);
 
             // Validate that the requester is either the volunteer themselves or an admin
@@ -415,9 +416,10 @@ internal class VolunteerImplementation : IVolunteer
     /// </exception>
     public void DeleteVolunteer(int volunteerId)
     {
+        AdminManager.ThrowOnSimulatorIsRunning();
+
         lock (AdminManager.BlMutex)
         {
-            AdminManager.ThrowOnSimulatorIsRunning();
             // Check if the volunteer exists
             var volunteer = _dal.Volunteer.Read(volunteerId);
             if (volunteer == null)
@@ -454,9 +456,10 @@ internal class VolunteerImplementation : IVolunteer
     /// </exception>
     public void AddVolunteer(BO.Volunteer volunteer)
     {
+        AdminManager.ThrowOnSimulatorIsRunning();
+
         lock (AdminManager.BlMutex)
         {
-            AdminManager.ThrowOnSimulatorIsRunning();
             // Check for null values
             if (volunteer == null)
                 throw new BlNullPropertyException("Volunteer object cannot be null.");
