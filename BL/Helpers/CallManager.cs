@@ -251,66 +251,151 @@ namespace Helpers
         /// </summary>
         public static void UpdateExpiredCalls()
         {
-            var systemTime = DateTime.Now;
+            DateTime systemTime = DateTime.Now;
 
+            // Fetch all calls and convert to a concrete list to avoid deferred execution
+            List<DO.Call> callList;
             lock (AdminManager.BlMutex)
             {
-                // Retrieve all calls from the DAL
-                var calls = s_dal.Call.ReadAll();
+                callList = s_dal.Call.ReadAll().ToList();
+            }
 
-                // Convert DO.Call to BO.Call
-                var boCalls = calls.Select(call => ConvertToBOCall(call)).ToList();
+            var updatedCallIds = new List<int>(); // Collect updated call IDs for notifications
 
-                foreach (var call in boCalls)
+            foreach (var call in callList)
+            {
+                bool callUpdated = false;
+
+                // Convert DO.Call to BO.Call for processing
+                BO.Call boCall = ConvertToBOCall(call);
+
+                if (boCall.DeadLine.HasValue && boCall.DeadLine.Value < systemTime && !IsCallClosed(boCall))
                 {
-                    if (call.DeadLine.HasValue && call.DeadLine.Value < systemTime && !IsCallClosed(call))
+                    if (boCall.Assignments == null || !boCall.Assignments.Any())
                     {
-                        if (call.Assignments == null || !call.Assignments.Any())
+                        // Create a new assignment with "Expired Cancellation"
+                        var newAssignment = new BO.CallAssignInList
                         {
-                            // Create a new assignment with "Expired Cancellation"
-                            var newAssignment = new BO.CallAssignInList
+                            VolunteerId = 0, // No volunteer
+                            VolunteerName = "System",
+                            StartTime = DateTime.MinValue,
+                            EndTime = systemTime,
+                            EndType = EndType.Expired
+                        };
+
+                        boCall.Assignments ??= new List<BO.CallAssignInList>();
+                        boCall.Assignments.Add(newAssignment);
+                        callUpdated = true;
+                    }
+                    else
+                    {
+                        var openAssignment = boCall.Assignments.LastOrDefault(a => a.EndTime == null);
+                        if (openAssignment != null)
+                        {
+                            var updatedAssignment = new BO.CallAssignInList
                             {
-                                VolunteerId = 0, // No volunteer
-                                VolunteerName = "System",
-                                StartTime = DateTime.MinValue,
+                                VolunteerId = openAssignment.VolunteerId,
+                                VolunteerName = openAssignment.VolunteerName,
+                                StartTime = openAssignment.StartTime,
                                 EndTime = systemTime,
                                 EndType = EndType.Expired
                             };
 
-                            if (call.Assignments == null)
-                                call.Assignments = new List<BO.CallAssignInList>();
-
-                            call.Assignments.Add(newAssignment);
-                        }
-                        else
-                        {
-                            // Update existing assignment by creating a new object
-                            var openAssignment = call.Assignments.LastOrDefault(a => a.EndTime == null);
-                            if (openAssignment != null)
+                            int index = boCall.Assignments.IndexOf(openAssignment);
+                            if (index >= 0)
                             {
-                                var updatedAssignment = new BO.CallAssignInList
-                                {
-                                    VolunteerId = openAssignment.VolunteerId,
-                                    VolunteerName = openAssignment.VolunteerName,
-                                    StartTime = openAssignment.StartTime,
-                                    EndTime = systemTime, // Updated EndTime
-                                    EndType = EndType.Expired // Updated EndType
-                                };
-
-                                // Replace the existing assignment in the list
-                                var index = call.Assignments.IndexOf(openAssignment);
-                                if (index >= 0)
-                                {
-                                    call.Assignments[index] = updatedAssignment;
-                                }
+                                boCall.Assignments[index] = updatedAssignment;
+                                callUpdated = true;
                             }
                         }
+                    }
 
+                    if (callUpdated)
+                    {
                         // Update the call in the DAL
-                        var updatedDOCall = ConvertToDOCall(call);
-                        s_dal.Call.Update(updatedDOCall);
+                        DO.Call updatedDOCall = ConvertToDOCall(boCall);
+                        lock (AdminManager.BlMutex)
+                        {
+                            s_dal.Call.Update(updatedDOCall);
+                        }
+
+                        updatedCallIds.Add(call.Id);
                     }
                 }
+            }
+
+            // Notify observers outside the lock
+            foreach (int callId in updatedCallIds)
+            {
+                Observers.NotifyItemUpdated(callId);
+            }
+            Observers.NotifyListUpdated();
+        }
+        /// <summary>
+        /// Updates the call type of all open calls whose deadlines are within the specified risk range.
+        ///</summary>
+        public static void UpdateRiskCall(DateTime oldClock, DateTime newClock, TimeSpan riskRange)
+        {
+            // Fetch all calls as a concrete list to avoid deferred execution
+            List<DO.Call> callList;
+            lock (AdminManager.BlMutex)
+            {
+                callList = s_dal.Call.ReadAll().ToList();
+            }
+
+            var updatedCallIds = new List<int>(); // Collect updated call IDs for notifications
+
+            foreach (var call in callList)
+            {
+                if (call.DeadLine.HasValue)
+                {
+                    var timeLeft = call.DeadLine.Value - newClock;
+
+                    DO.Call updatedCall = null;
+
+                    if (timeLeft <= riskRange)
+                    {
+                        // Update calls to risk status if within range
+                        switch (call.CallType)
+                        {
+                            case DO.CallType.Open:
+                                updatedCall = call with { CallType = DO.CallType.OpenAtRisk };
+                                break;
+                            case DO.CallType.InTreatment:
+                                updatedCall = call with { CallType = DO.CallType.InTreatmentAtRisk };
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        // Revert calls to non-risk status if out of range
+                        switch (call.CallType)
+                        {
+                            case DO.CallType.OpenAtRisk:
+                                updatedCall = call with { CallType = DO.CallType.Open };
+                                break;
+                            case DO.CallType.InTreatmentAtRisk:
+                                updatedCall = call with { CallType = DO.CallType.InTreatment };
+                                break;
+                        }
+                    }
+
+                    if (updatedCall != null)
+                    {
+                        lock (AdminManager.BlMutex)
+                        {
+                            s_dal.Call.Update(updatedCall);
+                        }
+
+                        updatedCallIds.Add(call.Id);
+                    }
+                }
+            }
+
+            // Notify observers outside the lock
+            foreach (int callId in updatedCallIds)
+            {
+                Observers.NotifyItemUpdated(callId);
             }
             Observers.NotifyListUpdated();
         }
@@ -325,66 +410,6 @@ namespace Helpers
             return call.Assignments != null && call.Assignments.Any(a => a.EndTime != null && a.EndType != null);
         }
 
-        /// <summary>
-        /// Updates the call type of all open calls whose deadlines are within the specified risk range.
-        ///</summary>
-        public static void UpdateRiskCall(DateTime oldClock, DateTime newClock, TimeSpan riskRange)
-        {
-            lock (AdminManager.BlMutex)
-            {
-                // Retrieve all calls from the DAL
-                var allCalls = s_dal.Call.ReadAll().ToList();
-
-                foreach (var call in allCalls)
-                {
-                    if (call.DeadLine.HasValue)
-                    {
-                        // Calculate the remaining time until the deadline
-                        var timeLeft = call.DeadLine.Value - newClock;
-
-                        if (timeLeft <= riskRange)
-                        {
-                            // Calls within the risk range
-                            switch (call.CallType)
-                            {
-                                case DO.CallType.Open:
-                                    // Update Open calls to OpenAtRisk
-                                    var updatedOpenCall = call with { CallType = DO.CallType.OpenAtRisk };
-                                    s_dal.Call.Update(updatedOpenCall);
-                                    break;
-
-                                case DO.CallType.InTreatment:
-                                    // Update InTreatment calls to InTreatmentAtRisk
-                                    var updatedInTreatmentCall = call with { CallType = DO.CallType.InTreatmentAtRisk };
-                                    s_dal.Call.Update(updatedInTreatmentCall);
-                                    break;
-                            }
-                        }
-                        else
-                        {
-                            // Calls outside the risk range
-                            switch (call.CallType)
-                            {
-                                case DO.CallType.OpenAtRisk:
-                                    // Revert OpenAtRisk calls to Open
-                                    var revertedOpenCall = call with { CallType = DO.CallType.Open };
-                                    s_dal.Call.Update(revertedOpenCall);
-                                    break;
-
-                                case DO.CallType.InTreatmentAtRisk:
-                                    // Revert InTreatmentAtRisk calls to InTreatment
-                                    var revertedInTreatmentCall = call with { CallType = DO.CallType.InTreatment };
-                                    s_dal.Call.Update(revertedInTreatmentCall);
-                                    break;
-                            }
-                        }
-                    }
-                }
-
-                // Notify observers about the updated call list
-                Observers.NotifyListUpdated();
-            }
-        }
 
 
         /// <summary>
