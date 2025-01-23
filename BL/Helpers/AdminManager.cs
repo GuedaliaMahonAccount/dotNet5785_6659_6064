@@ -55,18 +55,24 @@ internal static class AdminManager //stage 4
     }
 
     private static Task? _periodicTask = null;
-    private static void updateClock(DateTime newClock) // prepared for stage 7 as DRY to eliminate needless repetition
+    private static void updateClock(DateTime newClock) // Prepared for stage 7 as DRY to eliminate needless repetition
     {
-        var oldClock = s_dal.Config.Clock; //stage 4
-        s_dal.Config.Clock = newClock; //stage 4
+        var oldClock = s_dal.Config.Clock; // Stage 4
+        s_dal.Config.Clock = newClock; // Stage 4
 
-        if (_periodicTask is null || _periodicTask.IsCompleted) //stage 7
-            _periodicTask = Task.Run(() => CallManager.UpdateRiskCall(oldClock, newClock, RiskRange));
-        CallManager.UpdateExpiredCalls();
+        if (_periodicTask is null || _periodicTask.IsCompleted) // Stage 7
+        {
+            _periodicTask = Task.Run(() =>
+            {
+                CallManager.UpdateRiskCall(oldClock, newClock, RiskRange);
+                CallManager.UpdateExpiredCalls();
+            });
+        }
 
-        //Calling all the observers of clock update
-        ClockUpdatedObservers?.Invoke(); //prepared for stage 5
+        // Calling all the observers of clock update
+        ClockUpdatedObservers?.Invoke(); // Prepared for stage 5
     }
+
     #endregion Stage 4
 
     #region Stage 7 base
