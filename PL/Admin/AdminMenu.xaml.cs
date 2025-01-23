@@ -17,6 +17,10 @@ namespace PL
         private DispatcherTimer _timer = new DispatcherTimer();
 
         // Dependency Properties
+
+
+        private DateTime _lastSimulatorTime; // Last time shown by the simulator
+        private DateTime _lastRealTime;     // Real time when the simulator stopped
         public DateTime CurrentTime
         {
             get { return (DateTime)GetValue(CurrentTimeProperty); }
@@ -82,6 +86,10 @@ namespace PL
                 s_bl.Admin.StopSimulator();
                 IsSimulatorRunning = false;
                 SimulatorButtonText = "Start Simulator";
+
+                // Save the last simulator time and the real time when stopping
+                _lastSimulatorTime = s_bl.Admin.GetCurrentTime();
+                _lastRealTime = DateTime.Now;
             }
             else
             {
@@ -136,7 +144,21 @@ namespace PL
         private void InitializeTimer()
         {
             _timer.Interval = TimeSpan.FromSeconds(1);
-            _timer.Tick += (s, e) => CurrentTime = DateTime.Now;
+            _timer.Tick += (s, e) =>
+            {
+                if (IsSimulatorRunning)
+                {
+                    // Update the time using the simulator
+                    _lastSimulatorTime = s_bl.Admin.GetCurrentTime();
+                    CurrentTime = _lastSimulatorTime;
+                }
+                else
+                {
+                    // Continue from the last simulator time, adding the real-time difference
+                    TimeSpan timeSinceStop = DateTime.Now - _lastRealTime;
+                    CurrentTime = _lastSimulatorTime + timeSinceStop;
+                }
+            };
             _timer.Start();
         }
 
