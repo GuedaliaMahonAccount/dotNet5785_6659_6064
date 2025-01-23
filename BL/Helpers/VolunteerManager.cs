@@ -184,7 +184,14 @@ namespace Helpers
         /// <summary>
         /// new fonction to check coordinations
         /// </summary>
-        public static (double latitude, double longitude)? GetClosestCoordinates(string address, double targetLatitude, double targetLongitude)
+        /// <summary>
+        /// Retrieves the closest coordinates to the target latitude and longitude from an address asynchronously.
+        /// </summary>
+        /// <param name="address">The address to search for coordinates.</param>
+        /// <param name="targetLatitude">The target latitude to compare against.</param>
+        /// <param name="targetLongitude">The target longitude to compare against.</param>
+        /// <returns>The closest coordinates as a tuple or null if none are found within the tolerance.</returns>
+        public static async Task<(double latitude, double longitude)?> GetClosestCoordinatesAsync(string address, double targetLatitude, double targetLongitude)
         {
             if (string.IsNullOrWhiteSpace(address))
                 return null;
@@ -196,13 +203,13 @@ namespace Helpers
             {
                 using (var client = new HttpClient())
                 {
-                    var response = client.GetStringAsync(url).Result;
+                    var response = await client.GetStringAsync(url);
                     var json = JsonDocument.Parse(response);
                     var root = json.RootElement;
 
                     if (root.GetArrayLength() > 0)
                     {
-                        const double tolerance = 0.05; // Augmenté à environ 5km
+                        const double tolerance = 0.05; // Approximately 5 km tolerance
                         double closestDistance = double.MaxValue;
                         (double lat, double lon)? closestCoordinates = null;
 
@@ -211,8 +218,8 @@ namespace Helpers
                             double latitude = double.Parse(item.GetProperty("lat").GetString(), CultureInfo.InvariantCulture);
                             double longitude = double.Parse(item.GetProperty("lon").GetString(), CultureInfo.InvariantCulture);
 
-                            // Calculer la distance réelle entre les points
-                            double distance = CalculateDistance(latitude, longitude, targetLatitude, targetLongitude);
+                            // Calculate the actual distance between the points
+                            double distance = CalculateHaversineDistance(latitude, longitude, targetLatitude, targetLongitude);
 
                             if (distance < closestDistance)
                             {
@@ -221,8 +228,8 @@ namespace Helpers
                             }
                         }
 
-                        // Si la distance la plus proche est dans la tolérance
-                        if (closestDistance <= tolerance * 111.32) // Convertir degrés en km approximativement
+                        // If the closest distance is within the tolerance
+                        if (closestDistance <= tolerance * 111.32) // Convert degrees to km approximately
                         {
                             return closestCoordinates;
                         }
@@ -249,6 +256,86 @@ namespace Helpers
                     Math.Sin(dLon / 2) * Math.Sin(dLon / 2);
             var c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
             return R * c;
+        }
+
+        /// <summary>
+        /// Calculates the distance between two geographic points. he calculate by the choice of the volunteer wich type of ditance he want
+        /// </summary>
+        /// <param name="lat1"></param>
+        /// <param name="lon1"></param>
+        /// <param name="lat2"></param>
+        /// <param name="lon2"></param>
+        /// <param name="distanceType"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
+        public static double CalculateDistance(double lat1, double lon1, double lat2, double lon2, DistanceType distanceType)
+        {
+            const double R = 6371; // Earth's radius in kilometers
+
+            switch (distanceType)
+            {
+                case DistanceType.Plane:
+                case DistanceType.Helicopter:
+                case DistanceType.Drone:
+                    // Straight-line distance (Haversine formula)
+                    return CalculateHaversineDistance(lat1, lon1, lat2, lon2);
+
+                case DistanceType.Foot:
+                case DistanceType.HikingTrail:
+                case DistanceType.UrbanShortcuts:
+                    // Walking distance approximation (increase Haversine distance by 30% for paths)
+                    return CalculateHaversineDistance(lat1, lon1, lat2, lon2) * 1.3;
+
+                case DistanceType.Car:
+                case DistanceType.Bus:
+                case DistanceType.OffRoadVehicle:
+                    // Driving distance approximation (increase Haversine by 50%)
+                    return CalculateHaversineDistance(lat1, lon1, lat2, lon2) * 1.5;
+
+                case DistanceType.Bike:
+                case DistanceType.BicycleShare:
+                case DistanceType.Scooter:
+                    // Biking distance approximation (increase Haversine by 40%)
+                    return CalculateHaversineDistance(lat1, lon1, lat2, lon2) * 1.4;
+
+                case DistanceType.PublicTransport:
+                case DistanceType.Train:
+                case DistanceType.Waterway:
+                    // Assume a detour factor of 1.7 for routes with public transport or waterways
+                    return CalculateHaversineDistance(lat1, lon1, lat2, lon2) * 1.7;
+
+                case DistanceType.Horse:
+                case DistanceType.Ski:
+                case DistanceType.Snowmobile:
+                case DistanceType.Rollerblade:
+                case DistanceType.Skateboard:
+                    // Increase Haversine by 20% for terrain-based travel
+                    return CalculateHaversineDistance(lat1, lon1, lat2, lon2) * 1.2;
+
+                case DistanceType.Boat:
+                    // Assume minimal detour for water travel
+                    return CalculateHaversineDistance(lat1, lon1, lat2, lon2) * 1.1;
+
+                default:
+                    throw new ArgumentException($"Unsupported DistanceType: {distanceType}");
+            }
+        }
+        private static double CalculateHaversineDistance(double lat1, double lon1, double lat2, double lon2)
+        {
+            const double R = 6371; // Earth's radius in kilometers
+            var dLat = DegreesToRadians(lat2 - lat1);
+            var dLon = DegreesToRadians(lon2 - lon1);
+
+            var a = Math.Sin(dLat / 2) * Math.Sin(dLat / 2) +
+                    Math.Cos(DegreesToRadians(lat1)) * Math.Cos(DegreesToRadians(lat2)) *
+                    Math.Sin(dLon / 2) * Math.Sin(dLon / 2);
+
+            var c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
+            return R * c; // Distance in kilometers
+        }
+        private static double DegreesToRadians(double degrees)
+        {
+            return degrees * Math.PI / 180;
         }
 
         private static double ToRad(double degrees)

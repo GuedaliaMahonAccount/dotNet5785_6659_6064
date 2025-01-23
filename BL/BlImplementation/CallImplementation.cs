@@ -1,4 +1,5 @@
-﻿using BO;
+﻿using BlApi;
+using BO;
 using DalApi;
 using DO;
 using Helpers;
@@ -42,14 +43,15 @@ namespace BlImplementation
                 if (!newCall.Latitude.HasValue || !newCall.Longitude.HasValue)
                     throw new BlNullPropertyException("Coordinates cannot be null.");
 
+
                 // Validate coordinates with partial address
-                var closestCoordinates = VolunteerManager.GetClosestCoordinates(newCall.Address, newCall.Latitude.Value, newCall.Longitude.Value);
+                var closestCoordinates = await VolunteerManager.GetClosestCoordinatesAsync(newCall.Address, newCall.Latitude.Value, newCall.Longitude.Value);
                 if (closestCoordinates == null)
                     throw new BlInvalidValueException("Coordinates do not match the address.");
 
                 var callDO = new DO.Call
                 (
-                    Id: _dal.Config.NextCallId,
+                Id: _dal.Config.NextCallId,
                     CallType: (DO.CallType)newCall.CallType,
                     Address: newCall.Address,
                     Latitude: newCall.Latitude.Value,
@@ -559,7 +561,7 @@ namespace BlImplementation
                     throw new BlNullPropertyException("Coordinates cannot be null.");
 
                 // Validate coordinates with partial address
-                var closestCoordinates = VolunteerManager.GetClosestCoordinates(call.Address, call.Latitude.Value, call.Longitude.Value);
+                var closestCoordinates = await VolunteerManager.GetClosestCoordinatesAsync(call.Address, call.Latitude.Value, call.Longitude.Value);
                 if (closestCoordinates == null)
                     throw new BlInvalidValueException("Coordinates do not match the address.");
 
