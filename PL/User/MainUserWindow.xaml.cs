@@ -87,7 +87,6 @@ namespace PL
         {
             if (!_isUpdating)
             {
-                _isUpdating = true;
                 Dispatcher.BeginInvoke(new Action(() =>
                 {
                     QueryCurrentCalls(); // Refresh current calls on the UI thread

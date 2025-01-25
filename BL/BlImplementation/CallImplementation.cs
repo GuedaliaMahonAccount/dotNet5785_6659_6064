@@ -36,22 +36,28 @@ namespace BlImplementation
                     throw new BlInvalidAddressException("Address cannot be empty.");
 
                 // Call the asynchronous ValidAddressAsync method
-                if (!await VolunteerManager.ValidAddressAsync(newCall.Address))
+                if (!await CallManager.ValidAddressAsync(newCall.Address))
                     throw new BlInvalidValueException("Invalid address.");
 
-                // Ensure coordinates are not null and valid
+                // Calculate latitude and longitude automatically from the address
+                var coordinates = await CallManager.GetCoordinatesFromAddressAsync(newCall.Address);
+                if (coordinates == null)
+                    throw new BlInvalidValueException("Unable to retrieve valid coordinates for the address.");
+
+                newCall.Latitude = coordinates.Value.latitude;
+                newCall.Longitude = coordinates.Value.longitude;
+
+                // Validate coordinates
                 if (!newCall.Latitude.HasValue || !newCall.Longitude.HasValue)
                     throw new BlNullPropertyException("Coordinates cannot be null.");
 
-
-                // Validate coordinates with partial address
-                var closestCoordinates = await VolunteerManager.GetClosestCoordinatesAsync(newCall.Address, newCall.Latitude.Value, newCall.Longitude.Value);
+                var closestCoordinates = await CallManager.GetClosestCoordinatesAsync(newCall.Address, newCall.Latitude.Value, newCall.Longitude.Value);
                 if (closestCoordinates == null)
                     throw new BlInvalidValueException("Coordinates do not match the address.");
 
                 var callDO = new DO.Call
                 (
-                Id: _dal.Config.NextCallId,
+                    Id: _dal.Config.NextCallId,
                     CallType: (DO.CallType)newCall.CallType,
                     Address: newCall.Address,
                     Latitude: newCall.Latitude.Value,
@@ -553,15 +559,23 @@ namespace BlImplementation
                 if (call.StartTime >= call.DeadLine)
                     throw new BlInvalidValueException("The deadline must be later than the start time.");
 
-                if (!await VolunteerManager.ValidAddressAsync(call.Address))
+                if (!await CallManager.ValidAddressAsync(call.Address))
                     throw new BlInvalidValueException("Invalid address.");
+
+                // Calculate latitude and longitude automatically from the address
+                var coordinates = await CallManager.GetCoordinatesFromAddressAsync(call.Address);
+                if (coordinates == null)
+                    throw new BlInvalidValueException("Unable to retrieve valid coordinates for the address.");
+
+                call.Latitude = coordinates.Value.latitude;
+                call.Longitude = coordinates.Value.longitude;
 
                 // Ensure coordinates are not null and valid
                 if (!call.Latitude.HasValue || !call.Longitude.HasValue)
                     throw new BlNullPropertyException("Coordinates cannot be null.");
 
                 // Validate coordinates with partial address
-                var closestCoordinates = await VolunteerManager.GetClosestCoordinatesAsync(call.Address, call.Latitude.Value, call.Longitude.Value);
+                var closestCoordinates = await CallManager.GetClosestCoordinatesAsync(call.Address, call.Latitude.Value, call.Longitude.Value);
                 if (closestCoordinates == null)
                     throw new BlInvalidValueException("Coordinates do not match the address.");
 

@@ -12,6 +12,171 @@ namespace Helpers
         internal static ObserverManager Observers = new();
         private static IDal s_dal = Factory.Get;
 
+
+
+        /// <summary>
+        /// Retrieves coordinates from an address using LocationIQ API.
+        /// 
+        /// exemple of correct adress
+        /// "display_name": "מרכז אורן יצחק רגר, 185, Beer Sheva"
+        /// "lat": "31.27042089999999"
+        /// "lon": "34.7975837"
+        /// 
+        /// 
+        /// </summary>
+        //public static async Task<List<(double latitude, double longitude)>> GetCoordinatesFromAddressAsync(string address)
+        //{
+        //    if (string.IsNullOrWhiteSpace(address))
+        //        return null;
+
+        //    string apiKey = "pk.24d7295db243a75d8b3c688089250321";
+        //    string url = $"https://api.locationiq.com/v1/search.php?key={apiKey}&q={WebUtility.UrlEncode(address)}&format=json";
+
+        //    try
+        //    {
+        //        using (var client = new HttpClient())
+        //        {
+        //            var response = await client.GetStringAsync(url);
+        //            var json = JsonDocument.Parse(response);
+        //            var root = json.RootElement;
+
+        //            if (root.GetArrayLength() > 0)
+        //            {
+        //                var coordinatesList = new List<(double latitude, double longitude)>();
+        //                foreach (var item in root.EnumerateArray())
+        //                {
+        //                    var latitude = double.Parse(item.GetProperty("lat").GetString());
+        //                    var longitude = double.Parse(item.GetProperty("lon").GetString());
+        //                    coordinatesList.Add((latitude, longitude));
+        //                }
+        //                return coordinatesList;
+        //            }
+        //            return null; // No results
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Console.WriteLine($"Error fetching coordinates: {ex.Message}");
+        //        return null;
+        //    }
+        //}
+        public static async Task<(double latitude, double longitude)?> GetCoordinatesFromAddressAsync(string address)
+        {
+            if (string.IsNullOrWhiteSpace(address))
+                throw new ArgumentNullException(nameof(address), "Address cannot be null or empty.");
+
+            string apiKey = "pk.24d7295db243a75d8b3c688089250321";
+            string url = $"https://api.locationiq.com/v1/search.php?key={apiKey}&q={WebUtility.UrlEncode(address)}&format=json";
+
+            try
+            {
+                using var client = new HttpClient();
+                var response = await client.GetStringAsync(url);
+                var json = JsonDocument.Parse(response);
+                var root = json.RootElement;
+
+                if (root.GetArrayLength() > 0)
+                {
+                    // Get the first result (most relevant)
+                    var firstResult = root[0];
+                    var latitude = double.Parse(firstResult.GetProperty("lat").GetString(), CultureInfo.InvariantCulture);
+                    var longitude = double.Parse(firstResult.GetProperty("lon").GetString(), CultureInfo.InvariantCulture);
+                    return (latitude, longitude);
+                }
+
+                return null; // No results
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error fetching coordinates: {ex.Message}");
+                return null;
+            }
+        }
+        public static async Task<bool> ValidAddressAsync(string address)
+        {
+            var coordinates = await GetCoordinatesFromAddressAsync(address);
+            return coordinates != null; // If a valid pair of coordinates is returned, the address is valid.
+        }
+
+
+
+        /// <summary>
+        /// new fonction to check coordinations
+        /// </summary>
+        /// <summary>
+        /// Retrieves the closest coordinates to the target latitude and longitude from an address asynchronously.
+        /// </summary>
+        /// <param name="address">The address to search for coordinates.</param>
+        /// <param name="targetLatitude">The target latitude to compare against.</param>
+        /// <param name="targetLongitude">The target longitude to compare against.</param>
+        /// <returns>The closest coordinates as a tuple or null if none are found within the tolerance.</returns>
+        public static async Task<(double latitude, double longitude)?> GetClosestCoordinatesAsync(string address, double targetLatitude, double targetLongitude)
+        {
+            if (string.IsNullOrWhiteSpace(address))
+                return null;
+
+            string apiKey = "pk.24d7295db243a75d8b3c688089250321";
+            string url = $"https://api.locationiq.com/v1/search.php?key={apiKey}&q={WebUtility.UrlEncode(address)}&format=json";
+
+            try
+            {
+                using (var client = new HttpClient())
+                {
+                    var response = await client.GetStringAsync(url);
+                    var json = JsonDocument.Parse(response);
+                    var root = json.RootElement;
+
+                    if (root.GetArrayLength() > 0)
+                    {
+                        const double tolerance = 0.05; // Approximately 5 km tolerance
+                        double closestDistance = double.MaxValue;
+                        (double lat, double lon)? closestCoordinates = null;
+
+                        foreach (var item in root.EnumerateArray())
+                        {
+                            double latitude = double.Parse(item.GetProperty("lat").GetString(), CultureInfo.InvariantCulture);
+                            double longitude = double.Parse(item.GetProperty("lon").GetString(), CultureInfo.InvariantCulture);
+
+                            // Calculate the actual distance between the points
+                            double distance = CalculateHaversineDistance(latitude, longitude, targetLatitude, targetLongitude);
+
+                            if (distance < closestDistance)
+                            {
+                                closestDistance = distance;
+                                closestCoordinates = (latitude, longitude);
+                            }
+                        }
+
+                        // If the closest distance is within the tolerance
+                        if (closestDistance <= tolerance * 111.32) // Convert degrees to km approximately
+                        {
+                            return closestCoordinates;
+                        }
+                    }
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error fetching coordinates: {ex.Message}");
+                return null;
+            }
+        }
+        public static double CalculateDistance(double? lat1, double? lon1, double? lat2, double? lon2)
+        {
+            if (!lat1.HasValue || !lon1.HasValue || !lat2.HasValue || !lon2.HasValue)
+                throw new InvalidOperationException("Cannot calculate distance: one or more coordinates are null.");
+
+            var R = 6371; // Rayon de la Terre en km
+            var dLat = ToRad(lat2.Value - lat1.Value);
+            var dLon = ToRad(lon2.Value - lon1.Value);
+            var a = Math.Sin(dLat / 2) * Math.Sin(dLat / 2) +
+                    Math.Cos(ToRad(lat1.Value)) * Math.Cos(ToRad(lat2.Value)) *
+                    Math.Sin(dLon / 2) * Math.Sin(dLon / 2);
+            var c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
+            return R * c;
+        }
+
         /// <summary>
         /// Calculates the distance between two geographic points. he calculate by the choice of the volunteer wich type of ditance he want
         /// </summary>
@@ -92,126 +257,6 @@ namespace Helpers
             return degrees * Math.PI / 180;
         }
 
-
-        /// <summary>
-        /// Retrieves coordinates from an address using LocationIQ API.
-        /// 
-        /// exemple of correct adress
-        /// "display_name": "מרכז אורן יצחק רגר, 185, Beer Sheva"
-        /// "lat": "31.27042089999999"
-        /// "lon": "34.7975837"
-        /// 
-        /// 
-        /// </summary>
-        public static async Task<List<(double latitude, double longitude)>> GetCoordinatesFromAddressAsync(string address)
-        {
-            if (string.IsNullOrWhiteSpace(address))
-                return null;
-
-            string apiKey = "pk.24d7295db243a75d8b3c688089250321";
-            string url = $"https://api.locationiq.com/v1/search.php?key={apiKey}&q={WebUtility.UrlEncode(address)}&format=json";
-
-            try
-            {
-                using (var client = new HttpClient())
-                {
-                    var response = await client.GetStringAsync(url);
-                    var json = JsonDocument.Parse(response);
-                    var root = json.RootElement;
-
-                    if (root.GetArrayLength() > 0)
-                    {
-                        var coordinatesList = new List<(double latitude, double longitude)>();
-                        foreach (var item in root.EnumerateArray())
-                        {
-                            var latitude = double.Parse(item.GetProperty("lat").GetString());
-                            var longitude = double.Parse(item.GetProperty("lon").GetString());
-                            coordinatesList.Add((latitude, longitude));
-                        }
-                        return coordinatesList;
-                    }
-                    return null; // No results
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error fetching coordinates: {ex.Message}");
-                return null;
-            }
-        }
-        public static async Task<bool> ValidAddressAsync(string address)
-        {
-            var coordinatesList = await GetCoordinatesFromAddressAsync(address);
-            return coordinatesList != null && coordinatesList.Count > 0; // If at least one result is returned, the address is valid.
-        }
-
-
-        /// <summary>
-        /// new fonction to check coordinations
-        /// </summary>
-        public static (double latitude, double longitude)? GetClosestCoordinates(string address, double targetLatitude, double targetLongitude)
-        {
-            if (string.IsNullOrWhiteSpace(address))
-                return null;
-
-            string apiKey = "pk.24d7295db243a75d8b3c688089250321";
-            string url = $"https://api.locationiq.com/v1/search.php?key={apiKey}&q={WebUtility.UrlEncode(address)}&format=json";
-
-            try
-            {
-                using (var client = new HttpClient())
-                {
-                    var response = client.GetStringAsync(url).Result;
-                    var json = JsonDocument.Parse(response);
-                    var root = json.RootElement;
-
-                    if (root.GetArrayLength() > 0)
-                    {
-                        const double tolerance = 0.05; // Augmenté à environ 5km
-                        double closestDistance = double.MaxValue;
-                        (double lat, double lon)? closestCoordinates = null;
-
-                        foreach (var item in root.EnumerateArray())
-                        {
-                            double latitude = double.Parse(item.GetProperty("lat").GetString(), CultureInfo.InvariantCulture);
-                            double longitude = double.Parse(item.GetProperty("lon").GetString(), CultureInfo.InvariantCulture);
-
-                            // Calculer la distance réelle entre les points
-                            double distance = CalculateDistance(latitude, longitude, targetLatitude, targetLongitude);
-
-                            if (distance < closestDistance)
-                            {
-                                closestDistance = distance;
-                                closestCoordinates = (latitude, longitude);
-                            }
-                        }
-
-                        // Si la distance la plus proche est dans la tolérance
-                        if (closestDistance <= tolerance * 111.32) // Convertir degrés en km approximativement
-                        {
-                            return closestCoordinates;
-                        }
-                    }
-                    return null;
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error fetching coordinates: {ex.Message}");
-                return null;
-            }
-        }
-        public static double CalculateDistance(double lat1, double lon1, double lat2, double lon2)
-        {
-            var R = 6371; // Rayon de la Terre en km
-            var dLat = ToRad(lat2 - lat1);
-            var dLon = ToRad(lon2 - lon1);
-            var a = Math.Sin(dLat / 2) * Math.Sin(dLat / 2) +
-                    Math.Cos(ToRad(lat1)) * Math.Cos(ToRad(lat2)) *
-                    Math.Sin(dLon / 2) * Math.Sin(dLon / 2);
-            var c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
-            return R * c;
-        }
         private static double ToRad(double degrees)
         {
             return degrees * (Math.PI / 180);

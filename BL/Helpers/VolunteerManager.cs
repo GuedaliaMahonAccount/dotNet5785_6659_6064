@@ -121,15 +121,6 @@ namespace Helpers
 
 
         /// <summary>
-        /// Retrieves coordinates from an address using LocationIQ API. 
-        /// exemple of correct adress
-        /// "display_name": "מרכז אורן יצחק רגר, 185, באר שבע"
-        /// "lat": "31.27042089999999"
-        /// "lon": "34.7975837"
-        /// 
-        /// 
-        /// </summary>
-        /// <summary>
         /// Retrieves coordinates from an address using LocationIQ API.
         /// 
         /// exemple of correct adress
@@ -139,35 +130,67 @@ namespace Helpers
         /// 
         /// 
         /// </summary>
-        public static async Task<List<(double latitude, double longitude)>> GetCoordinatesFromAddressAsync(string address)
+        //public static async Task<List<(double latitude, double longitude)>> GetCoordinatesFromAddressAsync(string address)
+        //{
+        //    if (string.IsNullOrWhiteSpace(address))
+        //        return null;
+
+        //    string apiKey = "pk.24d7295db243a75d8b3c688089250321";
+        //    string url = $"https://api.locationiq.com/v1/search.php?key={apiKey}&q={WebUtility.UrlEncode(address)}&format=json";
+
+        //    try
+        //    {
+        //        using (var client = new HttpClient())
+        //        {
+        //            var response = await client.GetStringAsync(url);
+        //            var json = JsonDocument.Parse(response);
+        //            var root = json.RootElement;
+
+        //            if (root.GetArrayLength() > 0)
+        //            {
+        //                var coordinatesList = new List<(double latitude, double longitude)>();
+        //                foreach (var item in root.EnumerateArray())
+        //                {
+        //                    var latitude = double.Parse(item.GetProperty("lat").GetString());
+        //                    var longitude = double.Parse(item.GetProperty("lon").GetString());
+        //                    coordinatesList.Add((latitude, longitude));
+        //                }
+        //                return coordinatesList;
+        //            }
+        //            return null; // No results
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Console.WriteLine($"Error fetching coordinates: {ex.Message}");
+        //        return null;
+        //    }
+        //}
+        public static async Task<(double latitude, double longitude)?> GetCoordinatesFromAddressAsync(string address)
         {
             if (string.IsNullOrWhiteSpace(address))
-                return null;
+                throw new ArgumentNullException(nameof(address), "Address cannot be null or empty.");
 
             string apiKey = "pk.24d7295db243a75d8b3c688089250321";
             string url = $"https://api.locationiq.com/v1/search.php?key={apiKey}&q={WebUtility.UrlEncode(address)}&format=json";
 
             try
             {
-                using (var client = new HttpClient())
-                {
-                    var response = await client.GetStringAsync(url);
-                    var json = JsonDocument.Parse(response);
-                    var root = json.RootElement;
+                using var client = new HttpClient();
+                var response = await client.GetStringAsync(url);
+                var json = JsonDocument.Parse(response);
+                var root = json.RootElement;
 
-                    if (root.GetArrayLength() > 0)
-                    {
-                        var coordinatesList = new List<(double latitude, double longitude)>();
-                        foreach (var item in root.EnumerateArray())
-                        {
-                            var latitude = double.Parse(item.GetProperty("lat").GetString());
-                            var longitude = double.Parse(item.GetProperty("lon").GetString());
-                            coordinatesList.Add((latitude, longitude));
-                        }
-                        return coordinatesList;
-                    }
-                    return null; // No results
+                if (root.GetArrayLength() > 0)
+                {
+                    // Get the first result (most relevant)
+                    var firstResult = root[0];
+                    var latitude = double.Parse(firstResult.GetProperty("lat").GetString(), CultureInfo.InvariantCulture);
+                    var longitude = double.Parse(firstResult.GetProperty("lon").GetString(), CultureInfo.InvariantCulture);
+                    return (latitude, longitude);
                 }
+
+                return null; // No results
             }
             catch (Exception ex)
             {
@@ -177,8 +200,8 @@ namespace Helpers
         }
         public static async Task<bool> ValidAddressAsync(string address)
         {
-            var coordinatesList = await GetCoordinatesFromAddressAsync(address);
-            return coordinatesList != null && coordinatesList.Count > 0; // If at least one result is returned, the address is valid.
+            var coordinates = await GetCoordinatesFromAddressAsync(address);
+            return coordinates != null; // If a valid pair of coordinates is returned, the address is valid.
         }
 
         /// <summary>

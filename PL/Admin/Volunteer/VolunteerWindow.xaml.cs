@@ -258,7 +258,7 @@ namespace PL.Volunteer
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
-            return value is bool isVisible && isVisible ? "🙈" : "👁";
+            return value is bool isVisible && isVisible ? "👁️‍🗨️" : "👁";
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)

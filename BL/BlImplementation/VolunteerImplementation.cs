@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using BO;
 using BlApi;
-using DO;
 
 
 internal class VolunteerImplementation : IVolunteer
@@ -348,6 +347,14 @@ internal class VolunteerImplementation : IVolunteer
             if (!await VolunteerManager.ValidAddressAsync(updatedVolunteer.Address))
                 throw new BlInvalidValueException("Invalid address format.");
 
+            // Calculate latitude and longitude automatically from the address
+            var coordinates = await VolunteerManager.GetCoordinatesFromAddressAsync(updatedVolunteer.Address);
+            if (coordinates == null)
+                throw new BlInvalidValueException("Unable to retrieve valid coordinates for the address.");
+
+            updatedVolunteer.Latitude = coordinates.Value.latitude;
+            updatedVolunteer.Longitude = coordinates.Value.longitude;
+
             if (!updatedVolunteer.Latitude.HasValue || !updatedVolunteer.Longitude.HasValue)
                 throw new BlNullPropertyException("Volunteer coordinates cannot be null.");
 
@@ -447,71 +454,76 @@ internal class VolunteerImplementation : IVolunteer
     /// - The coordinates are null or do not match the address.
     /// - Other unexpected errors occur during the addition process.
     /// </exception>
-    public async Task AddVolunteerAsync(BO.Volunteer volunteer)
+    public async Task AddVolunteerAsync(BO.Volunteer newvolunteer)
     {
         await _semaphore.WaitAsync();
         try
         {
             // Validate the volunteer object
-            if (volunteer == null)
+            if (newvolunteer == null)
                 throw new BlNullPropertyException("Volunteer object cannot be null.");
 
-            if (string.IsNullOrWhiteSpace(volunteer.Name))
+            if (string.IsNullOrWhiteSpace(newvolunteer.Name))
                 throw new BlNullPropertyException("Volunteer name cannot be empty.");
 
-            if (string.IsNullOrWhiteSpace(volunteer.Phone))
+            if (string.IsNullOrWhiteSpace(newvolunteer.Phone))
                 throw new BlNullPropertyException("Volunteer phone number cannot be empty.");
 
-            if (string.IsNullOrWhiteSpace(volunteer.Email))
+            if (string.IsNullOrWhiteSpace(newvolunteer.Email))
                 throw new BlNullPropertyException("Volunteer email cannot be empty.");
 
-            if (string.IsNullOrWhiteSpace(volunteer.Password))
+            if (string.IsNullOrWhiteSpace(newvolunteer.Password))
                 throw new BlNullPropertyException("Volunteer password cannot be empty.");
 
-            if (string.IsNullOrWhiteSpace(volunteer.Address))
+            if (string.IsNullOrWhiteSpace(newvolunteer.Address))
                 throw new BlNullPropertyException("Volunteer address cannot be empty.");
 
-            if (!volunteer.Latitude.HasValue || !volunteer.Longitude.HasValue)
-                throw new BlNullPropertyException("Volunteer coordinates cannot be null.");
+            // Calculate latitude and longitude automatically from the address
+            var coordinates = await VolunteerManager.GetCoordinatesFromAddressAsync(newvolunteer.Address);
+            if (coordinates == null)
+                throw new BlInvalidValueException("Unable to retrieve valid coordinates for the address.");
+
+            newvolunteer.Latitude = coordinates.Value.latitude;
+            newvolunteer.Longitude = coordinates.Value.longitude;
 
             // Perform validation on individual fields
-            if (!VolunteerManager.ValidName(volunteer.Name))
+            if (!VolunteerManager.ValidName(newvolunteer.Name))
                 throw new BlInvalidValueException("Invalid name.");
 
-            if (!VolunteerManager.ValidPhone(volunteer.Phone))
+            if (!VolunteerManager.ValidPhone(newvolunteer.Phone))
                 throw new BlInvalidValueException("Invalid phone number.");
 
-            if (!VolunteerManager.ValidEmail(volunteer.Email))
+            if (!VolunteerManager.ValidEmail(newvolunteer.Email))
                 throw new BlInvalidValueException("Invalid email address.");
 
-            if (!VolunteerManager.ValidPassword(volunteer.Password))
+            if (!VolunteerManager.ValidPassword(newvolunteer.Password))
                 throw new BlInvalidValueException("Password must be at least 8 characters long, with a mix of uppercase, lowercase, and digits.");
 
-            if (!await VolunteerManager.ValidAddressAsync(volunteer.Address))
+            if (!await VolunteerManager.ValidAddressAsync(newvolunteer.Address))
                 throw new BlInvalidValueException("Invalid address format. Please ensure the address is valid.");
 
             // Encrypt the password
-            string encryptedPassword = AesEncryptionHelper.Encrypt(volunteer.Password);
+            string encryptedPassword = AesEncryptionHelper.Encrypt(newvolunteer.Password);
 
             // Create a new DO.Volunteer object
             var newVolunteer = new DO.Volunteer
             {
-                Id = volunteer.Id,
-                Name = volunteer.Name,
-                Phone = volunteer.Phone,
-                Email = volunteer.Email,
+                Id = newvolunteer.Id,
+                Name = newvolunteer.Name,
+                Phone = newvolunteer.Phone,
+                Email = newvolunteer.Email,
                 Password = encryptedPassword,
-                Address = volunteer.Address,
-                Latitude = volunteer.Latitude.Value,
-                Longitude = volunteer.Longitude.Value,
-                Role = (DO.Role)volunteer.Role,
-                IsActive = volunteer.IsActive
+                Address = newvolunteer.Address,
+                Latitude = newvolunteer.Latitude.Value,
+                Longitude = newvolunteer.Longitude.Value,
+                Role = (DO.Role)newvolunteer.Role,
+                IsActive = newvolunteer.IsActive
             };
 
             // Check if a volunteer with the same ID already exists
-            var existingVolunteer = _dal.Volunteer.Read(volunteer.Id);
+            var existingVolunteer = _dal.Volunteer.Read(newvolunteer.Id);
             if (existingVolunteer != null)
-                throw new BlInvalidValueException($"Volunteer with ID {volunteer.Id} already exists.");
+                throw new BlInvalidValueException($"Volunteer with ID {newvolunteer.Id} already exists.");
 
             // Save to database
             _dal.Volunteer.Create(newVolunteer);

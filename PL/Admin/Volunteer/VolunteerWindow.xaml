@@ -45,7 +45,6 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
                 <Label Grid.Row="0" Grid.Column="0" Content="Id:" HorizontalAlignment="Left" Margin="3" VerticalAlignment="Center" />
@@ -112,14 +111,8 @@
                 <Label Grid.Row="6" Grid.Column="0" Content="Address:" HorizontalAlignment="Left" Margin="3" VerticalAlignment="Center" />
                 <TextBox Grid.Row="6" Grid.Column="1" HorizontalAlignment="Left" Margin="3" Text="{Binding CurrentVolunteer.Address, Mode=TwoWay}" VerticalAlignment="Center" Width="120" />
 
-                <Label Grid.Row="7" Grid.Column="0" Content="Latitude:" HorizontalAlignment="Left" Margin="3" VerticalAlignment="Center" />
-                <TextBox Grid.Row="7" Grid.Column="1" HorizontalAlignment="Left" Margin="3" Text="{Binding CurrentVolunteer.Latitude, Mode=TwoWay}" VerticalAlignment="Center" Width="120" />
-
-                <Label Grid.Row="8" Grid.Column="0" Content="Longitude:" HorizontalAlignment="Left" Margin="3" VerticalAlignment="Center" />
-                <TextBox Grid.Row="8" Grid.Column="1" HorizontalAlignment="Left" Margin="3" Text="{Binding CurrentVolunteer.Longitude, Mode=TwoWay}" VerticalAlignment="Center" Width="120" />
-
-                <Label Grid.Row="9" Grid.Column="0" Content="Max Distance:" HorizontalAlignment="Left" Margin="3" VerticalAlignment="Center" />
-                <Grid Grid.Row="9" Grid.Column="1">
+                <Label Grid.Row="7" Grid.Column="0" Content="Max Distance:" HorizontalAlignment="Left" Margin="3" VerticalAlignment="Center" />
+                <Grid Grid.Row="7" Grid.Column="1">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
@@ -128,11 +121,11 @@
                     <TextBlock Grid.Column="1" Text="km" VerticalAlignment="Center" Margin="3" IsHitTestVisible="False" />
                 </Grid>
 
-                <Label Grid.Row="10" Grid.Column="0" Content="Distance Type:" HorizontalAlignment="Left" Margin="3" VerticalAlignment="Center" />
-                <ComboBox Grid.Row="10" Grid.Column="1" HorizontalAlignment="Left" Margin="3" ItemsSource="{Binding Source={StaticResource DistanceTypeCollectionKey}}" SelectedValue="{Binding CurrentVolunteer.DistanceType, Mode=TwoWay}" VerticalAlignment="Center" Width="120" />
+                <Label Grid.Row="8" Grid.Column="0" Content="Distance Type:" HorizontalAlignment="Left" Margin="3" VerticalAlignment="Center" />
+                <ComboBox Grid.Row="8" Grid.Column="1" HorizontalAlignment="Left" Margin="3" ItemsSource="{Binding Source={StaticResource DistanceTypeCollectionKey}}" SelectedValue="{Binding CurrentVolunteer.DistanceType, Mode=TwoWay}" VerticalAlignment="Center" Width="120" />
 
                 <!-- View Current Call Button Styled as Label -->
-                <Button Grid.Row="11"
+                <Button Grid.Row="9"
                         Grid.Column="1"
                         Content="View Current Call"
                         HorizontalAlignment="Left"
