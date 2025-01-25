@@ -369,6 +369,11 @@ namespace PL
                 remove => CommandManager.RequerySuggested -= value;
             }
         }
+
+        private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+
+        }
     }
 
     public class SimulatorRunningToBoolConverter : IValueConverter

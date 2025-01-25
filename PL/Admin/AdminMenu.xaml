@@ -75,16 +75,23 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
+
+            <!-- Label for Simulation Speed -->
+            <TextBlock Grid.Column="0" Text="Seconds/Second:" FontSize="14" Foreground="White" 
+               VerticalAlignment="Center" Margin="0,0,10,0" />
 
             <!-- TextBox -->
             <TextBox Grid.Column="1" Text="{Binding Interval, UpdateSourceTrigger=PropertyChanged}" 
              IsEnabled="{Binding IsSimulatorRunning, Converter={StaticResource SimulatorRunningToBoolConverter}, ConverterParameter=Invert}" 
-             TextAlignment="Center" FontSize="14" Background="White" Margin="21,-44,30,41" />
+             TextAlignment="Center" FontSize="14" Background="White" Width="80" Margin="0,0,10,0" TextChanged="TextBox_TextChanged" />
 
             <!-- Button -->
-            <Button Grid.Column="1" Content="{Binding SimulatorButtonText}" Click="btnToggleSimulator_Click" Width="194" FontSize="20" Margin="0,0,0,-32" />
+            <Button Grid.Column="2" Content="{Binding SimulatorButtonText}" Click="btnToggleSimulator_Click" Width="120" FontSize="14" 
+            HorizontalAlignment="Left" Margin="0,0,0,0" />
         </Grid>
+
 
         <!-- Buttons for Time Adjustments -->
         <StackPanel Grid.Column="1" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center">
