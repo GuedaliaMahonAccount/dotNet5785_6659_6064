@@ -29,7 +29,6 @@
 
         internal void NotifyListUpdated()
         {
-            Console.WriteLine("List observers notified."); // Debugging log
             _listObservers?.Invoke();
         }
 

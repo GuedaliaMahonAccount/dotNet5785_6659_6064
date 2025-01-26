@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using BO;
 using BlApi;
+using DO;
 
 
 internal class VolunteerImplementation : IVolunteer
@@ -388,6 +389,7 @@ internal class VolunteerImplementation : IVolunteer
             {
                 _dal.Volunteer.Update(updatedVolunteerDO);
                 VolunteerManager.Observers.NotifyItemUpdated(updatedVolunteer.Id);
+                VolunteerManager.Observers.NotifyListUpdated();
             }
         }
         finally
