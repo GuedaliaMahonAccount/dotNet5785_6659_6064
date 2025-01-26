@@ -17,6 +17,8 @@ namespace PL.Volunteer
         static readonly BlApi.IBl s_bl = BlApi.Factory.Get();
 
         private IEnumerable<BO.VolunteerInList> _allVolunteers;
+        private string _currentNameFilter = string.Empty; 
+        private BO.CallType _currentStatusFilter = BO.CallType.None; 
 
         public IEnumerable<BO.VolunteerInList> VolunteerList
         {
@@ -38,8 +40,10 @@ namespace PL.Volunteer
         public VolunteerListWindow()
         {
             InitializeComponent();
-            _allVolunteers = s_bl.Volunteer.GetVolunteersList(); // Load all volunteers initially
-            VolunteerList = _allVolunteers;
+            _allVolunteers = s_bl.Volunteer.GetVolunteersList(); 
+            VolunteerList = _allVolunteers; 
+            _currentNameFilter = string.Empty; 
+            _currentStatusFilter = BO.CallType.None; 
         }
 
         private bool _isWindowLoaded = false;
@@ -56,7 +60,9 @@ namespace PL.Volunteer
                         try
                         {
                             _allVolunteers = s_bl.Volunteer.GetVolunteersList();
-                            FilterVolunteersByName(TxtVolunteerNameFilter.Text);
+
+                            FilterVolunteersByName(_currentNameFilter);
+                            FilterVolunteersByStatus(_currentStatusFilter);
                         }
                         catch (Exception ex)
                         {
@@ -127,20 +133,22 @@ namespace PL.Volunteer
         {
             if (sender is ComboBox comboBox && comboBox.SelectedValue is BO.CallType selectedStatus)
             {
+                _currentStatusFilter = selectedStatus; 
                 FilterVolunteersByStatus(selectedStatus);
             }
         }
 
         private void TxtVolunteerNameFilter_TextChanged(object sender, TextChangedEventArgs e)
         {
-            FilterVolunteersByName((sender as TextBox)?.Text);
+            _currentNameFilter = (sender as TextBox)?.Text ?? string.Empty; 
+            FilterVolunteersByName(_currentNameFilter);
         }
 
         private void FilterVolunteersByName(string? name)
         {
             if (string.IsNullOrEmpty(name))
             {
-                VolunteerList = _allVolunteers;
+                VolunteerList = _allVolunteers; 
             }
             else
             {
@@ -154,7 +162,7 @@ namespace PL.Volunteer
         {
             if (status == null || status == BO.CallType.None)
             {
-                VolunteerList = _allVolunteers;
+                VolunteerList = _allVolunteers; 
             }
             else
             {
