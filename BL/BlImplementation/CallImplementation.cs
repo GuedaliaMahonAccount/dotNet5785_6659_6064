@@ -94,28 +94,48 @@ namespace BlImplementation
             AdminManager.ThrowOnSimulatorIsRunning();
             lock (AdminManager.BlMutex)
             {
+                // Fetch the assignment
                 var assignmentDO = _dal.Assignment.Read(assignmentId)
                     ?? throw new BlDoesNotExistException($"No assignment found with ID: {assignmentId}");
 
+                // Validate the requester
                 if (requesterId != assignmentDO.VolunteerId)
                     throw new BlInvalidRoleException("Requester is not authorized to cancel this assignment.");
 
+                // Ensure the assignment is not already completed
                 if (assignmentDO.EndType != null && (BO.EndType)assignmentDO.EndType == BO.EndType.Completed)
                     throw new BlInvalidValueException("Cannot cancel an assignment that is already completed.");
 
+                // Determine the cancellation type
                 var cancellationType = requesterId == assignmentDO.VolunteerId
                     ? DO.EndType.SelfCanceled
                     : DO.EndType.AdminCanceled;
 
+                // Update the assignment
                 var updatedAssignment = assignmentDO with
                 {
                     EndTime = DateTime.Now,
                     EndType = cancellationType
                 };
                 _dal.Assignment.Update(updatedAssignment);
+
+                // Fetch the associated call
+                var callDO = _dal.Call.Read(assignmentDO.CallId)
+                    ?? throw new BlDoesNotExistException($"No call found for ID: {assignmentDO.CallId}");
+
+                // Update the call's status
+                var updatedCall = callDO with
+                {
+                    CallType = cancellationType == DO.EndType.SelfCanceled
+                        ? DO.CallType.SelfCanceled
+                        : DO.CallType.AdminCanceled
+                };
+                _dal.Call.Update(updatedCall);
             }
-                CallManager.Observers.NotifyItemUpdated(assignmentId);
-                CallManager.Observers.NotifyListUpdated();
+
+            // Notify observers
+            CallManager.Observers.NotifyItemUpdated(assignmentId);
+            CallManager.Observers.NotifyListUpdated();
         }
 
         /// <summary>
@@ -132,27 +152,43 @@ namespace BlImplementation
             AdminManager.ThrowOnSimulatorIsRunning();
             lock (AdminManager.BlMutex)
             {
+                // Fetch the assignment
                 var assignmentDO = _dal.Assignment.Read(assignmentId)
                     ?? throw new BlDoesNotExistException($"No assignment found with ID: {assignmentId}");
 
+                // Ensure the volunteer matches the assignment
                 if (volunteerId != assignmentDO.VolunteerId)
                     throw new BlInvalidRoleException("Only the assigned volunteer can complete this assignment.");
 
+                // Ensure the assignment is not already completed or canceled
                 if (assignmentDO.EndType != null && (BO.EndType)assignmentDO.EndType == BO.EndType.Completed)
                     throw new BlInvalidValueException("Cannot complete an assignment that is already completed or canceled.");
 
+                // Fetch the associated call
+                var callDO = _dal.Call.Read(assignmentDO.CallId)
+                    ?? throw new BlDoesNotExistException($"No call found for ID: {assignmentDO.CallId}");
+
+                // Update the assignment
                 var updatedAssignment = assignmentDO with
                 {
                     EndTime = DateTime.Now,
                     EndType = BO.EndType.Completed
                 };
-
                 _dal.Assignment.Update(updatedAssignment);
+
+                // Update the call's status
+                var updatedCall = callDO with
+                {
+                    CallType = DO.CallType.Completed
+                };
+                _dal.Call.Update(updatedCall);
             }
-                CallManager.Observers.NotifyItemUpdated(assignmentId);
-                CallManager.Observers.NotifyListUpdated();
-            
+
+            // Notify observers
+            CallManager.Observers.NotifyItemUpdated(assignmentId);
+            CallManager.Observers.NotifyListUpdated();
         }
+
 
         /// <summary>
         /// Deletes a call from the system. 
@@ -181,8 +217,8 @@ namespace BlImplementation
 
                 _dal.Call.Delete(callId);
             }
-                CallManager.Observers.NotifyListUpdated();
-            
+            CallManager.Observers.NotifyListUpdated();
+
         }
 
         /// <summary>
@@ -451,7 +487,7 @@ namespace BlImplementation
                                     (BO.DistanceType)volunteer.DistanceType)
                     })
                     .ToList();
-            
+
                 // Apply optional call type filtering
                 if (callType != null)
                 {
@@ -526,8 +562,8 @@ namespace BlImplementation
                 _dal.Call.Update(updatedCall);
 
             }
-                CallManager.Observers.NotifyItemUpdated(callId);
-                CallManager.Observers.NotifyListUpdated();
+            CallManager.Observers.NotifyItemUpdated(callId);
+            CallManager.Observers.NotifyListUpdated();
         }
 
         /// <summary>
@@ -676,16 +712,17 @@ namespace BlImplementation
 
                     // Retrieve all calls associated with the volunteer's assignments
                     var calls = _dal.Call.ReadAll()
-                        .Where(c => assignments.Contains(c.Id))
+                        .Where(c => assignments.Contains(c.Id)) // Only fetch calls assigned to this volunteer
                         .Select(c => new BO.Call
-                        {
-                            Id = c.Id,
-                            CallType = (BO.CallType)c.CallType,
-                            StartTime = c.StartTime,
-                            Description = c.Description,
-                            DeadLine = c.DeadLine,
-                            Address = c.Address
-                        });
+                            {
+                                 Id = c.Id,
+                                 CallType = (BO.CallType)c.CallType, // Fetches the current CallType
+                                 StartTime = c.StartTime,
+                                 Description = c.Description,
+                                 DeadLine = c.DeadLine,
+                                 Address = c.Address
+                            });
+
 
                     return calls;
                 }
