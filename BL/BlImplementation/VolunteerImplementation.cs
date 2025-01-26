@@ -317,15 +317,19 @@ internal class VolunteerImplementation : IVolunteer
     /// </exception>
     public async Task UpdateVolunteerAsync(int requesterId, BO.Volunteer updatedVolunteer)
     {
+        AdminManager.ThrowOnSimulatorIsRunning();
         await _semaphore.WaitAsync();
         try
         {
             if (updatedVolunteer == null)
                 throw new BlNullPropertyException("Volunteer object cannot be null.");
 
-            var existingVolunteer = _dal.Volunteer.Read(updatedVolunteer.Id);
-            if (existingVolunteer == null)
-                throw new BlDoesNotExistException($"Volunteer with ID {updatedVolunteer.Id} does not exist.");
+            lock (AdminManager.BlMutex)
+            {
+                var existingVolunteer = _dal.Volunteer.Read(updatedVolunteer.Id);
+                if (existingVolunteer == null)
+                    throw new BlDoesNotExistException($"Volunteer with ID {updatedVolunteer.Id} does not exist.");
+            }
 
             // Validate the requester
             if (!VolunteerManager.IsRequesterAuthorizedToCancel(requesterId, updatedVolunteer.Id))
@@ -380,8 +384,11 @@ internal class VolunteerImplementation : IVolunteer
             };
 
             // Save updates to the database
-            _dal.Volunteer.Update(updatedVolunteerDO);
-            VolunteerManager.Observers.NotifyItemUpdated(updatedVolunteer.Id);
+            lock (AdminManager.BlMutex)
+            {
+                _dal.Volunteer.Update(updatedVolunteerDO);
+                VolunteerManager.Observers.NotifyItemUpdated(updatedVolunteer.Id);
+            }
         }
         finally
         {

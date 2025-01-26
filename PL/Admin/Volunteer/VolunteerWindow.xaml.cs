@@ -103,22 +103,22 @@ namespace PL.Volunteer
         }
 
         // Event handler for Add/Update button
-        private void btnAddUpdate_Click(object sender, RoutedEventArgs e)
+        private async void btnAddUpdate_Click(object sender, RoutedEventArgs e)
         {
             try
             {
                 if (ButtonText == "Add")
                 {
-                    s_bl.Volunteer.AddVolunteerAsync(CurrentVolunteer); // Add new Volunteer
+                    await s_bl.Volunteer.AddVolunteerAsync(CurrentVolunteer); 
                     MessageBox.Show("Volunteer added successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
                 else
                 {
-                    s_bl.Volunteer.UpdateVolunteerAsync(CurrentVolunteer.Id, CurrentVolunteer); // Update existing Volunteer
+                    await s_bl.Volunteer.UpdateVolunteerAsync(CurrentVolunteer.Id, CurrentVolunteer); 
                     MessageBox.Show("Volunteer updated successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
 
-                Close();
+                Close(); 
             }
             catch (Exception ex)
             {
