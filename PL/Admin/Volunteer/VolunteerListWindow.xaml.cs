@@ -59,8 +59,12 @@ namespace PL.Volunteer
                     {
                         try
                         {
-                            _allVolunteers = s_bl.Volunteer.GetVolunteersList();
+                            // Get all volunteers and filter them by CallType
+                            _allVolunteers = s_bl.Volunteer.GetVolunteersList()
+                                .Where(v => v.CurrentCallType == CallType.InTreatment || v.CurrentCallType == CallType.InTreatmentAtRisk)
+                                .ToList();
 
+                            // Apply additional filters
                             FilterVolunteersByName(_currentNameFilter);
                             FilterVolunteersByStatus(_currentStatusFilter);
                         }
@@ -76,6 +80,7 @@ namespace PL.Volunteer
                 }
             });
         }
+
 
         private void Window_Closed(object sender, EventArgs e)
         {

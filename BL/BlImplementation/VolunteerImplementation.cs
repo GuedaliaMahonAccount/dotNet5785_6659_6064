@@ -196,7 +196,6 @@ internal class VolunteerImplementation : IVolunteer
                 volunteersFromDal = volunteersFromDal.Where(v => v.IsActive == isActive.Value);
             }
 
-
             // Apply sorting based on the specified field
             if (sortByField.HasValue)
             {
@@ -227,17 +226,32 @@ internal class VolunteerImplementation : IVolunteer
                         // Sort volunteers by the type of the current call they are assigned to
                         volunteersFromDal = volunteersFromDal.OrderBy(v =>
                         {
-                            // Retrieve the assignment for the current volunteer
-                            var currentAssignment = _dal.Assignment.ReadAll()
-                                .FirstOrDefault(a => a.VolunteerId == v.Id && a.EndTime == null);
+                            // Retrieve all assignments for the current volunteer
+                            var assignmentsForVolunteer = _dal.Assignment.ReadAll()
+                                .Where(a => a.VolunteerId == v.Id);
 
-                            // Retrieve the associated call type, or default to BO.CallType.None if no active assignment
-                            return currentAssignment == null
-                                ? BO.CallType.None
-                                : _dal.Call.ReadAll()
-                                    .Where(c => c.Id == currentAssignment.CallId)
-                                    .Select(c => (BO.CallType?)c.CallType)
-                                    .FirstOrDefault() ?? BO.CallType.None;
+                            // Check for any active assignment
+                            var currentAssignment = assignmentsForVolunteer.FirstOrDefault(a => a.EndTime == null);
+
+                            if (currentAssignment == null)
+                            {
+                                // If no active assignment, return None
+                                return BO.CallType.None;
+                            }
+
+                            // Retrieve the associated call type for the current assignment
+                            var currentCallType = _dal.Call.ReadAll()
+                                .Where(c => c.Id == currentAssignment.CallId)
+                                .Select(c => (BO.CallType?)c.CallType)
+                                .FirstOrDefault() ?? BO.CallType.None;
+
+                            // Check if the current call type is InTreatment or InTreatmentAtRisk
+                            if (currentCallType == BO.CallType.InTreatment || currentCallType == BO.CallType.InTreatmentAtRisk)
+                            {
+                                return currentCallType;
+                            }
+
+                            return BO.CallType.None;
                         });
                         break;
 
@@ -255,36 +269,45 @@ internal class VolunteerImplementation : IVolunteer
             IEnumerable<DO.Volunteer> volunteers = volunteersFromDal.ToList(); // Convert to List to preserve sorting
             IEnumerable<DO.Assignment> assignments = _dal.Assignment.ReadAll();
 
-            return volunteers.Select(v => new BO.VolunteerInList
+            return volunteers.Select(v =>
             {
-                Id = v.Id,
-                Name = v.Name,
-                IsActive = v.IsActive,
-                CompletedAssignmentsCount = assignments.Count(call => call.VolunteerId == v.Id && Enum.Equals(call.EndType, DO.EndType.Completed)),
-                CancelledCallsCount = assignments.Count(call => call.VolunteerId == v.Id && Enum.Equals(call.EndType, DO.EndType.SelfCanceled)),
-                ExpiredCallsCount = assignments.Count(call => call.VolunteerId == v.Id && Enum.Equals(call.EndType, DO.EndType.Expired)),
-                CurrentCallId = assignments.Where(call => call.VolunteerId == v.Id).Select(call => call.CallId).FirstOrDefault(),
-                CurrentCallType = assignments.Where(call => call.VolunteerId == v.Id).Select(call =>
-                {
-                    if (call.EndType == null)
-                    {
-                        return BO.CallType.None; // Default value when EndType is null
-                    }
+                // Retrieve all assignments for the current volunteer
+                var assignmentsForVolunteer = _dal.Assignment.ReadAll()
+                    .Where(a => a.VolunteerId == v.Id);
 
-                    switch ((BO.EndType)call.EndType)
+                // Find the current active assignment
+                var currentAssignment = assignmentsForVolunteer.FirstOrDefault(a => a.EndTime == null);
+
+                // Determine the CurrentCallType
+                BO.CallType currentCallType = BO.CallType.None;
+
+                if (currentAssignment != null)
+                {
+                    // Retrieve the call type associated with the current assignment
+                    var callType = _dal.Call.ReadAll()
+                        .Where(c => c.Id == currentAssignment.CallId)
+                        .Select(c => (BO.CallType?)c.CallType)
+                        .FirstOrDefault();
+
+                    // Assign to currentCallType if it's valid
+                    if (callType == BO.CallType.InTreatment || callType == BO.CallType.InTreatmentAtRisk)
                     {
-                        case BO.EndType.Completed:
-                            return BO.CallType.Completed;
-                        case BO.EndType.SelfCanceled:
-                            return BO.CallType.SelfCanceled;
-                        case BO.EndType.Expired:
-                            return BO.CallType.Expired;
-                        case BO.EndType.AdminCanceled:
-                            return BO.CallType.AdminCanceled;
-                        default:
-                            throw new InvalidOperationException("Unknown EndType");
+                        currentCallType = callType.Value;
                     }
-                }).FirstOrDefault()
+                }
+
+                // Map the volunteer to the BO.VolunteerInList
+                return new BO.VolunteerInList
+                {
+                    Id = v.Id,
+                    Name = v.Name,
+                    IsActive = v.IsActive,
+                    CompletedAssignmentsCount = assignments.Count(call => call.VolunteerId == v.Id && Enum.Equals(call.EndType, DO.EndType.Completed)),
+                    CancelledCallsCount = assignments.Count(call => call.VolunteerId == v.Id && Enum.Equals(call.EndType, DO.EndType.SelfCanceled)),
+                    ExpiredCallsCount = assignments.Count(call => call.VolunteerId == v.Id && Enum.Equals(call.EndType, DO.EndType.Expired)),
+                    CurrentCallId = currentAssignment?.CallId ?? 0, // Assign 0 if no current assignment
+                    CurrentCallType = currentCallType // Assign None if no active call
+                };
             });
         }
     }

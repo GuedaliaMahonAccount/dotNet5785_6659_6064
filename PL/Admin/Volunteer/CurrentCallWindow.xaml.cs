@@ -9,13 +9,19 @@ namespace PL.Volunteer
 
         public CurrentCallWindow(CallInProgress? currentCall)
         {
-            CurrentCall = currentCall;
+            // Filter the call by status: InTreatment or InTreatmentAtRisk
+            CurrentCall = (currentCall != null &&
+                          (currentCall.CallType == CallType.InTreatment || currentCall.CallType == CallType.InTreatmentAtRisk))
+                          ? currentCall
+                          : null;
+
+            // Set DataContext to the filtered call or a placeholder
             DataContext = CurrentCall ?? new CallInProgress
             {
-                GeneralDescription = "No current call available."
+                GeneralDescription = "No relevant call available."
             };
+
             InitializeComponent();
         }
     }
-
 }
