@@ -60,9 +60,8 @@ namespace PL.Volunteer
                         try
                         {
                             // Get all volunteers and filter them by CallType
-                            _allVolunteers = s_bl.Volunteer.GetVolunteersList()
-                                .Where(v => v.CurrentCallType == CallType.InTreatment || v.CurrentCallType == CallType.InTreatmentAtRisk)
-                                .ToList();
+                            _allVolunteers = s_bl.Volunteer.GetVolunteersList();
+                                
 
                             // Apply additional filters
                             FilterVolunteersByName(_currentNameFilter);
