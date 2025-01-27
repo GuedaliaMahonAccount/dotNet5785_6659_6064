@@ -30,6 +30,9 @@ namespace PL.User
         // Flag to prevent multiple updates
         private volatile bool _isUpdating = false;
 
+        // DispatcherTimer for periodic updates
+        private DispatcherTimer _refreshTimer;
+
         private bool CanAssignCall()
         {
             try
@@ -73,8 +76,19 @@ namespace PL.User
                 }
             });
 
+            // Initialize and start the timer
+            _refreshTimer = new DispatcherTimer();
+            _refreshTimer.Interval = TimeSpan.FromSeconds(1); // Update every second
+            _refreshTimer.Tick += RefreshTimer_Tick;
+            _refreshTimer.Start();
+
             queryCallList();
             s_bl.Call.AddObserver(CallListObserver);
+        }
+
+        private void RefreshTimer_Tick(object sender, EventArgs e)
+        {
+            queryCallList(); // Refresh the call list periodically
         }
 
         private void queryCallList()
@@ -147,6 +161,7 @@ namespace PL.User
         {
             base.OnClosed(e);
             s_bl.Call.RemoveObserver(CallListObserver);
+            _refreshTimer.Stop(); // Stop the timer when the window is closed
         }
     }
 
