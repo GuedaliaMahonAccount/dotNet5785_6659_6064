@@ -62,7 +62,7 @@ public enum DistanceType
     Skateboard,          // Routes where skateboards can travel, typically urban or park paths
     UrbanShortcuts,      // Distance considering pedestrian shortcuts within urban settings (e.g., alleys)
 }
-public enum CallType
+public enum Status
 {
     None,
     Open,              // The call is open and not currently assigned to any volunteer. It may have been previously assigned but was canceled by the volunteer or administrator.

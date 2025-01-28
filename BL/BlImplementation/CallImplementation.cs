@@ -288,7 +288,7 @@ namespace BlImplementation
         /// <param name="filterValue">Value to filter calls by.</param>
         /// <param name="sortField">Optional sorting field.</param>
         /// <returns>A collection of calls with summarized details.</returns>
-        public IEnumerable<BO.CallInList> GetCallList(BO.CallType? callType = null, BO.CallSortField? sortByField = null)
+        public IEnumerable<BO.CallInList> GetCallList(BO.Status? status = null, BO.CallSortField? sortByField = null)
         {
             lock (AdminManager.BlMutex)
             {
@@ -296,13 +296,13 @@ namespace BlImplementation
                 var callsFromDal = _dal.Call.ReadAll();
 
                 // Filter by CallType if specified
-                if (callType.HasValue)
+                if (status.HasValue)
                 {
                     callsFromDal = callsFromDal.Where(c =>
                     {
-                        if (Enum.IsDefined(typeof(BO.CallType), (BO.CallType)c.CallType))
+                        if (Enum.IsDefined(typeof(BO.Status), (BO.Status)c.CallType))
                         {
-                            return (BO.CallType)c.CallType == callType.Value;
+                            return (BO.Status)c.CallType == status.Value;
                         }
                         return false;
                     });
@@ -355,7 +355,7 @@ namespace BlImplementation
             .OrderByDescending(a => a.EndTime)
             .Select(a => _dal.Volunteer.Read(a.VolunteerId).Name)
             .FirstOrDefault(),
-                    Status = (BO.CallType)c.CallType,
+                    Status = CallManager.GetStatusCall(c.Id),
                     AssignmentCount = assignments.Count(a => a.CallId == c.Id)
                 });
             }
