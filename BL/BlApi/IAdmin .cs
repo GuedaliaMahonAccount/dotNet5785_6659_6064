@@ -13,6 +13,8 @@ namespace BlApi
         void StartSimulator(int interval); 
         void StopSimulator();
 
+        void checkSimulator();
+
         #region Stage 5
         void AddConfigObserver(Action configObserver);
         void RemoveConfigObserver(Action configObserver);

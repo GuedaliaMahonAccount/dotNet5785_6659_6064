@@ -12,7 +12,7 @@
         IEnumerable<BO.OpenCallInList> GetOpenCalls(int volunteerId, Enum? callType, Enum? sortField);
         void CompleteCall(int volunteerId, int assignmentId);
         void CancelCall(int requesterId, int assignmentId);
-        void selectionCall(int volunteerId, int callId);
+        void selectionCall(int volunteerId, int callId, bool isSimulator);
         IEnumerable<BO.Call> CallHistoryByVolunteerId(int volunteerId);
         int GetAssignmentIdByCallId(int callId, int volunteerId);
         double _CalculateDistance(int callId, int volunteerId);

@@ -94,8 +94,29 @@ namespace PL.Volunteer
 
         private void AddvolunteerButton_Click(object sender, RoutedEventArgs e)
         {
-            new VolunteerWindow().Show();
+            try
+            {
+                // If you want to perform any checks before opening the VolunteerWindow, 
+                // like checking if the simulator is running, you can do so here.
+
+                // Example: Check if the simulator is running before opening the VolunteerWindow
+                s_bl.Admin.checkSimulator();
+
+                // If no exception, open the VolunteerWindow
+                new VolunteerWindow().Show();
+            }
+            catch (BO.BLTemporaryNotAvailableException ex)
+            {
+                // Catch the specific exception and show an error message
+                MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            catch (Exception ex)
+            {
+                // Catch any other unexpected exceptions
+                MessageBox.Show($"An unexpected error occurred: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
+
 
         private void DeleteVolunteer_Click(object sender, RoutedEventArgs e)
         {

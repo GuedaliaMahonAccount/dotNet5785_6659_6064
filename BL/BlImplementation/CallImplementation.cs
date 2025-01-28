@@ -523,9 +523,13 @@ namespace BlImplementation
         /// <param name="callId">The ID of the call to be assigned to the volunteer.</param>
         /// <exception cref="BlDoesNotExistException">Thrown when the call or volunteer does not exist.</exception>
         /// <exception cref="BlInvalidValueException">Thrown when the call is already assigned or expired.</exception>
-        public void selectionCall(int volunteerId, int callId)
+        public void selectionCall(int volunteerId, int callId, bool isSimulator=false)
         {
-            //AdminManager.ThrowOnSimulatorIsRunning();
+            if (!isSimulator)
+            {
+                AdminManager.ThrowOnSimulatorIsRunning();
+            }
+
             lock (AdminManager.BlMutex)
             {
                 var callDO = _dal.Call.Read(callId)

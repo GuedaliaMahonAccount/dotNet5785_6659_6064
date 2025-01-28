@@ -1,6 +1,5 @@
 ﻿namespace BO;
 
-
 public enum Role
 {
     GeneralVolunteer,     // A general role for volunteers without a specific specialty

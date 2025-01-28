@@ -125,7 +125,7 @@ namespace PL.User
         {
             try
             {
-                s_bl.Call.selectionCall(_volunteerId, callId);
+                s_bl.Call.selectionCall(_volunteerId, callId, false);
                 MessageBox.Show($"Call {callId} successfully assigned to volunteer {_volunteerId}.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)

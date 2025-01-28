@@ -117,5 +117,11 @@ namespace BlImplementation
             lock (AdminManager.BlMutex)
                 AdminManager.Stop();
         }
+
+        public void checkSimulator()
+        {
+            AdminManager.ThrowOnSimulatorIsRunning() ;
+        }
+
     }
 }
