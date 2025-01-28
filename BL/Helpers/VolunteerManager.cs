@@ -481,7 +481,7 @@ namespace Helpers
         /// <summary>
         /// Simulates the routine activities of volunteers, including assigning calls and managing call statuses.
         /// </summary>
-        public static void SimulateVolunteerActivity()
+        public static void SimulateVolunteerActivity(bool isSimulator)
         {
             Thread.CurrentThread.Name = $"Simulator{Guid.NewGuid()}";
 
@@ -504,7 +504,7 @@ namespace Helpers
                     // Volunteer has no active call; consider assigning a new call with a probability of 20%
                     if (s_random.NextDouble() < 0.2)
                     {
-                        AssignRandomCallToVolunteer(volunteer.Id, updatedCallIds);
+                        AssignRandomCallToVolunteer(volunteer.Id, updatedCallIds, isSimulator);
                     }
                 }
                 else
@@ -537,7 +537,7 @@ namespace Helpers
         /// <summary>
         /// Assigns a random call to a volunteer from the pool of available calls.
         /// </summary>
-        private static void AssignRandomCallToVolunteer(int volunteerId, LinkedList<int> updatedCallIds)
+        private static void AssignRandomCallToVolunteer(int volunteerId, LinkedList<int> updatedCallIds, bool isSimulator)
         {
             // Retrieve open calls with valid coordinates
             List<DO.Call> openCalls;
@@ -559,7 +559,7 @@ namespace Helpers
                     var callManager = new CallImplementation();
 
                     // Use selectionCall from CallImplementation
-                    callManager.selectionCall(volunteerId, selectedCall.Id);
+                    callManager.selectionCall(volunteerId, selectedCall.Id, isSimulator);
 
                     // Add the selected call ID to the updated list
                     updatedCallIds.AddLast(selectedCall.Id);

@@ -161,7 +161,7 @@ internal static class AdminManager //stage 4
             UpdateClock(Now.AddMinutes(s_interval));
 
             if (_simulateTask is null || _simulateTask.IsCompleted)//stage 7
-                _simulateTask = Task.Run(() => VolunteerManager.SimulateVolunteerActivity());
+                _simulateTask = Task.Run(() => VolunteerManager.SimulateVolunteerActivity(true));
             try
             {
                 Thread.Sleep(1000); // 1 second
