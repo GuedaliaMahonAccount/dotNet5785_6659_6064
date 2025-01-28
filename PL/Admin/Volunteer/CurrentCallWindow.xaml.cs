@@ -11,7 +11,7 @@ namespace PL.Volunteer
         {
             // Filter the call by status: InTreatment or InTreatmentAtRisk
             CurrentCall = (currentCall != null &&
-                          (currentCall.CallType == CallType.InTreatment || currentCall.CallType == CallType.InTreatmentAtRisk))
+                          (currentCall.Status == Status.InTreatment || currentCall.Status == Status.InTreatmentAtRisk))
                           ? currentCall
                           : null;
 

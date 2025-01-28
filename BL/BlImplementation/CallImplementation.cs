@@ -127,14 +127,6 @@ namespace BlImplementation
                 var callDO = _dal.Call.Read(assignmentDO.CallId)
                     ?? throw new BlDoesNotExistException($"No call found for ID: {assignmentDO.CallId}");
 
-                // Update the call's status
-                var updatedCall = callDO with
-                {
-                    CallType = cancellationType == DO.EndType.SelfCanceled
-                        ? DO.CallType.SelfCanceled
-                        : DO.CallType.AdminCanceled
-                };
-                _dal.Call.Update(updatedCall);
             }
 
             // Notify observers
@@ -180,12 +172,6 @@ namespace BlImplementation
                 };
                 _dal.Assignment.Update(updatedAssignment);
 
-                // Update the call's status
-                var updatedCall = callDO with
-                {
-                    CallType = DO.CallType.Completed
-                };
-                _dal.Call.Update(updatedCall);
             }
 
             // Notify observers
@@ -210,7 +196,7 @@ namespace BlImplementation
                 var callDO = _dal.Call.Read(callId)
                     ?? throw new BlDoesNotExistException($"No call found with ID: {callId}");
 
-                if (callDO.CallType != DO.CallType.Open)
+                if (CallManager.GetStatusCall(callDO.Id) != BO.Status.Open)
                     throw new BlInvalidValueException("Cannot delete a call that is not in 'Open' status.");
 
                 var assignments = _dal.Assignment.ReadAll()
@@ -295,14 +281,14 @@ namespace BlImplementation
                 // Retrieve all calls from the DAL
                 var callsFromDal = _dal.Call.ReadAll();
 
-                // Filter by CallType if specified
+                // Filter by Status if specified
                 if (status.HasValue)
                 {
                     callsFromDal = callsFromDal.Where(c =>
                     {
-                        if (Enum.IsDefined(typeof(BO.Status), (BO.Status)c.CallType))
+                        if (Enum.IsDefined(typeof(BO.Status), CallManager.GetStatusCall(c.Id)))
                         {
-                            return (BO.Status)c.CallType == status.Value;
+                            return CallManager.GetStatusCall(c.Id) == status.Value;
                         }
                         return false;
                     });
@@ -343,13 +329,7 @@ namespace BlImplementation
                     CallId = c.Id,
                     CallType = (BO.CallType)c.CallType,
                     StartTime = c.StartTime,
-                    LeftTimeTocomplete =
-            c.CallType == DO.CallType.Completed ||
-            c.CallType == DO.CallType.SelfCanceled ||
-            c.CallType == DO.CallType.Expired ||
-            c.CallType == DO.CallType.AdminCanceled
-            ? TimeSpan.Zero
-            : (c.DeadLine.HasValue ? c.DeadLine.Value - DateTime.Now : (TimeSpan?)null),
+                    LeftTimeTocomplete = (c.DeadLine.HasValue ? c.DeadLine.Value - DateTime.Now : (TimeSpan?)null),
                     LastVolunteerName = assignments
             .Where(a => a.CallId == c.Id)
             .OrderByDescending(a => a.EndTime)
@@ -372,16 +352,21 @@ namespace BlImplementation
             {
                 var callsDO = _dal.Call.ReadAll();
 
+                // Group calls by their Status property (or GetStatusCall if it's a method)
                 var groupedQuantities = from call in callsDO
-                                        group call by (int)call.CallType into callGroup
-                                        select new { CallType = callGroup.Key, Count = callGroup.Count() };
+                                        group call by (int)CallManager.GetStatusCall(call.Id) into callGroup
+                                        select new { Status = callGroup.Key, Count = callGroup.Count() };
 
-                int maxStatus = Enum.GetValues(typeof(DO.CallType)).Cast<int>().Max();
+                // Determine the maximum value in the DO.Status enum
+                int maxStatus = Enum.GetValues(typeof(DO.Status)).Cast<int>().Max();
 
+                // Initialize an array to hold quantities for each status
                 var quantities = new int[maxStatus + 1];
+
+                // Populate the array based on the grouped quantities
                 foreach (var group in groupedQuantities)
                 {
-                    quantities[group.CallType] = group.Count;
+                    quantities[group.Status] = group.Count;
                 }
 
                 return quantities;
@@ -475,10 +460,10 @@ namespace BlImplementation
                 // Filter calls to include only relevant ones (Open, OpenAtRisk, AdminCanceled, SelfCanceled)
                 var openCalls = callsDO
                     .Where(call =>
-                        call.CallType == DO.CallType.Open ||
-                        call.CallType == DO.CallType.OpenAtRisk ||
-                        call.CallType == DO.CallType.AdminCanceled ||
-                        call.CallType == DO.CallType.SelfCanceled)
+                        CallManager.GetStatusCall(call.Id) is (BO.Status)DO.Status.Open or
+                        (BO.Status)DO.Status.OpenAtRisk or
+                        (BO.Status)DO.Status.AdminCanceled or
+                        (BO.Status)DO.Status.SelfCanceled)
                     .Select(call => new BO.OpenCallInList
                     {
                         Id = call.Id,
@@ -564,14 +549,6 @@ namespace BlImplementation
 
                 _dal.Assignment.Create(newAssignment);
 
-                // Update the call type based on its current state
-                var updatedCallType = callDO.CallType == DO.CallType.OpenAtRisk
-                    ? DO.CallType.InTreatmentAtRisk
-                    : DO.CallType.InTreatment;
-
-                var updatedCall = callDO with { CallType = updatedCallType };
-
-                _dal.Call.Update(updatedCall);
 
             }
             CallManager.Observers.NotifyItemUpdated(callId);

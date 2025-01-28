@@ -24,10 +24,10 @@ namespace PL.Call
         public ObservableCollection<BO.CallInList> CallList { get; set; } = new ObservableCollection<BO.CallInList>();
 
         // Collection for call type filter
-        public ObservableCollection<BO.CallType> CallTypeCollection { get; } = new ObservableCollection<BO.CallType>((BO.CallType[])Enum.GetValues(typeof(BO.CallType)));
+        public ObservableCollection<BO.Status> CallTypeCollection { get; } = new ObservableCollection<BO.Status>((BO.Status[])Enum.GetValues(typeof(BO.Status)));
 
         // Property for the selected call type filter
-        public BO.CallType Type { get; set; }
+        public BO.Status Type { get; set; }
 
         // Property for tracking the selected call in the list
         public BO.CallInList? SelectedCall { get; set; }
@@ -38,16 +38,16 @@ namespace PL.Call
         /// <summary>
         /// Default constructor - initializes the window with no filter (CallType.None)
         /// </summary>
-        public CallListWindow() : this(BO.CallType.None) { }
+        public CallListWindow() : this(BO.Status.None) { }
 
         /// <summary>
         /// Constructor - initializes the window with a specific call type filter
         /// </summary>
-        /// <param name="callType">The call type to filter the list by</param>
-        public CallListWindow(BO.CallType callType)
+        /// <param name="status">The call type to filter the list by</param>
+        public CallListWindow(BO.Status status)
         {
             InitializeComponent();
-            Type = callType;
+            Type = status;
             DataContext = this; // Bind the data context to the current instance
             queryCallList();    // Load the initial call list
         }
@@ -73,7 +73,7 @@ namespace PL.Call
                     try
                     {
                         CallList.Clear();
-                        var filteredCalls = Type == BO.CallType.None
+                        var filteredCalls = Type == BO.Status.None
                             ? s_bl.Call.GetCallList()
                             : s_bl.Call.GetCallList(Type);
 
@@ -185,19 +185,19 @@ namespace PL.Call
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is BO.CallType callType)
+            if (value is BO.Status status)
             {
-                return callType switch
+                return status switch
                 {
-                    BO.CallType.None => Brushes.Gray,
-                    BO.CallType.Open => Brushes.Green,
-                    BO.CallType.InTreatment => Brushes.Blue,
-                    BO.CallType.Completed => Brushes.DarkGreen,
-                    BO.CallType.Expired => Brushes.OrangeRed,
-                    BO.CallType.SelfCanceled => Brushes.Orange,
-                    BO.CallType.AdminCanceled => Brushes.Red,
-                    BO.CallType.OpenAtRisk => Brushes.Yellow,
-                    BO.CallType.InTreatmentAtRisk => Brushes.Gold,
+                    BO.Status.None => Brushes.Gray,
+                    BO.Status.Open => Brushes.Green,
+                    BO.Status.InTreatment => Brushes.Blue,
+                    BO.Status.Completed => Brushes.DarkGreen,
+                    BO.Status.Expired => Brushes.OrangeRed,
+                    BO.Status.SelfCanceled => Brushes.Orange,
+                    BO.Status.AdminCanceled => Brushes.Red,
+                    BO.Status.OpenAtRisk => Brushes.Yellow,
+                    BO.Status.InTreatmentAtRisk => Brushes.Gold,
                     _ => Brushes.Black
                 };
             }

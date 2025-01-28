@@ -544,7 +544,7 @@ namespace Helpers
             lock (AdminManager.BlMutex)
             {
                 openCalls = s_dal.Call.ReadAll(c =>
-                    (c.CallType == DO.CallType.Open || c.CallType == DO.CallType.OpenAtRisk) &&
+                    (CallManager.GetStatusCall(c.Id) == BO.Status.Open || CallManager.GetStatusCall(c.Id) == BO.Status.OpenAtRisk) &&
                     c.Latitude != 0 && c.Longitude != 0).ToList();
             }
 
@@ -599,10 +599,9 @@ namespace Helpers
                     };
                     s_dal.Assignment.Update(updatedAssignment);
 
-                    var updatedCall = call with { CallType = DO.CallType.Completed };
-                    s_dal.Call.Update(updatedCall);
 
                     updatedCallIds.AddLast(call.Id);
+                    Observers.NotifyItemUpdated(call.Id);
                 }
             }
             else if (s_random.NextDouble() < 0.1) // 10% probability of canceling the call
@@ -616,12 +615,13 @@ namespace Helpers
                     };
                     s_dal.Assignment.Update(updatedAssignment);
 
-                    var updatedCall = call with { CallType = DO.CallType.Open };
-                    s_dal.Call.Update(updatedCall);
 
                     updatedCallIds.AddLast(call.Id);
+                    Observers.NotifyItemUpdated(call.Id);
                 }
             }
+
+            Observers.NotifyListUpdated();
         }
 
     }

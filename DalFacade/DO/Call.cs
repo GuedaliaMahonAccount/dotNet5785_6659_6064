@@ -29,6 +29,6 @@ namespace DO
         /// <summary>
         /// Default constructor for a call
         /// </summary>
-        public Call() : this(0, CallType.Open, "", 0, 0, DateTime.Now, null, null) { }
+        public Call() : this(0, CallType.None, "", 0, 0, DateTime.Now, null, null) { }
     }
 }

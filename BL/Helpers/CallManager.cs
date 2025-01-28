@@ -396,28 +396,28 @@ namespace Helpers
                     if (timeLeft <= riskRange)
                     {
                         // Update calls to risk status if within range
-                        switch (call.CallType)
-                        {
-                            case DO.CallType.Open:
-                                updatedCall = call with { CallType = DO.CallType.OpenAtRisk };
-                                break;
-                            case DO.CallType.InTreatment:
-                                updatedCall = call with { CallType = DO.CallType.InTreatmentAtRisk };
-                                break;
-                        }
+                        //switch (CallManager.GetStatusCall(call.Id))
+                        //{
+                        //    case BO.Status.Open:
+                        //        updatedCall = call with { Status = DO.Status.OpenAtRisk };
+                        //        break;
+                        //    case BO.Status.InTreatment:
+                        //        updatedCall = call with { Status = DO.Status.InTreatmentAtRisk };
+                        //        break;
+                        //}
                     }
                     else
                     {
                         // Revert calls to non-risk status if out of range
-                        switch (call.CallType)
-                        {
-                            case DO.CallType.OpenAtRisk:
-                                updatedCall = call with { CallType = DO.CallType.Open };
-                                break;
-                            case DO.CallType.InTreatmentAtRisk:
-                                updatedCall = call with { CallType = DO.CallType.InTreatment };
-                                break;
-                        }
+                        //switch (call.CallType)
+                        //{
+                        //    case DO.CallType.OpenAtRisk:
+                        //        updatedCall = call with { CallType = DO.CallType.Open };
+                        //        break;
+                        //    case DO.CallType.InTreatmentAtRisk:
+                        //        updatedCall = call with { CallType = DO.CallType.InTreatment };
+                        //        break;
+                        //}
                     }
 
                     if (updatedCall != null)

@@ -26,7 +26,7 @@ namespace BO
         public DateTime? EstimatedCompletionTime { get; init; }
         public DateTime AssignmentStartTime { get; init; }
         public double Distance { get; init; }
-        public CallType Status { get; init; }
+        public Status Status { get; init; }
 
         public override string ToString()
         {

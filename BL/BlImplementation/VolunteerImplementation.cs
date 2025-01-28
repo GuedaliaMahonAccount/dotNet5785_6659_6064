@@ -5,9 +5,10 @@ using System.Linq;
 using BO;
 using BlApi;
 using DO;
+using DalApi;
 
 
-internal class VolunteerImplementation : IVolunteer
+internal class VolunteerImplementation : BlApi.IVolunteer
 {
     private readonly DalApi.IDal _dal = DalApi.Factory.Get;
     private static readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
@@ -119,7 +120,7 @@ internal class VolunteerImplementation : IVolunteer
                     EstimatedCompletionTime = activeAssignment.EndTime,
                     AssignmentStartTime = activeAssignment.StartTime,
                     Distance = VolunteerManager.CalculateDistance(volunteerData.Latitude, volunteerData.Longitude, callData.Latitude, callData.Longitude),
-                    Status = BO.CallType.InTreatment
+                    Status = CallManager.GetStatusCall(callData.Id)
                 };
 
                 // Assign the call in progress to the volunteer
@@ -245,11 +246,6 @@ internal class VolunteerImplementation : IVolunteer
                                 .Select(c => (BO.CallType?)c.CallType)
                                 .FirstOrDefault() ?? BO.CallType.None;
 
-                            // Check if the current call type is InTreatment or InTreatmentAtRisk
-                            if (currentCallType == BO.CallType.InTreatment || currentCallType == BO.CallType.InTreatmentAtRisk)
-                            {
-                                return currentCallType;
-                            }
 
                             return BO.CallType.None;
                         });
@@ -284,16 +280,10 @@ internal class VolunteerImplementation : IVolunteer
                 if (currentAssignment != null)
                 {
                     // Retrieve the call type associated with the current assignment
-                    var callType = _dal.Call.ReadAll()
+                    currentCallType = _dal.Call.ReadAll()
                         .Where(c => c.Id == currentAssignment.CallId)
                         .Select(c => (BO.CallType?)c.CallType)
-                        .FirstOrDefault();
-
-                    // Assign to currentCallType if it's valid
-                    if (callType == BO.CallType.InTreatment || callType == BO.CallType.InTreatmentAtRisk)
-                    {
-                        currentCallType = callType.Value;
-                    }
+                        .FirstOrDefault() ?? BO.CallType.None; // Default to None if null
                 }
 
                 // Map the volunteer to the BO.VolunteerInList
@@ -306,9 +296,10 @@ internal class VolunteerImplementation : IVolunteer
                     CancelledCallsCount = assignments.Count(call => call.VolunteerId == v.Id && Enum.Equals(call.EndType, DO.EndType.SelfCanceled)),
                     ExpiredCallsCount = assignments.Count(call => call.VolunteerId == v.Id && Enum.Equals(call.EndType, DO.EndType.Expired)),
                     CurrentCallId = currentAssignment?.CallId ?? 0, // Assign 0 if no current assignment
-                    CurrentCallType = currentCallType // Assign None if no active call
+                    CurrentCallType = currentCallType // Use the resolved CurrentCallType
                 };
             });
+
         }
     }
 
@@ -619,7 +610,7 @@ internal class VolunteerImplementation : IVolunteer
                         _dal.Volunteer.Read(volunteerId).Longitude,
                         callData.Latitude,
                         callData.Longitude),
-                    Status = (BO.CallType)callData.CallType
+                    Status = CallManager.GetStatusCall(callData.Id)
                 };
 
                 currentCalls.Add(callInProgress);

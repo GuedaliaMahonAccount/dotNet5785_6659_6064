@@ -3,7 +3,7 @@
     public interface ICall : IObservable
     {
         int[] GetCallQuantities();
-        IEnumerable<BO.CallInList> GetCallList(BO.CallType? callType = null, BO.CallSortField? sortByField = null);
+        IEnumerable<BO.CallInList> GetCallList(BO.Status? status = null, BO.CallSortField? sortByField = null);
         BO.Call GetCallDetails(int callId);
         Task UpdateCallAsync(BO.Call call); // Changed to async
         void DeleteCall(int callId);

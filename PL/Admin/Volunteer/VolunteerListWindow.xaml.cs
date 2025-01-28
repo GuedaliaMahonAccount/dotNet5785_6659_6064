@@ -183,16 +183,16 @@ namespace PL.Volunteer
             }
         }
 
-        private void FilterVolunteersByStatus(BO.CallType? status)
+        private void FilterVolunteersByStatus(BO.CallType? callType)
         {
-            if (status == null || status == BO.CallType.None)
+            if (callType == null || callType == BO.CallType.None)
             {
                 VolunteerList = _allVolunteers; 
             }
             else
             {
                 VolunteerList = _allVolunteers
-                                .Where(volunteer => volunteer.CurrentCallType == status)
+                                .Where(volunteer => volunteer.CurrentCallType == callType)
                                 .ToList();
             }
         }
@@ -250,14 +250,20 @@ namespace PL.Volunteer
                 return callType switch
                 {
                     BO.CallType.None => Brushes.Gray,
-                    BO.CallType.Open => Brushes.Green,
-                    BO.CallType.InTreatment => Brushes.Blue,
-                    BO.CallType.Completed => Brushes.DarkGreen,
-                    BO.CallType.Expired => Brushes.OrangeRed,
-                    BO.CallType.SelfCanceled => Brushes.Orange,
-                    BO.CallType.AdminCanceled => Brushes.Red,
-                    BO.CallType.OpenAtRisk => Brushes.Yellow,
-                    BO.CallType.InTreatmentAtRisk => Brushes.Gold,
+                    BO.CallType.PrepareFood => Brushes.Orange,
+                    BO.CallType.CleanClothes => Brushes.LightBlue,
+                    BO.CallType.DeliverFood => Brushes.Green,
+                    BO.CallType.ProvideTransportation => Brushes.Purple,
+                    BO.CallType.OrganizeEvents => Brushes.Gold,
+                    BO.CallType.SupplyDistribution => Brushes.DarkGreen,
+                    BO.CallType.MedicalSupport => Brushes.Red,
+                    BO.CallType.PsychologicalSupport => Brushes.Pink,
+                    BO.CallType.EquipmentRepair => Brushes.Brown,
+                    BO.CallType.CampSetup => Brushes.Teal,
+                    BO.CallType.CleanFacilities => Brushes.LightGray,
+                    BO.CallType.ITSupport => Brushes.Cyan,
+                    BO.CallType.LanguageTranslation => Brushes.LightGreen,
+                    BO.CallType.Tutoring => Brushes.Yellow,
                     _ => Brushes.Black
                 };
             }
@@ -270,4 +276,5 @@ namespace PL.Volunteer
             throw new NotImplementedException();
         }
     }
+
 }

@@ -110,20 +110,18 @@ namespace PL
                     {
                         int[] quantities = s_bl.Call.GetCallQuantities();
                         CallQuantities.Clear();
-                        foreach (BO.CallType callType in Enum.GetValues(typeof(BO.CallType)))
+                        foreach (BO.Status status in Enum.GetValues(typeof(BO.Status)))
                         {
                             CallQuantities.Add(new KeyValuePair<string, int>(
-                                callType.ToString(),
-                                quantities[(int)callType]));
+                                status.ToString(),
+                                quantities[(int)status]));
                         }
 
-                        // Debug: Check if the collection is filled
-                        Debug.WriteLine($"CallQuantities count: {CallQuantities.Count}");
                     }
                     catch (Exception ex)
                     {
                         MessageBox.Show($"Error loading call quantities: {ex.Message}", "Error",
-                                       MessageBoxButton.OK, MessageBoxImage.Error);
+                                        MessageBoxButton.OK, MessageBoxImage.Error);
                     }
                     finally
                     {
@@ -135,9 +133,9 @@ namespace PL
 
         private void NavigateToCallList(string callTypeStr)
         {
-            if (Enum.TryParse(callTypeStr, out BO.CallType callType))
+            if (Enum.TryParse(callTypeStr, out BO.Status status))
             {
-                new Call.CallListWindow(callType).Show();
+                new Call.CallListWindow(status).Show();
             }
         }
 
@@ -281,7 +279,7 @@ namespace PL
 
         private void BtnHandleCall_Click(object sender, RoutedEventArgs e)
         {
-            new Call.CallListWindow(BO.CallType.None).Show();
+            new Call.CallListWindow(BO.Status.None).Show();
         }
 
         private void btnResetDB_Click(object sender, RoutedEventArgs e)

@@ -21,7 +21,7 @@ namespace BO
         public TimeSpan? LeftTimeToExpire { get; init; }
         public string? LastVolunteerName { get; init; }
         public TimeSpan? LeftTimeTocomplete { get; init; }
-        public CallType Status { get; init; }
+        public Status Status { get; init; }
         public int AssignmentCount { get; init; }
 
         public override string ToString()

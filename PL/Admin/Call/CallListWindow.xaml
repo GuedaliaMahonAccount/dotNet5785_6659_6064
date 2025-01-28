@@ -33,7 +33,7 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            <Label Content="Filter Calls By Type:" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center" />
+            <Label Content="Filter Calls By Status:" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center" />
             <ComboBox ItemsSource="{Binding CallTypeCollection}"
                       SelectedValue="{Binding Type, Mode=TwoWay}"
                       SelectionChanged="CbCallTypeSelector_SelectionChanged"
@@ -53,7 +53,7 @@
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding Status}" FontSize="16"
-                                       Foreground="{Binding CallType, Converter={StaticResource CallTypeToColorConverter}}" />
+                                       Foreground="{Binding Status, Converter={StaticResource CallTypeToColorConverter}}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>

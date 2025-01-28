@@ -234,11 +234,7 @@ namespace DalTest
 
                 // Fix the remaining time to 0 for specific statuses
                 TimeSpan? leftTime = null;
-                if (callTypes[i] == CallType.Completed || callTypes[i] == CallType.SelfCanceled || callTypes[i] == CallType.Expired)
-                {
-                    leftTime = TimeSpan.Zero; // Force remaining time to 0
-                }
-                else if (deadline.HasValue)
+                if (deadline.HasValue)
                 {
                     leftTime = deadline.Value - DateTime.Now; // Calculate remaining time
                 }
@@ -274,15 +270,15 @@ namespace DalTest
             // Assign volunteers to calls
             foreach (var call in calls)
             {
-                // Skip calls that should not be assigned
-                if (call.CallType == CallType.None ||
-                    call.CallType == CallType.Open ||
-                    call.CallType == CallType.OpenAtRisk ||
-                    call.CallType == CallType.AdminCanceled ||
-                    call.CallType == CallType.SelfCanceled)
-                {
-                    continue; // Skip these calls
-                }
+                //// Skip calls that should not be assigned
+                //if (call.CallType == CallType.None ||
+                //    call.CallType == CallType.Open ||
+                //    call.CallType == CallType.OpenAtRisk ||
+                //    call.CallType == CallType.AdminCanceled ||
+                //    call.CallType == CallType.SelfCanceled)
+                //{
+                //    continue; // Skip these calls
+                //}
 
                 // Assign a volunteer randomly
                 var volunteer = shuffledVolunteers[s_rand.Next(totalVolunteers)];

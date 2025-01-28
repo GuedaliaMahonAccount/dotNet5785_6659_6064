@@ -73,6 +73,25 @@ public enum Status
     OpenAtRisk,        // The call is open and nearing its required completion time, within a risk time range defined by the administrator.
     InTreatmentAtRisk // The call is currently in treatment but nearing its required completion time, within a risk time range defined by the administrator.
 }
+public enum CallType
+{
+    None,
+    PrepareFood,            // Preparing meals or food supplies for soldiers
+    CleanClothes,           // Collecting, washing, and returning soldiers' laundry
+    DeliverFood,            // Delivering meals or food supplies to designated locations
+    ProvideTransportation,  // Transporting soldiers, supplies, or equipment
+    OrganizeEvents,         // Planning and organizing morale-boosting activities or events
+    SupplyDistribution,     // Distributing hygiene kits, uniforms, or other essential supplies
+    MedicalSupport,         // Providing basic first aid or medical assistance (if qualified)
+    PsychologicalSupport,   // Offering emotional or mental health support
+    EquipmentRepair,        // Repairing or maintaining essential equipment or tools
+    CampSetup,              // Setting up temporary camps, tents, or living areas
+    CleanFacilities,        // Cleaning and maintaining living or operational facilities
+    ITSupport,              // Assisting with technology setup, maintenance, or troubleshooting
+    LanguageTranslation,    // Assisting with communication and translations in different languages
+    Tutoring,               // Providing educational support or tutoring for soldiers
+}
+
 public enum EndType
 {
     Completed,            // The call was successfully handled and completed before the maximum allowed time.
