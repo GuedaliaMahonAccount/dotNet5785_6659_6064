@@ -291,7 +291,7 @@ namespace Helpers
         /// </summary>
         public static void UpdateExpiredCalls()
         {
-            DateTime systemTime = DateTime.Now;
+            DateTime systemTime = AdminManager.Now;
 
             // Fetch all calls and convert to a concrete list to avoid deferred execution
             List<DO.Call> callList;
@@ -596,7 +596,7 @@ namespace Helpers
             {
                 var _call = new CallImplementation().GetCallDetails(CallID);
 
-                if (_call.DeadLine.HasValue && _call.DeadLine.Value < DateTime.Now)
+                if (_call.DeadLine.HasValue && _call.DeadLine.Value < AdminManager.Now)
                 {
                     if (_call.Assignments != null && _call.Assignments.Any(a => a.EndType == BO.EndType.Completed))
                     {

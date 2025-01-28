@@ -8,6 +8,7 @@ using System.Text;
 using BO;
 using System.Globalization;
 using BlImplementation;
+using DO;
 
 namespace Helpers
 {
@@ -170,7 +171,7 @@ namespace Helpers
         public static async Task<(double latitude, double longitude)?> GetCoordinatesFromAddressAsync(string address)
         {
             if (string.IsNullOrWhiteSpace(address))
-                throw new ArgumentNullException(nameof(address), "Address cannot be null or empty.");
+                throw new System.ArgumentNullException(nameof(address), "Address cannot be null or empty.");
 
             string apiKey = "pk.24d7295db243a75d8b3c688089250321";
             string url = $"https://api.locationiq.com/v1/search.php?key={apiKey}&q={WebUtility.UrlEncode(address)}&format=json";
@@ -292,51 +293,51 @@ namespace Helpers
         /// <param name="distanceType"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentException"></exception>
-        public static double CalculateDistance(double lat1, double lon1, double lat2, double lon2, DistanceType distanceType)
+        public static double CalculateDistance(double lat1, double lon1, double lat2, double lon2, BO.DistanceType distanceType)
         {
             const double R = 6371; // Earth's radius in kilometers
 
             switch (distanceType)
             {
-                case DistanceType.Plane:
-                case DistanceType.Helicopter:
-                case DistanceType.Drone:
+                case BO.DistanceType.Plane:
+                case BO.DistanceType.Helicopter:
+                case BO.DistanceType.Drone:
                     // Straight-line distance (Haversine formula)
                     return CalculateHaversineDistance(lat1, lon1, lat2, lon2);
 
-                case DistanceType.Foot:
-                case DistanceType.HikingTrail:
-                case DistanceType.UrbanShortcuts:
+                case BO.DistanceType.Foot:
+                case BO.DistanceType.HikingTrail:
+                case BO.DistanceType.UrbanShortcuts:
                     // Walking distance approximation (increase Haversine distance by 30% for paths)
                     return CalculateHaversineDistance(lat1, lon1, lat2, lon2) * 1.3;
 
-                case DistanceType.Car:
-                case DistanceType.Bus:
-                case DistanceType.OffRoadVehicle:
+                case BO.DistanceType.Car:
+                case BO.DistanceType.Bus:
+                case BO.DistanceType.OffRoadVehicle:
                     // Driving distance approximation (increase Haversine by 50%)
                     return CalculateHaversineDistance(lat1, lon1, lat2, lon2) * 1.5;
 
-                case DistanceType.Bike:
-                case DistanceType.BicycleShare:
-                case DistanceType.Scooter:
+                case BO.DistanceType.Bike:
+                case BO.DistanceType.BicycleShare:
+                case BO.DistanceType.Scooter:
                     // Biking distance approximation (increase Haversine by 40%)
                     return CalculateHaversineDistance(lat1, lon1, lat2, lon2) * 1.4;
 
-                case DistanceType.PublicTransport:
-                case DistanceType.Train:
-                case DistanceType.Waterway:
+                case BO.DistanceType.PublicTransport:
+                case BO.DistanceType.Train:
+                case BO.DistanceType.Waterway:
                     // Assume a detour factor of 1.7 for routes with public transport or waterways
                     return CalculateHaversineDistance(lat1, lon1, lat2, lon2) * 1.7;
 
-                case DistanceType.Horse:
-                case DistanceType.Ski:
-                case DistanceType.Snowmobile:
-                case DistanceType.Rollerblade:
-                case DistanceType.Skateboard:
+                case BO.DistanceType.Horse:
+                case BO.DistanceType.Ski:
+                case BO.DistanceType.Snowmobile:
+                case BO.DistanceType.Rollerblade:
+                case BO.DistanceType.Skateboard:
                     // Increase Haversine by 20% for terrain-based travel
                     return CalculateHaversineDistance(lat1, lon1, lat2, lon2) * 1.2;
 
-                case DistanceType.Boat:
+                case BO.DistanceType.Boat:
                     // Assume minimal detour for water travel
                     return CalculateHaversineDistance(lat1, lon1, lat2, lon2) * 1.1;
 
@@ -578,49 +579,58 @@ namespace Helpers
         private static void HandleActiveCall(DO.Volunteer volunteer, DO.Assignment activeAssignment, LinkedList<int> updatedCallIds)
         {
             var call = s_dal.Call.Read(activeAssignment.CallId);
+            var _callImplementation = new CallImplementation();
 
-            // Determine if enough time has passed to complete the call
+            // Ensure the call exists
+            if (call == null)
+            {
+                Console.WriteLine($"Call with ID {activeAssignment.CallId} not found.");
+                return;
+            }
+
+            // Calculate the distance between the volunteer and the call's location
             double distance = CalculateDistance(
                 volunteer.Latitude ?? 0, volunteer.Longitude ?? 0,
-                call.Latitude, call.Longitude);
+                call.Latitude, call.Longitude
+            );
 
-            TimeSpan estimatedDuration = TimeSpan.FromMinutes(distance / 5); // Assume 5 km/h travel
-            estimatedDuration += TimeSpan.FromMinutes(s_random.Next(10, 30)); // Add random buffer time
+            // Estimate the time required to complete the call (assumes 5 km/h travel)
+            TimeSpan estimatedDuration = TimeSpan.FromMinutes(distance / 5);
+            estimatedDuration += TimeSpan.FromMinutes(s_random.Next(1440, 4320)); // Random time between 1 to 3 days
 
+            // Check if enough time has passed to complete the call
             if (DateTime.Now - activeAssignment.StartTime >= estimatedDuration)
             {
-                // Mark the call as completed
-                lock (AdminManager.BlMutex)
+                try
                 {
-                    var updatedAssignment = activeAssignment with
-                    {
-                        EndTime = DateTime.Now,
-                        EndType = DO.EndType.Completed
-                    };
-                    s_dal.Assignment.Update(updatedAssignment);
+                    // Complete the call using the existing method
+                    _callImplementation.CompleteCall(activeAssignment.VolunteerId, activeAssignment.Id);
 
-
+                    // Add the call ID to the list of updated calls for observer notifications
                     updatedCallIds.AddLast(call.Id);
-                    Observers.NotifyItemUpdated(call.Id);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error completing call ID {call.Id}: {ex.Message}");
                 }
             }
             else if (s_random.NextDouble() < 0.1) // 10% probability of canceling the call
             {
-                lock (AdminManager.BlMutex)
+                try
                 {
-                    var updatedAssignment = activeAssignment with
-                    {
-                        EndTime = DateTime.Now,
-                        EndType = DO.EndType.SelfCanceled
-                    };
-                    s_dal.Assignment.Update(updatedAssignment);
+                    // Cancel the call using the existing method
+                    _callImplementation.CancelCall(activeAssignment.VolunteerId, activeAssignment.Id);
 
-
+                    // Add the call ID to the list of updated calls for observer notifications
                     updatedCallIds.AddLast(call.Id);
-                    Observers.NotifyItemUpdated(call.Id);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error canceling call ID {call.Id}: {ex.Message}");
                 }
             }
 
+            // Notify observers after updates
             Observers.NotifyListUpdated();
         }
 

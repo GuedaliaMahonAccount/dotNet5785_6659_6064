@@ -73,7 +73,7 @@ namespace PL
         {
             InitializeComponent();
             CallQuantities = new ObservableCollection<KeyValuePair<string, int>>();
-            InitializeTimer();
+            //InitializeTimer();
             NavigateToCallListCommand = new RelayCommand<string>(NavigateToCallList);
             DataContext = this;  // Set this after initializing all properties
             LoadCallQuantities();  // Load the data after setting DataContext

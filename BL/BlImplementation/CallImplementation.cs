@@ -329,7 +329,7 @@ namespace BlImplementation
                     CallId = c.Id,
                     CallType = (BO.CallType)c.CallType,
                     StartTime = c.StartTime,
-                    LeftTimeTocomplete = (c.DeadLine.HasValue ? c.DeadLine.Value - DateTime.Now : (TimeSpan?)null),
+                    LeftTimeTocomplete = (c.DeadLine.HasValue ? c.DeadLine.Value - AdminManager.Now : (TimeSpan?)null),
                     LastVolunteerName = assignments
             .Where(a => a.CallId == c.Id)
             .OrderByDescending(a => a.EndTime)

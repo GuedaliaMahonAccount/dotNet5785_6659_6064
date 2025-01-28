@@ -135,7 +135,7 @@
                         </Style>
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
-                <DataGridTextColumn Header="Status" Binding="{Binding Status}">
+                <DataGridTextColumn Header="CallType" Binding="{Binding Status}">
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
                             <Setter Property="FontSize" Value="18" />
