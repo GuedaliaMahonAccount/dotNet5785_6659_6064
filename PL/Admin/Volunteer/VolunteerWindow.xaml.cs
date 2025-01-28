@@ -109,22 +109,29 @@ namespace PL.Volunteer
             {
                 if (ButtonText == "Add")
                 {
-                    await s_bl.Volunteer.AddVolunteerAsync(CurrentVolunteer); 
+                    await s_bl.Volunteer.AddVolunteerAsync(CurrentVolunteer); // Wait for the asynchronous addition
                     MessageBox.Show("Volunteer added successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
                 else
                 {
-                    await s_bl.Volunteer.UpdateVolunteerAsync(CurrentVolunteer.Id, CurrentVolunteer); 
+                    await s_bl.Volunteer.UpdateVolunteerAsync(CurrentVolunteer.Id, CurrentVolunteer); // Wait for the asynchronous update
                     MessageBox.Show("Volunteer updated successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
 
-                Close(); 
+                Close(); // Close the window after success
+            }
+            catch (BO.BLTemporaryNotAvailableException ex)
+            {
+                // Handle the specific exception if the simulator is running
+                MessageBox.Show($"Operation not allowed: {ex.Message}", "Simulator Running", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
             catch (Exception ex)
             {
+                // Handle all other exceptions
                 MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+
 
         // see current call window
         private void btnViewCurrentCall_Click(object sender, RoutedEventArgs e)

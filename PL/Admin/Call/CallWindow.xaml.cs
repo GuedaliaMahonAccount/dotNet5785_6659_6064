@@ -88,25 +88,31 @@ namespace PL.Call
         }
 
         // Event handler for Add/Update button
-        private void BtnAddUpdate_Click(object sender, RoutedEventArgs e)
+        private async void BtnAddUpdate_Click(object sender, RoutedEventArgs e)
         {
             try
             {
                 if (ButtonText == "Add")
                 {
-                    s_bl.Call.AddCallAsync(CurrentCall); // Add new Call
+                    await s_bl.Call.AddCallAsync(CurrentCall); // Wait for the asynchronous addition
                     MessageBox.Show("Call added successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
                 else
                 {
-                    s_bl.Call.UpdateCallAsync(CurrentCall); // Update existing Call
+                    await s_bl.Call.UpdateCallAsync(CurrentCall); // Wait for the asynchronous update
                     MessageBox.Show("Call updated successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
 
-                Close();
+                Close(); // Close the window after success
+            }
+            catch (BO.BLTemporaryNotAvailableException ex)
+            {
+                // Handle the specific exception when the simulator is running
+                MessageBox.Show($"Operation not allowed: {ex.Message}", "Simulator Running", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
             catch (Exception ex)
             {
+                // Handle all other exceptions
                 MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }

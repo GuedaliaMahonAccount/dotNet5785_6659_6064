@@ -488,6 +488,7 @@ internal class VolunteerImplementation : IVolunteer
     /// </exception>
     public async Task AddVolunteerAsync(BO.Volunteer newvolunteer)
     {
+        AdminManager.ThrowOnSimulatorIsRunning();
         await _semaphore.WaitAsync();
         try
         {
