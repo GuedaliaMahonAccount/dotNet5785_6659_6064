@@ -525,7 +525,7 @@ namespace BlImplementation
         /// <exception cref="BlInvalidValueException">Thrown when the call is already assigned or expired.</exception>
         public void selectionCall(int volunteerId, int callId)
         {
-            AdminManager.ThrowOnSimulatorIsRunning();
+            //AdminManager.ThrowOnSimulatorIsRunning();
             lock (AdminManager.BlMutex)
             {
                 var callDO = _dal.Call.Read(callId)

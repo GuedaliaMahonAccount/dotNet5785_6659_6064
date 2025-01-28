@@ -113,7 +113,6 @@ namespace PL.User
         {
             if (!_isUpdating)
             {
-                _isUpdating = true;
                 Dispatcher.BeginInvoke(new Action(() =>
                 {
                     queryCallList(); // Refresh the call list on UI thread

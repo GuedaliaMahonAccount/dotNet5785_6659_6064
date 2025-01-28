@@ -7,6 +7,7 @@ using System.Security.Cryptography;
 using System.Text;
 using BO;
 using System.Globalization;
+using BlImplementation;
 
 namespace Helpers
 {
@@ -542,11 +543,9 @@ namespace Helpers
             List<DO.Call> openCalls;
             lock (AdminManager.BlMutex)
             {
-                // Remove the HasValue check since Latitude and Longitude are non-nullable
                 openCalls = s_dal.Call.ReadAll(c =>
                     (c.CallType == DO.CallType.Open || c.CallType == DO.CallType.OpenAtRisk) &&
                     c.Latitude != 0 && c.Longitude != 0).ToList();
-
             }
 
             if (openCalls.Count > 0)
@@ -554,28 +553,21 @@ namespace Helpers
                 // Select a random call
                 var selectedCall = openCalls[s_random.Next(openCalls.Count)];
 
-                lock (AdminManager.BlMutex)
+                try
                 {
-                    // Create an assignment for the volunteer
-                    var newAssignment = new DO.Assignment
-                    (
-                        Id: s_dal.Config.NextAssignmentId,
-                        CallId: selectedCall.Id,
-                        VolunteerId: volunteerId,
-                        StartTime: DateTime.Now,
-                        EndTime: null,
-                        EndType: null
-                    );
-                    s_dal.Assignment.Create(newAssignment);
+                    // Get an instance of CallImplementation (or use a dependency-injected version)
+                    var callManager = new CallImplementation();
 
-                    // Update the call status
-                    var updatedCallType = selectedCall.CallType == DO.CallType.OpenAtRisk
-                        ? DO.CallType.InTreatmentAtRisk
-                        : DO.CallType.InTreatment;
-                    var updatedCall = selectedCall with { CallType = updatedCallType };
-                    s_dal.Call.Update(updatedCall);
+                    // Use selectionCall from CallImplementation
+                    callManager.selectionCall(volunteerId, selectedCall.Id);
 
+                    // Add the selected call ID to the updated list
                     updatedCallIds.AddLast(selectedCall.Id);
+                }
+                catch (Exception ex)
+                {
+                    // Handle errors during assignment (e.g., if the call is already assigned)
+                    Console.WriteLine($"Error assigning call ID {selectedCall.Id} to volunteer ID {volunteerId}: {ex.Message}");
                 }
             }
         }
