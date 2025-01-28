@@ -8,6 +8,7 @@ using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
+using Helpers;
 
 namespace PL.Call
 {
@@ -129,8 +130,26 @@ namespace PL.Call
         /// </summary>
         private void AddCallButton_Click(object sender, RoutedEventArgs e)
         {
-            new CallWindow().Show();
+            try
+            {
+                // Call the method to check if the simulator is running
+                s_bl.Admin.checkSimulator();
+
+                // If no exception, open the CallWindow
+                new CallWindow().Show();
+            }
+            catch (BO.BLTemporaryNotAvailableException ex)
+            {
+                // Catch the specific exception and show an error message
+                MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            catch (Exception ex)
+            {
+                // Catch any other unexpected exceptions
+                MessageBox.Show($"An unexpected error occurred: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
+
     }
 
     public class TimeSpanToLabeledStringConverter : IValueConverter
