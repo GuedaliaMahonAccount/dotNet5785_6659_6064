@@ -68,8 +68,12 @@ namespace BlImplementation
                 );
 
                 // Add the call to the database
-                _dal.Call.Create(callDO);
-                CallManager.Observers.NotifyListUpdated();
+
+                lock (AdminManager.BlMutex)
+                {
+                    _dal.Call.Create(callDO);
+                    CallManager.Observers.NotifyListUpdated();
+                }
             }
             finally
             {
@@ -627,10 +631,14 @@ namespace BlImplementation
                     DeadLine: call.DeadLine
                 );
 
-                // Update the call in the DAL
-                _dal.Call.Update(callDO);
-                CallManager.Observers.NotifyItemUpdated(callDO.Id);
-                CallManager.Observers.NotifyListUpdated();
+
+                lock (AdminManager.BlMutex)
+                {
+                    // Update the call in the DAL
+                    _dal.Call.Update(callDO);
+                    CallManager.Observers.NotifyItemUpdated(callDO.Id);
+                    CallManager.Observers.NotifyListUpdated();
+                }
             }
             finally
             {

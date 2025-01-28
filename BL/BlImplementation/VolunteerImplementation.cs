@@ -558,8 +558,13 @@ internal class VolunteerImplementation : IVolunteer
                 throw new BlInvalidValueException($"Volunteer with ID {newvolunteer.Id} already exists.");
 
             // Save to database
-            _dal.Volunteer.Create(newVolunteer);
-            VolunteerManager.Observers.NotifyListUpdated();
+
+            lock (AdminManager.BlMutex)
+            {
+                _dal.Volunteer.Create(newVolunteer);
+                VolunteerManager.Observers.NotifyListUpdated();
+            }
+
         }
         finally
         {

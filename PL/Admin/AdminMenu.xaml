@@ -121,14 +121,43 @@
         <StackPanel Grid.Column="0" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="20">
             <TextBlock Text="Set risk time for call to expire (Day)" FontSize="16" Foreground="White" Margin="0,0,0,10" />
             <StackPanel Orientation="Horizontal">
-                <TextBox Text="{Binding MaxYearRange, UpdateSourceTrigger=PropertyChanged}" Width="60" Height="30" 
-                         TextAlignment="Center" FontSize="14" Background="White" Margin="0,0,10,0" />
+                <!-- TextBox -->
+                <TextBox Text="{Binding MaxYearRange, UpdateSourceTrigger=PropertyChanged}" 
+                 Width="60" Height="30" TextAlignment="Center" FontSize="14" Background="White" Margin="0,0,10,0"
+                 IsEnabled="{Binding IsSimulatorRunning, Converter={StaticResource SimulatorRunningToBoolConverter}, ConverterParameter=Invert}">
+                    <TextBox.Style>
+                        <Style TargetType="TextBox">
+                            <Setter Property="Background" Value="White" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsSimulatorRunning}" Value="True">
+                                    <Setter Property="Background" Value="LightGray" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBox.Style>
+                </TextBox>
+
+                <!-- Button -->
                 <Button Content="Update" Width="100" Height="30" FontSize="14" Click="btnUpdateMaxYearRange_Click" 
-                        Background="SlateBlue" Foreground="White" />
+                Background="SlateBlue" Foreground="White" 
+                IsEnabled="{Binding IsSimulatorRunning, Converter={StaticResource SimulatorRunningToBoolConverter}, ConverterParameter=Invert}">
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Setter Property="Background" Value="SlateBlue" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsSimulatorRunning}" Value="True">
+                                    <Setter Property="Background" Value="Gray" />
+                                    <Setter Property="Foreground" Value="DarkGray" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
             </StackPanel>
         </StackPanel>
 
-      
+
+
 
         <!-- Volunteer and Call Management -->
         <StackPanel Grid.Column="1" Grid.Row="6" VerticalAlignment="Top" HorizontalAlignment="Center">
