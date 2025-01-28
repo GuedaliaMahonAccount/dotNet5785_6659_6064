@@ -623,7 +623,7 @@ namespace Helpers
 
                 if (_call.Assignments != null && _call.Assignments.Any(a => a.EndTime == null))
                 {
-                    if ((DateTime.Now - _call.StartTime) >= AdminManager.RiskRange)
+                    if ((_call.DeadLine - AdminManager.Now) <= AdminManager.RiskRange)
                     {
                         return BO.Status.InTreatmentAtRisk;
                     }
@@ -635,7 +635,7 @@ namespace Helpers
 
                 if (_call.Assignments == null || !_call.Assignments.Any())
                 {
-                    if ((DateTime.Now - _call.StartTime) >= AdminManager.RiskRange)
+                    if (( _call.DeadLine - AdminManager.Now) <= AdminManager.RiskRange)
                     {
                         return BO.Status.OpenAtRisk;
                     }
