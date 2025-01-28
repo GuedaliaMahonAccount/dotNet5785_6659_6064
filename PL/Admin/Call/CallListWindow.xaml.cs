@@ -158,6 +158,11 @@ namespace PL.Call
         {
             if (value is TimeSpan timeSpan)
             {
+                if (timeSpan == TimeSpan.Zero)
+                {
+                    return "No time left";
+                }
+
                 var parts = new List<string>();
 
                 if (timeSpan.Days > 0)
@@ -172,7 +177,7 @@ namespace PL.Call
                 return parts.Count > 0 ? string.Join(", ", parts) : "0";
             }
 
-            return string.Empty; // If value is not a TimeSpan
+            return "No time left"; 
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
