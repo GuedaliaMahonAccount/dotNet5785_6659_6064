@@ -270,18 +270,32 @@ namespace DalTest
             // Assign volunteers to calls
             foreach (var call in calls)
             {
-                //// Skip calls that should not be assigned
-                //if (call.CallType == CallType.None ||
-                //    call.CallType == CallType.Open ||
-                //    call.CallType == CallType.OpenAtRisk ||
-                //    call.CallType == CallType.AdminCanceled ||
-                //    call.CallType == CallType.SelfCanceled)
-                //{
-                //    continue; // Skip these calls
-                //}
+                Volunteer volunteer;
+                int attempts = 0;
 
-                // Assign a volunteer randomly
-                var volunteer = shuffledVolunteers[s_rand.Next(totalVolunteers)];
+                // Find a volunteer with less than 1 assignments
+                do
+                {
+                    volunteer = shuffledVolunteers[s_rand.Next(totalVolunteers)];
+
+                    // Check the number of assignments for this volunteer
+                    int assignmentCount = s_dal.Assignment
+                        .ReadAll()
+                        .Count(a => a.VolunteerId == volunteer.Id);
+
+                    if (assignmentCount < 1)
+                    {
+                        break;
+                    }
+
+                    attempts++;
+                } while (attempts < totalVolunteers);
+
+                // Skip if no suitable volunteer was found
+                if (attempts == totalVolunteers)
+                {
+                    continue;
+                }
 
                 // Generate a random start time within a reasonable range
                 DateTime startTime = call.StartTime.AddHours(s_rand.Next(1, 24));
