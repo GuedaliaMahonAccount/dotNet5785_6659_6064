@@ -4,6 +4,7 @@ using System.Text.Json;
 using System.Net.Mail;
 using BO;
 using System.Globalization;
+using BlImplementation;
 
 namespace Helpers
 {
@@ -584,7 +585,69 @@ namespace Helpers
         }
 
 
+        /// <summary>
+        /// Retrieves the status of a call by its ID.
+        /// </summary>
+        /// <param name="CallID"></param>
+        /// <returns></returns>
+        public static BO.Status GetStatusCall(int CallID)
+        {
+            lock (AdminManager.BlMutex)
+            {
+                var _call = new CallImplementation().GetCallDetails(CallID);
 
+                if (_call.DeadLine.HasValue && _call.DeadLine.Value < DateTime.Now)
+                {
+                    if (_call.Assignments != null && _call.Assignments.Any(a => a.EndType == BO.EndType.Completed))
+                    {
+                        return BO.Status.Completed;
+                    }
+                    else
+                    {
+                        return BO.Status.Expired;
+                    }
+                }
+
+                if (_call.Assignments != null && _call.Assignments.Any())
+                {
+                    var lastAssignment = _call.Assignments.Last();
+                    if (lastAssignment.EndType == BO.EndType.SelfCanceled)
+                    {
+                        return BO.Status.SelfCanceled;
+                    }
+                    else if (lastAssignment.EndType == BO.EndType.AdminCanceled)
+                    {
+                        return BO.Status.AdminCanceled;
+                    }
+                }
+
+                if (_call.Assignments != null && _call.Assignments.Any(a => a.EndTime == null))
+                {
+                    if ((DateTime.Now - _call.StartTime) >= AdminManager.RiskRange)
+                    {
+                        return BO.Status.InTreatmentAtRisk;
+                    }
+                    else
+                    {
+                        return BO.Status.InTreatment;
+                    }
+                }
+
+                if (_call.Assignments == null || !_call.Assignments.Any())
+                {
+                    if ((DateTime.Now - _call.StartTime) >= AdminManager.RiskRange)
+                    {
+                        return BO.Status.OpenAtRisk;
+                    }
+                    else
+                    {
+                        return BO.Status.Open;
+                    }
+                }
+
+                return BO.Status.None;
+            }
+        }
 
 
 
