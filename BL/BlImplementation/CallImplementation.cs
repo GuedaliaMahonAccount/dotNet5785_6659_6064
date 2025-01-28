@@ -469,12 +469,16 @@ namespace BlImplementation
             {
                 // Retrieve all calls from the DAL
                 var callsDO = _dal.Call.ReadAll();
-                //retrieve volunteer info
+                // Retrieve volunteer info
                 var volunteer = _dal.Volunteer.Read(volunteerId);
 
-                // Filter calls to include only open ones (or "open in risk")
+                // Filter calls to include only relevant ones (Open, OpenAtRisk, AdminCanceled, SelfCanceled)
                 var openCalls = callsDO
-                    .Where(call => call.CallType == DO.CallType.Open || call.CallType == DO.CallType.OpenAtRisk)
+                    .Where(call =>
+                        call.CallType == DO.CallType.Open ||
+                        call.CallType == DO.CallType.OpenAtRisk ||
+                        call.CallType == DO.CallType.AdminCanceled ||
+                        call.CallType == DO.CallType.SelfCanceled)
                     .Select(call => new BO.OpenCallInList
                     {
                         Id = call.Id,

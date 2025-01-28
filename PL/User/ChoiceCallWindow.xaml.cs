@@ -13,16 +13,16 @@ namespace PL.User
 
         public RelayCommand AssignCallCommand { get; }
 
-        public IEnumerable<BO.Call> CallList
+        public IEnumerable<BO.OpenCallInList> CallList
         {
-            get { return (IEnumerable<BO.Call>)GetValue(CallListProperty); }
+            get { return (IEnumerable<BO.OpenCallInList>)GetValue(CallListProperty); }
             set { SetValue(CallListProperty, value); }
         }
 
         public RelayCommand ShowDescriptionCommand { get; }
 
         public static readonly DependencyProperty CallListProperty =
-            DependencyProperty.Register("CallList", typeof(IEnumerable<BO.Call>),
+            DependencyProperty.Register("CallList", typeof(IEnumerable<BO.OpenCallInList>),
             typeof(ChoiceCallWindow), new PropertyMetadata(null));
 
         private readonly int _volunteerId;
@@ -58,7 +58,7 @@ namespace PL.User
 
             ShowDescriptionCommand = new RelayCommand(param =>
             {
-                if (param is BO.Call call)
+                if (param is BO.OpenCallInList call)
                 {
                     MessageBox.Show(call.Description, "Description", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
@@ -68,7 +68,7 @@ namespace PL.User
             {
                 if (param != null && CanAssignCall())
                 {
-                    AssignCall((int)param);
+                    AssignCall((int)param); // Pass the call ID as an int
                 }
                 else
                 {
@@ -76,20 +76,10 @@ namespace PL.User
                 }
             });
 
-            // Initialize and start the timer
-            _refreshTimer = new DispatcherTimer();
-            _refreshTimer.Interval = TimeSpan.FromSeconds(1); // Update every second
-            _refreshTimer.Tick += RefreshTimer_Tick;
-            _refreshTimer.Start();
-
             queryCallList();
             s_bl.Call.AddObserver(CallListObserver);
         }
 
-        private void RefreshTimer_Tick(object sender, EventArgs e)
-        {
-            queryCallList(); // Refresh the call list periodically
-        }
 
         private void queryCallList()
         {
@@ -100,24 +90,12 @@ namespace PL.User
                 {
                     try
                     {
-                        // Fetch initial list of calls
-                        var callIds = s_bl.Call.GetCallList()
-                            .Where(call => call.CallType == BO.CallType.Open
-                                           || call.CallType == BO.CallType.OpenAtRisk
-                                           || call.CallType == BO.CallType.AdminCanceled
-                                           || call.CallType == BO.CallType.SelfCanceled)
-                            .Select(call => call.CallId)
-                            .ToList();
-
-                        // Fetch full details for each call and calculate distance
-                        CallList = callIds
-                            .Select(callId =>
-                            {
-                                var call = s_bl.Call.GetCallDetails(callId.Value);
-                                double distance = s_bl.Call._CalculateDistance(callId.Value, _volunteerId);
-                                return call;
-                            })
-                            .ToList();
+                        // Directly use GetOpenCalls which returns OpenCallInList objects
+                        CallList = s_bl.Call.GetOpenCalls(
+                            _volunteerId,
+                            null, // No specific call type filter
+                            BO.ClosedCallSortField.Distance // Sort by distance
+                        ).ToList();
                     }
                     catch (Exception ex)
                     {
@@ -125,7 +103,7 @@ namespace PL.User
                     }
                     finally
                     {
-                        _isUpdating = false; // Reset the flag after the operation is done
+                        _isUpdating = false;
                     }
                 }));
             }
@@ -161,7 +139,6 @@ namespace PL.User
         {
             base.OnClosed(e);
             s_bl.Call.RemoveObserver(CallListObserver);
-            _refreshTimer.Stop(); // Stop the timer when the window is closed
         }
     }
 
