@@ -49,7 +49,7 @@ namespace PL.Volunteer
         private bool _isWindowLoaded = false;
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            _isWindowLoaded = true; // Indicate that the window has fully loaded
+            _isWindowLoaded = true;
             s_bl.Volunteer.AddObserver(() =>
             {
                 if (!_isUpdating)
@@ -59,21 +59,32 @@ namespace PL.Volunteer
                     {
                         try
                         {
-                            // Get all volunteers and filter them by CallType
                             _allVolunteers = s_bl.Volunteer.GetVolunteersList();
-                                
 
-                            // Apply additional filters
-                            FilterVolunteersByName(_currentNameFilter);
-                            FilterVolunteersByStatus(_currentStatusFilter);
+                            var filteredList = _allVolunteers;
+
+                            if (!string.IsNullOrEmpty(_currentNameFilter))
+                            {
+                                filteredList = filteredList.Where(volunteer =>
+                                    volunteer.Name.IndexOf(_currentNameFilter, StringComparison.OrdinalIgnoreCase) >= 0);
+                            }
+
+                            if (_currentStatusFilter != BO.CallType.None)
+                            {
+                                filteredList = filteredList.Where(volunteer =>
+                                    volunteer.CurrentCallType == _currentStatusFilter);
+                            }
+
+                            VolunteerList = filteredList.ToList();
                         }
                         catch (Exception ex)
                         {
-                            MessageBox.Show($"Error updating volunteer list: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                            MessageBox.Show($"Error updating volunteer list: {ex.Message}",
+                                "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                         }
                         finally
                         {
-                            _isUpdating = false; // Reset the flag after the operation is done
+                            _isUpdating = false;
                         }
                     }));
                 }
