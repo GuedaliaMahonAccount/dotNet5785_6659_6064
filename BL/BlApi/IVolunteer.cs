@@ -14,6 +14,8 @@ namespace BlApi
         Task AddVolunteerAsync(Volunteer volunteer);
         int FindVolunteerID(string name);
         List<BO.CallInProgress> GetCurrentCallsForVolunteer(int volunteerId);
+        Volunteer _GetVolunteerDetails(int volunteerId);
+
     }
 }
 

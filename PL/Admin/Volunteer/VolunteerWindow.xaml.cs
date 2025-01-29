@@ -59,7 +59,7 @@ namespace PL.Volunteer
             // Initialize CurrentVolunteer based on whether an ID is provided
             CurrentVolunteer = id == 0
                 ? new BO.Volunteer() // New Volunteer
-                : s_bl.Volunteer.GetVolunteerDetails(id); // Fetch existing Volunteer from BL
+                : s_bl.Volunteer._GetVolunteerDetails(id); // Fetch existing Volunteer from BL
 
             InitializeComponent();
 
@@ -86,7 +86,7 @@ namespace PL.Volunteer
                 {
                     if (CurrentVolunteer?.Id != null)
                     {
-                        var updatedVolunteer = s_bl.Volunteer.GetVolunteerDetails(CurrentVolunteer.Id);
+                        var updatedVolunteer = s_bl.Volunteer._GetVolunteerDetails(CurrentVolunteer.Id);
                         if (updatedVolunteer != null)
                         {
                             CurrentVolunteer = updatedVolunteer;

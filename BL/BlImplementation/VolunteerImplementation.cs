@@ -619,6 +619,78 @@ internal class VolunteerImplementation : BlApi.IVolunteer
             return currentCalls;
         }
     }
+        
+
+
+
+
+          public BO.Volunteer _GetVolunteerDetails(int volunteerId)
+    {
+        lock (AdminManager.BlMutex)
+        {
+            // Retrieve all volunteers from the DAL
+            var volunteersFromDal = _dal.Volunteer.ReadAll();
+
+            // Find the specific volunteer by ID
+            var volunteerData = volunteersFromDal.FirstOrDefault(v => v.Id == volunteerId);
+
+            if (volunteerData == null)
+            {
+                // Volunteer not found
+                throw new BlDoesNotExistException($"Volunteer with ID {volunteerId} not found.");
+            }
+
+            // Map the DO.Volunteer data to a BO.Volunteer object
+            var volunteer = new BO.Volunteer
+            {
+                Id = volunteerData.Id,
+                Name = volunteerData.Name,
+                Phone = volunteerData.Phone,
+                Email = volunteerData.Email,
+                IsActive = volunteerData.IsActive,
+                Role = (BO.Role)volunteerData.Role,
+                DistanceType = (BO.DistanceType)volunteerData.DistanceType,
+                Address = volunteerData.Address,
+                Latitude = volunteerData.Latitude,
+                Longitude = volunteerData.Longitude,
+                MaxDistance = volunteerData.MaxDistance,
+                Password = AesEncryptionHelper.Decrypt(volunteerData.Password), 
+                CurrentCall = null // Initialize as null
+            };
+
+            // Check if the volunteer has an active assignment
+            var assignments = _dal.Assignment.ReadAll();
+            var activeAssignment = assignments.FirstOrDefault(a => a.VolunteerId == volunteerId && a.EndTime == null);
+
+            if (activeAssignment != null)
+            {
+                // Retrieve the associated call from the DAL
+                var callData = _dal.Call.Read(activeAssignment.CallId);
+
+                // Map the active assignment and call to BO.CallInProgress
+                var callInProgress = new BO.CallInProgress
+                {
+                    Id = activeAssignment.Id,
+                    CallId = callData.Id,
+                    CallType = (BO.CallType)callData.CallType,
+                    GeneralDescription = callData.Description,
+                    Address = callData.Address,
+                    StartTime = callData.StartTime,
+                    EstimatedCompletionTime = activeAssignment.EndTime,
+                    AssignmentStartTime = activeAssignment.StartTime,
+                    Distance = VolunteerManager.CalculateDistance(volunteerData.Latitude, volunteerData.Longitude, callData.Latitude, callData.Longitude),
+                    Status = CallManager.GetStatusCall(callData.Id)
+                };
+
+                // Assign the call in progress to the volunteer
+                volunteer.CurrentCall = callInProgress;
+            }
+            return volunteer;
+        }
+    }
+    
+
+
 
 
 
