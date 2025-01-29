@@ -534,7 +534,7 @@ Option Options:
             // Update the volunteer using the BL
             try
             {
-                s_bl.Volunteer.UpdateVolunteer(requesterId, volunteer);
+                s_bl.Volunteer.UpdateVolunteerAsync(requesterId, volunteer);
                 Console.WriteLine("Volunteer with ID {0} has been updated successfully.", volunteerId);
             }
             catch (Exception ex)
@@ -618,7 +618,7 @@ Option Options:
 
             try
             {
-                s_bl.Volunteer.AddVolunteer(volunteer);
+                s_bl.Volunteer.AddVolunteerAsync(volunteer);
                 Console.WriteLine("Volunteer added successfully.");
             }
             catch (BO.BlInvalidValueException ex)
@@ -667,7 +667,7 @@ Option Options:
         {
             try
             {
-                CallType? callType = null;
+                Status? callType = null;
                 BO.CallSortField? sortField = null;
 
                 while (true)
@@ -699,10 +699,10 @@ Option Options:
                         case 1: // Get All Calls
                             break;
                         case 2: // Open Calls
-                            callType = CallType.Open;
+                            callType = Status.Open;
                             break;
                         case 3: // Closed Calls
-                            callType = CallType.Completed;
+                            callType = Status.Completed;
                             break;
                         case 4: // Sort by Call Type
                             sortField = BO.CallSortField.CallType;
@@ -823,7 +823,7 @@ Option Options:
                     if (DateTime.TryParse(Console.ReadLine(), out DateTime deadline))
                         call.DeadLine = deadline;
 
-                    s_bl.Call.UpdateCall(call);
+                    s_bl.Call.UpdateCallAsync(call);
                     Console.WriteLine("Call updated successfully.");
                 }
                 catch (Exception ex)
@@ -868,7 +868,7 @@ Option Options:
         {
             Call call = new()
             {
-                CallType = CallType.Open
+                CallType = CallType.None
             };
 
             // Prompt for Address
@@ -949,7 +949,7 @@ Option Options:
                 }
             }
 
-            s_bl.Call.AddCall(call);
+            s_bl.Call.AddCallAsync(call);
         }
 
         /// <summary>
@@ -1115,7 +1115,7 @@ Option Options:
                 {
                     try
                     {
-                        s_bl.Call.selectionCall(volunteerId, callId);
+                        s_bl.Call.selectionCall(volunteerId, callId, true);
                         Console.WriteLine("Volunteer successfully assigned to call.");
                     }
                     catch (Exception ex)
@@ -1232,7 +1232,7 @@ Option Options:
         {
             try
             {
-                s_bl.Admin.ResetDatabase();
+                s_bl.Admin.ResetDB();
                 Console.WriteLine("Database reset successfully.");
             }
             catch (Exception ex)
@@ -1248,7 +1248,7 @@ Option Options:
         {
             try
             {
-                s_bl.Admin.InitializeDatabase();
+                s_bl.Admin.InitializeDB();
                 Console.WriteLine("Database initialized successfully.");
             }
             catch (Exception ex)
