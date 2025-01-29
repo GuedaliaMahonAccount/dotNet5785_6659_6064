@@ -102,9 +102,15 @@ namespace BlImplementation
                 var assignmentDO = _dal.Assignment.Read(assignmentId)
                     ?? throw new BlDoesNotExistException($"No assignment found with ID: {assignmentId}");
 
-                // Validate the requester
-                if (requesterId != assignmentDO.VolunteerId)
+                // Fetch the requester details to check if they are an admin
+                var requester = _dal.Volunteer.Read(requesterId)
+                    ?? throw new BlDoesNotExistException($"No volunteer found with ID: {requesterId}");
+
+                // Check if the requester is authorized to cancel (either the volunteer assigned OR an admin)
+                if (requesterId != assignmentDO.VolunteerId && requester.Role != DO.Role.Admin)
+                {
                     throw new BlInvalidRoleException("Requester is not authorized to cancel this assignment.");
+                }
 
                 // Ensure the assignment is not already completed
                 if (assignmentDO.EndType != null && (BO.EndType)assignmentDO.EndType == BO.EndType.Completed)
@@ -179,7 +185,6 @@ namespace BlImplementation
             CallManager.Observers.NotifyListUpdated();
         }
 
-
         /// <summary>
         /// Deletes a call from the system. 
         /// Ensures the call is in an open state and has not been assigned to any volunteer before deletion.
@@ -191,24 +196,39 @@ namespace BlImplementation
         public void DeleteCall(int callId)
         {
             AdminManager.ThrowOnSimulatorIsRunning();
+
             lock (AdminManager.BlMutex)
             {
+                // Check if the call exists in the database
                 var callDO = _dal.Call.Read(callId)
                     ?? throw new BlDoesNotExistException($"No call found with ID: {callId}");
 
+                // Ensure the call is in 'Open' status
                 if (CallManager.GetStatusCall(callDO.Id) != BO.Status.Open)
+                {
                     throw new BlInvalidValueException("Cannot delete a call that is not in 'Open' status.");
+                }
 
-                var assignments = _dal.Assignment.ReadAll()
-                    .Where(assignment => assignment.CallId == callId);
-
-                if (assignments.Any())
+                // Ensure the call was NEVER assigned to any volunteer
+                var hasAssignments = _dal.Assignment.ReadAll().Any(a => a.CallId == callId);
+                if (hasAssignments)
+                {
                     throw new BlDeletionImpossibleException("Cannot delete a call that has been assigned to a volunteer.");
+                }
 
-                _dal.Call.Delete(callId);
+                // Attempt to delete the call from the database
+                try
+                {
+                    _dal.Call.Delete(callId);
+                }
+                catch (Exception ex)
+                {
+                    throw new BlDoesNotExistException($"Failed to delete call {callId}: {ex.Message}");
+                }
             }
-            CallManager.Observers.NotifyListUpdated();
 
+            // Notify observers to refresh UI
+            CallManager.Observers.NotifyListUpdated();
         }
 
         /// <summary>

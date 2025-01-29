@@ -38,7 +38,7 @@ internal class VolunteerImplementation : BlApi.IVolunteer
             // Retrieve all volunteers from the DAL
             var volunteersFromDal = _dal.Volunteer.ReadAll();
 
-                       // Find the volunteer with matching username and encrypted password
+            // Find the volunteer with matching username and encrypted password
             var vol = volunteersFromDal.FirstOrDefault(v => v.Name == username && v.Password == encryptedPassword);
 
             if (vol == null)
@@ -130,6 +130,12 @@ internal class VolunteerImplementation : BlApi.IVolunteer
         }
     }
 
+    /// <summary>
+    /// Retrieves the details of a specific volunteer, including general information and any current call in progress.
+    /// </summary>
+    /// <param name="name"></param>
+    /// <returns></returns>
+    /// <exception cref="BlDoesNotExistException"></exception>
     public int FindVolunteerID(string name)
     {
         lock (AdminManager.BlMutex)
@@ -564,19 +570,6 @@ internal class VolunteerImplementation : BlApi.IVolunteer
         }
     }
 
-    private static bool IsEncrypted(string password)
-    {
-        try
-        {
-            Convert.FromBase64String(password);
-            return true;
-        }
-        catch
-        {
-            return false;
-        }
-    }
-
     /// <summary>
     /// Retrieves all current calls assigned to a volunteer.
     /// </summary>
@@ -619,12 +612,14 @@ internal class VolunteerImplementation : BlApi.IVolunteer
             return currentCalls;
         }
     }
-        
 
-
-
-
-          public BO.Volunteer _GetVolunteerDetails(int volunteerId)
+    /// <summary>
+    /// Retrieves the details of a specific volunteer, including general information and any current call in progress.
+    /// </summary>
+    /// <param name="volunteerId"></param>
+    /// <returns></returns>
+    /// <exception cref="BlDoesNotExistException"></exception>
+    public BO.Volunteer _GetVolunteerDetails(int volunteerId)
     {
         lock (AdminManager.BlMutex)
         {
@@ -654,7 +649,7 @@ internal class VolunteerImplementation : BlApi.IVolunteer
                 Latitude = volunteerData.Latitude,
                 Longitude = volunteerData.Longitude,
                 MaxDistance = volunteerData.MaxDistance,
-                Password = AesEncryptionHelper.Decrypt(volunteerData.Password), 
+                Password = AesEncryptionHelper.Decrypt(volunteerData.Password),
                 CurrentCall = null // Initialize as null
             };
 
@@ -688,8 +683,24 @@ internal class VolunteerImplementation : BlApi.IVolunteer
             return volunteer;
         }
     }
-    
 
+    /// <summary>
+    /// Retrieves the details of a specific volunteer, including general information and any current call in progress.
+    /// </summary>
+    /// <returns></returns>
+    /// <exception cref="BlDoesNotExistException"></exception>
+    public int GetAdminId()
+    {
+        lock (AdminManager.BlMutex)
+        {
+            var admin = _dal.Volunteer.ReadAll().FirstOrDefault(v => v.Role == DO.Role.Admin);
+            if (admin == null)
+            {
+                throw new BlDoesNotExistException("No admin found in the system.");
+            }
+            return admin.Id;
+        }
+    }
 
 
 

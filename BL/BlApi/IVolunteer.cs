@@ -15,6 +15,7 @@ namespace BlApi
         int FindVolunteerID(string name);
         List<BO.CallInProgress> GetCurrentCallsForVolunteer(int volunteerId);
         Volunteer _GetVolunteerDetails(int volunteerId);
+        int GetAdminId();
 
     }
 }

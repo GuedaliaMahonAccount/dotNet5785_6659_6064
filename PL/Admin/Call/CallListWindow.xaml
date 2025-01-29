@@ -42,18 +42,18 @@
 
         <!-- DataGrid for Calls -->
         <DataGrid Grid.Row="1" ItemsSource="{Binding CallList}"
-                  IsReadOnly="True" AutoGenerateColumns="False"
-                  EnableRowVirtualization="True"
-                  RowDetailsVisibilityMode="VisibleWhenSelected"
-                  SelectedItem="{Binding SelectedCall}"
-                  MouseDoubleClick="lsvCallList_MouseDoubleClick">
+          IsReadOnly="True" AutoGenerateColumns="False"
+          EnableRowVirtualization="True"
+          RowDetailsVisibilityMode="VisibleWhenSelected"
+          SelectedItem="{Binding SelectedCall}"
+          MouseDoubleClick="lsvCallList_MouseDoubleClick">
             <DataGrid.Columns>
                 <DataGridTextColumn Binding="{Binding CallId}" Header="Id" Width="Auto" />
                 <DataGridTemplateColumn Header="Status" Width="Auto">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding Status}" FontSize="16"
-                                       Foreground="{Binding Status, Converter={StaticResource CallTypeToColorConverter}}" />
+                               Foreground="{Binding Status, Converter={StaticResource CallTypeToColorConverter}}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
@@ -71,6 +71,26 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
+
+                <!-- Action Buttons Column -->
+                <DataGridTemplateColumn Header="Actions" Width="200">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                <!-- Delete Button -->
+                                <Button Content="Delete" Foreground="White" Background="Red" Width="70"
+                                Click="DeleteCall_Click"
+                                Tag="{Binding CallId}" Margin="5,0,5,0" />
+
+                                <!-- Cancel (By Admin) Button -->
+                                <Button Content="Cancel" Foreground="White" Background="Orange" Width="70"
+                                Click="CancelCall_Click"
+                                Tag="{Binding CallId}" Margin="5,0,5,0" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
             </DataGrid.Columns>
         </DataGrid>
 

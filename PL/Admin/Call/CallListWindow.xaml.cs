@@ -150,6 +150,81 @@ namespace PL.Call
             }
         }
 
+
+        /// <summary>
+        /// Event handler for the Delete button in the DataGrid
+        /// </summary>
+        private void DeleteCall_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button button && button.Tag is int callId)
+            {
+                try
+                {
+                    // Confirm deletion
+                    var result = MessageBox.Show($"Are you sure you want to delete call {callId}?", "Confirm Deletion",
+                        MessageBoxButton.YesNo, MessageBoxImage.Warning);
+
+                    if (result == MessageBoxResult.Yes)
+                    {
+                        s_bl.Call.DeleteCall(callId);
+                        queryCallList(); // Refresh the call list
+                    }
+                }
+                catch (BO.BlInvalidValueException ex)
+                {
+                    MessageBox.Show($"Cannot delete this call: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+                catch (BO.BlDeletionImpossibleException ex)
+                {
+                    MessageBox.Show($"This call cannot be deleted: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Unexpected error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Event handler for the Cancel (by Admin) button in the DataGrid
+        /// </summary>
+        private void CancelCall_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button button && button.Tag is int callId)
+            {
+                try
+                {
+                    int adminId = s_bl.Volunteer.GetAdminId(); // Fetch admin ID dynamically
+
+                    // Confirm cancellation
+                    var result = MessageBox.Show($"Are you sure you want to cancel call {callId}?", "Confirm Cancellation",
+                        MessageBoxButton.YesNo, MessageBoxImage.Warning);
+
+                    if (result == MessageBoxResult.Yes)
+                    {
+                        s_bl.Call.CancelCall(adminId, callId);
+                        queryCallList(); // Refresh the call list
+                    }
+                }
+                catch (BO.BlDoesNotExistException ex)
+                {
+                    MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+                catch (BO.BlInvalidRoleException ex)
+                {
+                    MessageBox.Show($"Permission Denied: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+                catch (BO.BlInvalidValueException ex)
+                {
+                    MessageBox.Show($"Invalid operation: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Unexpected error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+        }
+
     }
 
     public class TimeSpanToLabeledStringConverter : IValueConverter
