@@ -93,7 +93,7 @@ namespace PL
             }
             else
             {
-                s_bl.Admin.StartSimulator(Interval);
+                s_bl.Admin.StartSimulator(Interval / 60);
                 IsSimulatorRunning = true;
                 SimulatorButtonText = "Stop Simulator";
             }
