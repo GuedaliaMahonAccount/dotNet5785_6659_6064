@@ -138,9 +138,22 @@ namespace PL
         // Open the history window
         private void ViewHistory_Click(object sender, RoutedEventArgs e)
         {
-            var historyWindow = new HistoryCallWindow(CurrentUser.Name);
-            historyWindow.Show();
+            try
+            {
+                s_bl.Admin.checkSimulator();
+                var historyWindow = new HistoryCallWindow(CurrentUser.Name);
+                historyWindow.Show();
+            }
+            catch (BO.BLTemporaryNotAvailableException ex)
+            {
+                MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"An unexpected error occurred: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
+
 
         // Open the call selection window
         private void ChooseCall_Click(object sender, RoutedEventArgs e)
