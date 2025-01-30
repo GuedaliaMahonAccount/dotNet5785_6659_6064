@@ -451,6 +451,11 @@ internal class VolunteerImplementation : BlApi.IVolunteer
 
             // Attempt to delete the volunteer
             _dal.Volunteer.Delete(volunteerId);
+            var assignments = _dal.Assignment.ReadAll().Where(a => a.VolunteerId == volunteerId);
+            foreach (var assignment in assignments)
+            {
+                _dal.Assignment.Delete(assignment.Id);
+            }
             VolunteerManager.Observers.NotifyListUpdated();
         }
     }
