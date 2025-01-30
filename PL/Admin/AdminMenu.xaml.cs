@@ -335,14 +335,16 @@ namespace PL
             {
                 s_bl.Admin.StopSimulator();
             }
-
-            var result = MessageBox.Show("Are you sure you want to close this window?",
-                                         "Confirm Close",
-                                         MessageBoxButton.YesNo,
-                                         MessageBoxImage.Question);
-            if (result == MessageBoxResult.No)
+            if (!Login.isMainWindowClosing)
             {
-                e.Cancel = true;
+                var result = MessageBox.Show("Are you sure you want to close this window?",
+                                             "Confirm Close",
+                                             MessageBoxButton.YesNo,
+                                             MessageBoxImage.Question);
+                if (result == MessageBoxResult.No)
+                {
+                    e.Cancel = true;
+                }
             }
         }
 

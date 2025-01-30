@@ -28,20 +28,41 @@ namespace PL
         {
         }
 
+
+
+        internal static bool isMainWindowClosing = false;
+
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            var result = MessageBox.Show("Are you sure you want to close this window?",
-                                         "Confirm Close",
-                                         MessageBoxButton.YesNo,
-                                         MessageBoxImage.Question);
-
-            if (result == MessageBoxResult.No)
+            if (sender == Application.Current.MainWindow)
             {
-                e.Cancel = true;
+                var result = MessageBox.Show("Are you sure you want to close this window?",
+                                              "Confirm Close",
+                                              MessageBoxButton.YesNo,
+                                              MessageBoxImage.Question);
+
+                if (result == MessageBoxResult.No)
+                {
+                    e.Cancel = true;
+                }
+                else
+                {
+                    isMainWindowClosing = true; 
+                    Application.Current.Shutdown();
+                }
+            }
+            else
+            {
+                if (isMainWindowClosing)
+                {
+                    e.Cancel = false;
+                }
             }
         }
 
-      
+
+
+
 
         private void LoginButton_Click(object sender, RoutedEventArgs e)
         {
