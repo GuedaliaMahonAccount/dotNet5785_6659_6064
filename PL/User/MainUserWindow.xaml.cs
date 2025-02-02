@@ -6,6 +6,7 @@ using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Threading;
 using BO;
+using PL.Volunteer;
 
 namespace PL
 {
@@ -95,8 +96,8 @@ namespace PL
             }
         }
 
-        public ICommand CompleteCallCommand => new RelayCommand(CompleteCall);
-        public ICommand CancelCallCommand => new RelayCommand(CancelCall);
+        public ICommand CompleteCallCommand => new User.RelayCommand(CompleteCall);
+        public ICommand CancelCallCommand => new User.RelayCommand(CancelCall);
 
         // Adjust methods to handle the `object` parameter
         private void CompleteCall(object parameter)
@@ -168,6 +169,15 @@ namespace PL
             base.OnClosed(e);
             s_bl.Call.RemoveObserver(CallObserver); // Remove observer to prevent memory leaks
         }
+
+        private void UpdateVolunteer_Click(object sender, RoutedEventArgs e)
+        {
+            if (CurrentUser != null)
+            {
+               new VolunteerWindow(CurrentUser.Id).Show();
+            }
+        }
+
     }
 
     public class CountToVisibilityConverter : IValueConverter
