@@ -400,9 +400,10 @@ internal class VolunteerImplementation : BlApi.IVolunteer
                 Address = updatedVolunteer.Address,
                 Latitude = updatedVolunteer.Latitude.Value,
                 Longitude = updatedVolunteer.Longitude.Value,
+                MaxDistance = updatedVolunteer.MaxDistance.Value,
                 Role = (DO.Role)updatedVolunteer.Role,
                 IsActive = updatedVolunteer.IsActive
-            };
+            }; 
 
             // Save updates to the database
             lock (AdminManager.BlMutex)
