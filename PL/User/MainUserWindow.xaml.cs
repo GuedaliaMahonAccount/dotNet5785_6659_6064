@@ -7,14 +7,30 @@ using System.Windows.Input;
 using System.Windows.Threading;
 using BO;
 using PL.Volunteer;
+using System.ComponentModel;
 
 namespace PL
 {
-    public partial class MainUserWindow : Window
+    public partial class MainUserWindow : Window, INotifyPropertyChanged
     {
         static readonly BlApi.IBl s_bl = BlApi.Factory.Get();
 
-        public BO.Volunteer CurrentUser { get; set; }
+        private BO.Volunteer _currentUser;
+        public BO.Volunteer CurrentUser
+        {
+            get { return _currentUser; }
+            set
+            {
+                if (_currentUser != value)
+                {
+                    _currentUser = value;
+                    OnPropertyChanged(nameof(CurrentUser)); // הפעלת האירוע PropertyChanged
+                }
+            }
+        }
+
+
+
         public ObservableCollection<BO.CallInProgress> CurrentCalls
         {
             get { return (ObservableCollection<BO.CallInProgress>)GetValue(CurrentCallsProperty); }
@@ -155,13 +171,14 @@ namespace PL
             }
         }
 
-
         // Open the call selection window
         private void ChooseCall_Click(object sender, RoutedEventArgs e)
         {
             var choiceWindow = new ChoiceCallWindow(CurrentUser.Id);
             choiceWindow.Show();
         }
+
+
 
         // Cleanup when the window is closed
         protected override void OnClosed(EventArgs e)
@@ -174,10 +191,22 @@ namespace PL
         {
             if (CurrentUser != null)
             {
-               new VolunteerWindow(CurrentUser.Id).Show();
+                var volunteerWindow = new VolunteerWindow(CurrentUser.Id);
+                volunteerWindow.VolunteerUpdated += (updatedVolunteer) =>
+                {
+                    CurrentUser = updatedVolunteer;
+                };
+                volunteerWindow.Show();
             }
         }
 
+        // Implement INotifyPropertyChanged
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
     }
 
     public class CountToVisibilityConverter : IValueConverter
