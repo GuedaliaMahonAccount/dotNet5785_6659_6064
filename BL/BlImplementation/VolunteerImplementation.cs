@@ -713,7 +713,6 @@ internal class VolunteerImplementation : BlApi.IVolunteer
 
 
 
-
     // ...
     #region Stage 5
     public void AddObserver(Action listObserver) =>
