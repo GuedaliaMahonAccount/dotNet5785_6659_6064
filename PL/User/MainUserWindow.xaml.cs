@@ -192,13 +192,30 @@ namespace PL
             if (CurrentUser != null)
             {
                 var volunteerWindow = new VolunteerWindow(CurrentUser.Id);
+
+                // Check if the window is still open before proceeding
+                //if (!volunteerWindow.IsLoaded)
+                //{
+                //    return; // Exit if the window was closed due to an error
+                //}
+
                 volunteerWindow.VolunteerUpdated += (updatedVolunteer) =>
                 {
                     CurrentUser = updatedVolunteer;
                 };
-                volunteerWindow.Show();
+
+                try
+                {
+                    volunteerWindow.Show();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"An unexpected error occurred: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+
             }
         }
+
 
         // Implement INotifyPropertyChanged
         public event PropertyChangedEventHandler PropertyChanged;
