@@ -55,21 +55,44 @@ namespace PL.Volunteer
 
         public VolunteerWindow(int id = 0)
         {
-            TogglePasswordVisibilityCommand = new RelayCommand(() => IsPasswordVisible = !IsPasswordVisible);
+            try
+            {
+                TogglePasswordVisibilityCommand = new RelayCommand(() => IsPasswordVisible = !IsPasswordVisible);
 
-            ButtonText = id == 0 ? "Add" : "Update";
+                ButtonText = id == 0 ? "Add" : "Update";
 
-            // Initialize CurrentVolunteer based on whether an ID is provided
-            CurrentVolunteer = id == 0
-                ? new BO.Volunteer() // New Volunteer
-                : s_bl.Volunteer._GetVolunteerDetails(id); // Fetch existing Volunteer from BL
+                // Initialize CurrentVolunteer with error handling
+                if (id == 0)
+                {
+                    CurrentVolunteer = new BO.Volunteer(); // New Volunteer
+                }
+                else
+                {
+                    try
+                    {
+                        CurrentVolunteer = s_bl.Volunteer._GetVolunteerDetails(id); // Fetch existing Volunteer from BL
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"An error occurred while retrieving volunteer details: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        Close(); // Close the window if an error occurs
+                        return; // Ensure the rest of the constructor is not executed
+                    }
+                }
 
-            InitializeComponent();
+                InitializeComponent();
 
-            // Attach event handlers for loading and closing
-            Loaded += VolunteerWindow_Loaded;
-            Closed += VolunteerWindow_Closed;
+                // Attach event handlers for loading and closing
+                Loaded += VolunteerWindow_Loaded;
+                Closed += VolunteerWindow_Closed;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"An unexpected error occurred: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                Close(); // Close the window if an unexpected error occurs
+            }
         }
+
 
         private void VolunteerWindow_Loaded(object sender, RoutedEventArgs e)
         {

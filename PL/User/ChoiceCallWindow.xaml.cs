@@ -51,33 +51,50 @@ namespace PL.User
 
         public ChoiceCallWindow(int volunteerId)
         {
-            InitializeComponent();
-            _volunteerId = volunteerId;
-
-            DataContext = this;
-
-            ShowDescriptionCommand = new RelayCommand(param =>
+            try
             {
-                if (param is BO.OpenCallInList call)
-                {
-                    MessageBox.Show(call.Description, "Description", MessageBoxButton.OK, MessageBoxImage.Information);
-                }
-            });
+                InitializeComponent();
+                _volunteerId = volunteerId;
 
-            AssignCallCommand = new RelayCommand(param =>
+                DataContext = this;
+
+                // Ensure the volunteer exists before proceeding
+                var volunteer = s_bl.Volunteer._GetVolunteerDetails(volunteerId);
+                if (volunteer == null)
+                {
+                    MessageBox.Show("The selected volunteer no longer exists.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    Close(); // Close the window if the volunteer does not exist
+                    return;
+                }
+
+                ShowDescriptionCommand = new RelayCommand(param =>
+                {
+                    if (param is BO.OpenCallInList call)
+                    {
+                        MessageBox.Show(call.Description, "Description", MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
+                });
+
+                AssignCallCommand = new RelayCommand(param =>
+                {
+                    if (param != null && CanAssignCall())
+                    {
+                        AssignCall((int)param); // Pass the call ID as an int
+                    }
+                    else
+                    {
+                        MessageBox.Show("You already have an active call and cannot assign a new one.", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
+                });
+
+                queryCallList();
+                s_bl.Call.AddObserver(CallListObserver);
+            }
+            catch (Exception ex)
             {
-                if (param != null && CanAssignCall())
-                {
-                    AssignCall((int)param); // Pass the call ID as an int
-                }
-                else
-                {
-                    MessageBox.Show("You already have an active call and cannot assign a new one.", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
-                }
-            });
-
-            queryCallList();
-            s_bl.Call.AddObserver(CallListObserver);
+                MessageBox.Show($"An error occurred: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                Close(); // Ensure the window does not open if there is an error
+            }
         }
 
 
