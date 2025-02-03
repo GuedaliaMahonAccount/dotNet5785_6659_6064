@@ -402,8 +402,8 @@ internal class VolunteerImplementation : BlApi.IVolunteer
                 Longitude = updatedVolunteer.Longitude.Value,
                 MaxDistance = updatedVolunteer.MaxDistance.Value,
                 Role = (DO.Role)updatedVolunteer.Role,
-                DistanceType = (DO.DistanceType)updatedVolunteer.DistanceType,
-                IsActive = updatedVolunteer.IsActive
+                IsActive = updatedVolunteer.IsActive,
+                DistanceType = (DO.DistanceType)updatedVolunteer.DistanceType
             }; 
 
             // Save updates to the database
