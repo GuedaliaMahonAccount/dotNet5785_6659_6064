@@ -25,7 +25,7 @@ namespace PL.Volunteer
             }
         }
 
-        public event Action<BO.Volunteer> VolunteerUpdated;
+        public static event Action<BO.Volunteer> VolunteerUpdated;
 
 
         public ICommand TogglePasswordVisibilityCommand { get; }
@@ -143,7 +143,6 @@ namespace PL.Volunteer
                     await s_bl.Volunteer.UpdateVolunteerAsync(CurrentVolunteer.Id, CurrentVolunteer); // Wait for the asynchronous update
                     MessageBox.Show("Volunteer updated successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
                     VolunteerUpdated?.Invoke(CurrentVolunteer);
-
                 }
 
                 Close(); // Close the window after success
