@@ -402,6 +402,7 @@ internal class VolunteerImplementation : BlApi.IVolunteer
                 Longitude = updatedVolunteer.Longitude.Value,
                 MaxDistance = updatedVolunteer.MaxDistance.Value,
                 Role = (DO.Role)updatedVolunteer.Role,
+                DistanceType = (DO.DistanceType)updatedVolunteer.DistanceType,
                 IsActive = updatedVolunteer.IsActive
             }; 
 
@@ -553,7 +554,9 @@ internal class VolunteerImplementation : BlApi.IVolunteer
                 Latitude = newvolunteer.Latitude.Value,
                 Longitude = newvolunteer.Longitude.Value,
                 Role = (DO.Role)newvolunteer.Role,
-                IsActive = newvolunteer.IsActive
+                IsActive = newvolunteer.IsActive,
+                MaxDistance = newvolunteer.MaxDistance,
+                DistanceType = (DO.DistanceType)newvolunteer.DistanceType
             };
 
             // Check if a volunteer with the same ID already exists

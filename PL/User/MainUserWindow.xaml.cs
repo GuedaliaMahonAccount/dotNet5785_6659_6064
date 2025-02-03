@@ -24,7 +24,7 @@ namespace PL
                 if (_currentUser != value)
                 {
                     _currentUser = value;
-                    OnPropertyChanged(nameof(CurrentUser)); // הפעלת האירוע PropertyChanged
+                    OnPropertyChanged(nameof(CurrentUser)); // event PropertyChanged
                 }
             }
         }
