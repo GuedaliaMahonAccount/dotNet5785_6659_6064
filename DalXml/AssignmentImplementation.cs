@@ -15,9 +15,15 @@ internal class AssignmentImplementation : IAssignment
             Id = (int?)a.Element("Id") ?? throw new FormatException("Unable to parse Id"),
             CallId = (int?)a.Element("CallId") ?? throw new FormatException("Unable to parse CallId"),
             VolunteerId = (int?)a.Element("VolunteerId") ?? throw new FormatException("Unable to parse VolunteerId"),
-            StartTime = (DateTime?)a.Element("StartTime") ?? throw new FormatException("Unable to parse StartTime"),
-            EndTime = (DateTime?)a.Element("EndTime"),
-            EndType = Enum.TryParse((string?)a.Element("EndType"), out EndType endType) ? endType : null
+            StartTime = DateTime.TryParse((string?)a.Element("StartTime"), out DateTime startTime)
+        ? startTime
+        : throw new FormatException("Unable to parse StartTime"),
+            EndTime = DateTime.TryParse((string?)a.Element("EndTime"), out DateTime endTime)
+        ? endTime
+        : null, // Allows null values
+            EndType = Enum.TryParse((string?)a.Element("EndType"), out EndType endType)
+        ? endType
+        : null
         };
     }
 
